@@ -1,0 +1,1 @@
+{"records":[{"id":"a","name":"Example"},{"id":"a","name":""}],"required_fields":["/name"],"unique_fields":["/id"],"expected_count":3,"job_status":"completed","next_cursor":"page-2","truncated":false}

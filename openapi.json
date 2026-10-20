@@ -1,0 +1,271 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "ResultGate authenticated local API",
+    "version": "0.1.1"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:8765"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  },
+  "paths": {
+    "/v1/extraction": {
+      "post": {
+        "operationId": "check_extraction",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "records": {
+                    "items": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "maxItems": 5000,
+                    "title": "Records",
+                    "type": "array"
+                  },
+                  "required_fields": {
+                    "description": "RFC6901 pointers, e.g. /name",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 64,
+                    "title": "Required Fields",
+                    "type": "array"
+                  },
+                  "unique_fields": {
+                    "description": "Composite unique key pointers",
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 64,
+                    "title": "Unique Fields",
+                    "type": "array"
+                  },
+                  "expected_count": {
+                    "description": "Total expected records in the whole supplied dataset, not a single page",
+                    "minimum": 0,
+                    "title": "Expected Count",
+                    "type": "integer"
+                  },
+                  "job_status": {
+                    "default": "unknown",
+                    "enum": [
+                      "completed",
+                      "failed",
+                      "cancelled",
+                      "scraping",
+                      "unknown"
+                    ],
+                    "title": "Job Status",
+                    "type": "string"
+                  },
+                  "next_cursor": {
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Explicit null means no remaining page; omission means unknown",
+                    "title": "Next Cursor"
+                  },
+                  "seen_cursors": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 5000,
+                    "title": "Seen Cursors",
+                    "type": "array"
+                  },
+                  "truncated": {
+                    "description": "Explicit false if caller knows no truncation occurred",
+                    "title": "Truncated",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "records"
+                ],
+                "title": "ExtractionInput",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contract audit, never a truth guarantee"
+          },
+          "400": {
+            "description": "Invalid Host"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Browser Origin rejected"
+          },
+          "408": {
+            "description": "Body timeout"
+          },
+          "413": {
+            "description": "Body too large"
+          },
+          "415": {
+            "description": "Content type must be application/json"
+          },
+          "422": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/v1/citations": {
+      "post": {
+        "operationId": "check_citations",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "sources": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "maxLength": 256,
+                          "minLength": 1,
+                          "title": "Id",
+                          "type": "string"
+                        },
+                        "text": {
+                          "title": "Text",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "text"
+                      ],
+                      "title": "Source",
+                      "type": "object"
+                    },
+                    "maxItems": 100,
+                    "title": "Sources",
+                    "type": "array"
+                  },
+                  "citations": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "source_id": {
+                          "maxLength": 256,
+                          "minLength": 1,
+                          "title": "Source Id",
+                          "type": "string"
+                        },
+                        "quote": {
+                          "maxLength": 10000,
+                          "minLength": 1,
+                          "title": "Quote",
+                          "type": "string"
+                        },
+                        "start": {
+                          "minimum": 0,
+                          "title": "Start",
+                          "type": "integer"
+                        },
+                        "end": {
+                          "minimum": 1,
+                          "title": "End",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "source_id",
+                        "quote"
+                      ],
+                      "title": "Citation",
+                      "type": "object"
+                    },
+                    "maxItems": 1000,
+                    "title": "Citations",
+                    "type": "array"
+                  },
+                  "required_source_ids": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 100,
+                    "title": "Required Source Ids",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "sources",
+                  "citations"
+                ],
+                "title": "CitationInput",
+                "type": "object"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Contract audit, never a truth guarantee"
+          },
+          "400": {
+            "description": "Invalid Host"
+          },
+          "401": {
+            "description": "Missing or invalid bearer token"
+          },
+          "403": {
+            "description": "Browser Origin rejected"
+          },
+          "408": {
+            "description": "Body timeout"
+          },
+          "413": {
+            "description": "Body too large"
+          },
+          "415": {
+            "description": "Content type must be application/json"
+          },
+          "422": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    }
+  }
+}
