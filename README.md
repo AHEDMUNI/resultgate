@@ -2,9 +2,19 @@
 
 <!-- mcp-name: io.github.AHEDMUNI/resultgate -->
 
-Local MCP tools for extraction-contract checks and literal citation integrity. Version 0.1.1 is a release candidate, not yet published to a public registry.
+Local MCP tools for extraction-contract checks and literal citation integrity. Version 0.1.1 is published on [PyPI](https://pypi.org/project/resultgate-pilot/0.1.1/).
 
 **A pass is not a truth guarantee.** ResultGate evaluates the evidence you supply; it does not fetch sources, detect every missing fact, verify source authenticity, or judge semantic support. Incomplete completion evidence returns `unknown`.
+
+## Install from PyPI (Python 3.11+)
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install resultgate-pilot==0.1.1
+.venv/bin/resultgate-pilot --help
+```
+
+For MCP clients with uv installed: `uvx resultgate-pilot==0.1.1`.
 
 ## Install from GitHub (Python 3.11+ and Git)
 
@@ -28,7 +38,7 @@ python3 -m venv .venv
 
 On Windows use `py -m venv .venv` and `.venv\Scripts\python.exe -m pip install <wheel>`; the executable is `.venv\Scripts\resultgate.exe`. Windows/macOS execution has not yet been tested in this release review.
 
-After PyPI publication is verified, the registry launch command will be `uvx resultgate-pilot==0.1.1`. That public package command is NOT usable until publication. The package exposes both `resultgate` and `resultgate-pilot` executables.
+The public package exposes both `resultgate` and `resultgate-pilot` executables.
 
 ## Connect an MCP client
 
