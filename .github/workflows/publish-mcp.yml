@@ -1,0 +1,43 @@
+name: Publish to MCP Registry
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mcp-registry-release
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: github.repository == 'AHEDMUNI/resultgate' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify live PyPI release and ownership marker
+        run: |
+          python3 - <<'PY'
+          import json, urllib.request
+          with open('server.json') as f:
+              s = json.load(f)
+          assert s['name'] == 'io.github.AHEDMUNI/resultgate'
+          assert s['version'] == '0.1.1'
+          with urllib.request.urlopen('https://pypi.org/pypi/resultgate-pilot/0.1.1/json', timeout=30) as r:
+              p = json.load(r)
+          assert p['info']['version'] == s['version']
+          assert '<!-- mcp-name: io.github.AHEDMUNI/resultgate -->' in p['info']['description']
+          assert len(p['urls']) == 2
+          PY
+      - name: Install pinned official publisher with checksum verification
+        run: |
+          curl --fail --location --silent --show-error https://github.com/modelcontextprotocol/registry/releases/download/v1.8.1/mcp-publisher_linux_amd64.tar.gz -o publisher.tar.gz
+          echo 'a06c9096dcb9727c13555b6be26c7effa707b01f06a4c561ba7a3635443cf2cc  publisher.tar.gz' | sha256sum --check
+          tar -xzf publisher.tar.gz mcp-publisher
+      - name: Authenticate using GitHub OIDC
+        run: ./mcp-publisher login github-oidc
+      - name: Publish metadata to official MCP Registry
+        run: ./mcp-publisher publish
