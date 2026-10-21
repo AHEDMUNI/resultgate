@@ -13,7 +13,7 @@ SPEC={'description':'Structure the public example from GROBID documentation',
       'required_capabilities':['citation_structuring'],
       'citation':'Graff, Expert. Opin. Ther. Targets (2002) 6(1): 103-113',
       'expected_surname':'Graff','expected_year':2002}
-async def main():
+async def main(live=True):
     with tempfile.TemporaryDirectory() as directory:
         params=StdioServerParameters(command=sys.executable,args=['-I','-m','resultgate.server','--brokerage','--delegation',
             '--allow-demo-task-requests','--internal-delegation-tests','--delegation-store',directory,'--provider-registry',directory],cwd=directory)
@@ -24,6 +24,16 @@ async def main():
                 assert 'submit_provider' in names and 'review' not in names
                 registered=await session.call_tool('discover_registered_providers',{})
                 assert registered.structuredContent['providers']==[]
+                submission={'name':'Internal fixture','description':'Not an actual provider','capabilities':['fixture'],
+                    'protocol':'api','endpoint':'https://provider.example.com/api','auth':'none',
+                    'requirements':'none','pricing':'internal only','limits':'none'}
+                submitted=await session.call_tool('submit_provider',{'submission':submission})
+                assert not submitted.isError and submitted.structuredContent['provider']['state']=='pending'
+                registered=await session.call_tool('discover_registered_providers',{})
+                assert registered.structuredContent['providers']==[]
+                if not live:
+                    print(json.dumps({'kind':'internal_isolated_offline_onboarding','tools':17,'pending_hidden':True,'independent_uses':0}))
+                    return True
                 found=await session.call_tool('discover_agents',{'required_capabilities':['citation_structuring']})
                 assert found.structuredContent['providers'][0]['id']=='grobid_demo'
                 plan=await session.call_tool('prepare_delegation',{'task':SPEC,'request_id':'internal-grobid-demo'})
@@ -49,6 +59,6 @@ async def main():
         print(json.dumps(report,indent=2))
         return data['task']['state']=='verified'
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--live',action='store_true');args=parser.parse_args()
-    if not args.live: parser.error('--live required for one public demo citation disclosure')
-    sys.exit(0 if asyncio.run(main()) else 1)
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--live',action='store_true');parser.add_argument('--offline',action='store_true');args=parser.parse_args()
+    if args.live == args.offline: parser.error('choose --live (one public citation) or --offline')
+    sys.exit(0 if asyncio.run(main(args.live)) else 1)

@@ -47,6 +47,7 @@ jobs:
           /tmp/resultgate-client/bin/python -I scripts/acceptance.py
           /tmp/resultgate-client/bin/python -I scripts/brokerage_installed_acceptance.py
           /tmp/resultgate-client/bin/python -I scripts/delegation_installed_acceptance.py
+          /tmp/resultgate-client/bin/python -I scripts/network_acceptance.py --offline
       - name: New installed client discovers and delegates (internal only)
         if: github.event_name == 'push' && github.repository == 'AHEDMUNI/resultgate'
         run: /tmp/resultgate-client/bin/python -I scripts/network_acceptance.py --live
