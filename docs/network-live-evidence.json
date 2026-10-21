@@ -1,6 +1,6 @@
 {
   "kind": "internal_isolated_installed_full_acceptance",
-  "timestamp_utc": "2026-10-21T01:04:42.170649+00:00",
+  "timestamp_utc": "2026-10-21T01:06:36.568485+00:00",
   "provider": "GROBID project demo",
   "provider_kind": "specialist_ml_service_not_autonomous_agent",
   "state": "verified",
@@ -28,7 +28,7 @@
   "commission_eligible": false,
   "revenue_usd": 0,
   "money_spent_usd": 0,
-  "source_commit": "dd84d14c8b7ba8082327202475624c089e905691",
-  "workflow_run": "https://github.com/AHEDMUNI/resultgate/actions/runs/39525121685",
-  "job_id": 118977836525
+  "source_commit": "054c0b5c2cf373602fa2097b4d103b1db5583f6c",
+  "workflow_run": "https://github.com/AHEDMUNI/resultgate/actions/runs/39525333903",
+  "job_id": 118978498188
 }
