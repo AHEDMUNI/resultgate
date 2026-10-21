@@ -192,3 +192,27 @@ runs this on the authorized server and completes the hosted test-card Checkout.
 Sources: official stripe/stripe-cli v1.54.1 release asset digest and source config
 (`STRIPE_API_KEY`, `STRIPE_DEVICE_NAME`); Stripe Accounts object controller/type docs;
 Stripe destination charges and proportional application-fee refund documentation.
+
+
+## Checkout compatibility fix — 2026-10-21
+
+Owner supplied Workbench HTTP400 invalid_request_error for API version
+2026-09-30.endive: payment_method_types is no longer supported in Checkout Session
+creation. Removed the field entirely from the payload; Dashboard-managed dynamic
+payment methods are used. $100 amount, application_fee_amount=500, current existing
+connected account and order reference are unchanged. No replacement random key/order
+is created. Validation failures do not start endpoint execution and therefore are not
+saved in Stripe's idempotency cache (official API idempotency docs).
+
+A durable Checkout journal now freezes payload digest, original creation time and
+response state before POST, retains rg-test-ORDER_ID, blocks changed parameters and
+stops retries beyond 23 hours instead of risking a pruned Stripe key. Existing bound
+sessions are reused. The owner-verified earlier validation rejection predates this
+journal; the corrected first attempt records the current payload before network I/O.
+No expired owner authorization is renewed automatically. Asynchronous success events
+are also forwarded and verified; unpaid completion events do not accrue commission.
+
+New regression coverage asserts the obsolete parameter is absent from the actual
+form request and checks $100/500-cent fee/destination, stable keys after timeout and
+HTTP400, changed-payload rejection and aged retry refusal. These remain code tests;
+actual Checkout IDs and signed paid/refund evidence must come from the server run.

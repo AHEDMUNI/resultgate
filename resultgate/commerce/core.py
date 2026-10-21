@@ -163,7 +163,7 @@ class Commerce:
             row=self.db.execute('SELECT active,expires FROM commerce_grants WHERE id=?',(approval['grant'],)).fetchone()
             if not row or not row[0] or row[1]<=time.time(): raise ValueError('grant revoked/expired')
         s=self.load('services',o['service_id'])
-        return {'mode':'payment','payment_method_types[0]':'card',
+        return {'mode':'payment',
                 'line_items[0][price_data][currency]':'usd',
                 'line_items[0][price_data][unit_amount]':str(o['amount']),
                 'line_items[0][price_data][product_data][name]':s['title'],

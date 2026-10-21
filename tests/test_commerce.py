@@ -36,6 +36,8 @@ class CommerceTests(unittest.TestCase):
         if request.method=='GET':
             return httpx.Response(200,json={'id':'acct_fixture','country':'US','charges_enabled':True,'payouts_enabled':True,'capabilities':{'transfers':'active'}})
         data=parse_qs(request.content.decode())
+        self.assertFalse(any(k=='payment_method_types' or k.startswith('payment_method_types[') for k in data))
+        self.assertEqual(['10000'],data['line_items[0][price_data][unit_amount]'])
         self.assertEqual(['500'],data['payment_intent_data[application_fee_amount]'])
         self.assertEqual(['acct_fixture'],data['payment_intent_data[transfer_data][destination]'])
         self.assertEqual(['1'],data['line_items[0][quantity]'])
@@ -210,3 +212,60 @@ class CommerceTests(unittest.TestCase):
                     payload=json.loads(response.content[0].text)
                     self.assertEqual('analysis-v1',payload['services'][0]['id'])
         asyncio.run(run())
+
+    def test_dynamic_checkout_does_not_send_obsolete_payment_method_types(self):
+        self.approve()
+        payload=self.c.checkout_payload(self.buyer,self.o['id'])
+        self.assertFalse(any(k=='payment_method_types' or k.startswith('payment_method_types[') for k in payload))
+        self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        post=next(r for r in self.calls if r.method=='POST')
+        data=parse_qs(post.content.decode())
+        self.assertEqual(['10000'],data['line_items[0][price_data][unit_amount]'])
+        self.assertEqual(['500'],data['payment_intent_data[application_fee_amount]'])
+        self.assertEqual(['acct_fixture'],data['payment_intent_data[transfer_data][destination]'])
+
+    def test_checkout_timeout_reuses_same_key_and_frozen_parameters(self):
+        self.approve(); original=self.adapter.request; attempts=[]
+        def request(method,path,data=None,key=None):
+            if method=='POST':
+                attempts.append((key,dict(data)))
+                if len(attempts)==1: raise httpx.ReadTimeout('fixture only')
+            return original(method,path,data,key)
+        self.adapter.request=request
+        with self.assertRaises(httpx.ReadTimeout):self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.assertEqual(attempts[0],attempts[1])
+        self.assertEqual('rg-test-'+self.o['id'],attempts[0][0])
+
+    def test_uncertain_checkout_never_changes_parameters_or_expires_key(self):
+        self.approve(); original=self.adapter.request
+        def timeout(method,path,data=None,key=None):
+            if method=='POST':raise httpx.ReadTimeout('fixture only')
+            return original(method,path,data,key)
+        self.adapter.request=timeout
+        with self.assertRaises(httpx.ReadTimeout):self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        before=len(self.calls)
+        with self.c.db:self.c.db.execute("UPDATE commerce_checkout_attempts SET digest='different'")
+        with self.assertRaises(ValueError):self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.assertEqual(before+1,len(self.calls))  # GET eligibility only, no POST
+        with self.c.db:self.c.db.execute('DELETE FROM commerce_checkout_attempts')
+        with self.assertRaises(httpx.ReadTimeout):self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        with self.c.db:self.c.db.execute('UPDATE commerce_checkout_attempts SET created=0')
+        with self.assertRaises(ValueError):self.adapter.checkout(self.c,self.buyer,self.o['id'])
+
+    def test_stripe_validation_rejection_retries_same_order_and_key(self):
+        from resultgate.commerce.stripe_test import StripeRequestRejected
+        self.approve(); original=self.adapter.request; keys=[]
+        def reject_once(method,path,data=None,key=None):
+            if method=='POST':
+                keys.append(key)
+                if len(keys)==1:
+                    raise StripeRequestRejected(400,json.dumps({'error':{'type':'invalid_request_error'}}))
+            return original(method,path,data,key)
+        self.adapter.request=reject_once
+        with self.assertRaises(StripeRequestRejected):self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.assertEqual(0,self.c.db.execute('SELECT count(*) FROM commerce_sessions').fetchone()[0])
+        self.assertEqual(0,self.c.db.execute('SELECT count(*) FROM commerce_payments').fetchone()[0])
+        self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.assertEqual(['rg-test-'+self.o['id']]*2,keys)
+        self.assertEqual(1,self.c.db.execute('SELECT count(*) FROM commerce_orders').fetchone()[0])

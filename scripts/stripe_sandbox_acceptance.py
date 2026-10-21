@@ -95,16 +95,20 @@ class Receiver(BaseHTTPRequestHandler):
             event = verify_webhook(self.rfile.read(length), self.headers.get('Stripe-Signature'), self.server.signing)
             obj = event['data']['object']; kind = event['type']
             # Ignore other Sandbox activity; never apply another customer's event.
-            relevant = (kind == 'checkout.session.completed' and obj.get('client_reference_id') == self.server.order)
+            relevant = (kind in ('checkout.session.completed','checkout.session.async_payment_succeeded') and obj.get('client_reference_id') == self.server.order)
             if kind == 'charge.refunded':
                 row = self.server.commerce.db.execute('SELECT id FROM commerce_payments WHERE order_id=?', (self.server.order,)).fetchone()
                 relevant = bool(row and obj.get('payment_intent') == row[0])
             if relevant:
                 result = self.server.commerce.event(event)
                 # Replay the SAME Stripe-signed event; require idempotent ledger handling.
-                if not self.server.commerce.event(event).get('duplicate'):
-                    raise ValueError('event replay not idempotent')
-                record = {'id': event['id'], 'type': kind, 'signature_verified': True, 'duplicate_replay_verified': True}
+                replay_verified = False
+                if not result.get('ignored'):
+                    if not self.server.commerce.event(event).get('duplicate'):
+                        raise ValueError('event replay not idempotent')
+                    replay_verified = True
+                record = {'id': event['id'], 'type': kind, 'signature_verified': True,
+                          'duplicate_replay_verified': replay_verified, 'ignored': result.get('ignored')}
                 self.server.events[event['id']] = record
                 save(self.server.directory / 'signed-events.json', list(self.server.events.values()))
                 print('SIGNED EVENT VERIFIED: ' + event['id'] + ' ' + kind, flush=True)
@@ -121,7 +125,7 @@ def start_listener(binary, key, server, config_directory):
                HOME=config_directory, XDG_CONFIG_HOME=config_directory,
                STRIPE_CLI_TELEMETRY_OPTOUT='1', STRIPE_CLI_SKIP_UPDATE_CHECK='1')
     proc = subprocess.Popen([binary, 'listen', '--forward-to', 'http://127.0.0.1:18776/webhook',
-                             '--events', 'checkout.session.completed,charge.refunded'],
+                             '--events', 'checkout.session.completed,checkout.session.async_payment_succeeded,charge.refunded'],
                             env=env, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT, text=True)
     ready = threading.Event()

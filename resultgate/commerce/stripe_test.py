@@ -77,9 +77,27 @@ class StripeTest:
             raise ValueError('eligible US test connected account required')
         payload.update(success_url=self.origin+'/commerce/return',cancel_url=self.origin+'/commerce/cancel',
                        expires_at=str(expires))
-        # Same order and parameters after timeout -> same Stripe idempotency key.
-        session=self.request('POST','/v1/checkout/sessions',payload,'rg-test-'+oid)
-        return commerce.bind_session(oid,session)
+        # Persist frozen parameters BEFORE POST. Never roll an uncertain request onto
+        # another key/order, or reuse Stripe's key after its retention window.
+        from .core import hashed
+        commerce.db.execute('CREATE TABLE IF NOT EXISTS commerce_checkout_attempts (order_id TEXT PRIMARY KEY, digest TEXT, created REAL, state TEXT)')
+        digest=hashed(payload)
+        with commerce.db:
+            commerce.db.execute('INSERT OR IGNORE INTO commerce_checkout_attempts VALUES(?,?,?,?)',(oid,digest,time.time(),'started'))
+        attempt=commerce.db.execute('SELECT digest,created FROM commerce_checkout_attempts WHERE order_id=?',(oid,)).fetchone()
+        if attempt[0]!=digest: raise ValueError('Checkout parameters changed; inspect original request before retry')
+        if time.time()-attempt[1]>23*3600: raise ValueError('Checkout retry window expired; inspect Stripe before retry')
+        try:
+            session=self.request('POST','/v1/checkout/sessions',payload,'rg-test-'+oid)
+        except StripeRequestRejected as error:
+            # A rejection is diagnostic evidence, not authority to change the key.
+            with commerce.db:
+                commerce.db.execute('UPDATE commerce_checkout_attempts SET state=? WHERE order_id=?',('http_'+str(error.safe['http_status']),oid))
+            raise
+        result=commerce.bind_session(oid,session)
+        with commerce.db:
+            commerce.db.execute('UPDATE commerce_checkout_attempts SET state=? WHERE order_id=?',('bound',oid))
+        return result
 
 
 def verify_webhook(raw, signature, secret, now=None):
