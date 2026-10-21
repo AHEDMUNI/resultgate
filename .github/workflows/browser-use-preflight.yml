@@ -1,0 +1,48 @@
+name: Browser Use read-only preflight (no agent execution)
+on:
+  push:
+    branches: [trial/browser-use-preflight]
+permissions:
+  contents: read
+concurrency:
+  group: browser-use-read-only-preflight
+  cancel-in-progress: false
+jobs:
+  inspect:
+    if: github.repository == 'AHEDMUNI/resultgate'
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Read eligibility only, never submit a task
+        env:
+          BROWSER_USE_API_KEY: ${{ secrets.BROWSER_USE_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os, tempfile
+          from decimal import Decimal
+          from resultgate.delegation.browser_use_trial import Trial, Transport, TrialError
+          try:
+              with tempfile.TemporaryDirectory() as directory:
+                  trial = Trial(directory, Transport(os.environ.get('BROWSER_USE_API_KEY')))
+                  try:
+                      result = trial.preflight()
+                      print(json.dumps({
+                          'free_tier': result['is_free_tier'],
+                          'at_least_50_cents_credit': Decimal(result['credits_usd']) >= Decimal('0.50'),
+                          'no_active_sessions': result['active_sessions'] == 0,
+                          'promotional_origin_verified': False,
+                          'recharge_verified': False,
+                          'agent_tasks_submitted': 0,
+                      }))
+                  finally:
+                      trial.db.close()
+          except (TrialError, OSError):
+              print('{"preflight":"blocked","agent_tasks_submitted":0}')
+              raise SystemExit(1) from None
+          PY
