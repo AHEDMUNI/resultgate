@@ -55,7 +55,7 @@ def create_app(commerce, stripe=None, webhook_secret=None):
             return reply(result)
         except (ValueError,KeyError,TypeError,TimeoutError): return reply({'error':'invalid_or_inaccessible_request'},400)
     async def landing(request):
-        return HTMLResponse('<h1>ResultGate marketplace — sandbox</h1><p>No live payments. Providers: no joining or monthly fee; 5% of eligible paid transactions, adjusted for refunds and disputes. No service completion condition.</p><p>Invited providers use POST /commerce/providers/apply. Customers use GET /commerce/services and POST /commerce/orders with their own credential. Payment approval is an owner-only step.</p>',headers={'Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'",'Cache-Control':'no-store'})
+        return HTMLResponse('<h1>ResultGate marketplace — sandbox</h1><p>No live payments. Providers: no joining or monthly fee; 15% of eligible paid transactions, adjusted for refunds and disputes. No service completion condition.</p><p>Invited providers use POST /commerce/providers/apply. Customers use GET /commerce/services and POST /commerce/orders with their own credential. Payment approval is an owner-only step.</p>',headers={'Content-Security-Policy':"default-src 'none'; frame-ancestors 'none'",'Cache-Control':'no-store'})
     routes=[Route('/commerce',landing),Route('/commerce/return',landing),Route('/commerce/cancel',landing),Route('/commerce/webhook',handle,methods=['POST']),
             Route('/commerce/terms',handle),Route('/commerce/providers/apply',handle,methods=['POST']),
             Route('/commerce/services',handle,methods=['GET','POST']),Route('/commerce/dashboard',handle),

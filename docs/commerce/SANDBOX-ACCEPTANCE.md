@@ -1,3 +1,5 @@
+> New v2 orders use 15%. The completed historical Sandbox run used 5%; its evidence is unchanged. Resume an old order only at its frozen rate. Never change its fee or idempotency key to test the new policy. No new hosted 15% payment is claimed.
+
 # Connect sandbox acceptance — 2026-10-21
 
 ## Completed Stripe Sandbox acceptance
@@ -16,12 +18,12 @@ financial code remains an unmerged draft and is not deployed. No live keys used.
 
 Validation: **296 tests passed**, including 12 new Connect tests and 18 existing
 commerce tests. Database backup/restore followed by payment/refund replay passed.
-New Connect tests use httpx.MockTransport, not Stripe's network. The tested lifecycle:
+New Connect tests use httpx.MockTransport, not Stripe's network. The current v2 fixture lifecycle (58 focused tests after the 15% change):
 
 | Step | Eligible amount | Commission | Provider entitlement before costs |
 |---|---:|---:|---:|
-| Confirmed fixture payment | $100 | $5 | $95 |
-| Refund $40 cumulatively | $60 | $3 | $57 |
+| Confirmed fixture payment | $100 | $15 | $85 |
+| Refund $40 cumulatively | $60 | $9 | $51 |
 | Refund $100 cumulatively | $0 | $0 | $0 |
 
 Payment replay and refund retry do not duplicate the operation. Reconciliation checks
@@ -65,10 +67,10 @@ put keys in command arguments, git, email, screenshots or this conversation.
 7. Create Checkout through authenticated POST `/commerce/orders/ORDER_ID/checkout`.
    Complete its Stripe-hosted page using Stripe's documented test card, never a real
    card. The success page is not payment proof; wait for the signed payment event.
-8. Run `reconcile ORDER_ID`. It must report matched, fee 500 cents, provider 9500 cents
+8. Run `reconcile ORDER_ID`. It must report matched, fee 1500 cents, provider 8500 cents
    before costs, and real revenue zero. Save the redacted IDs/report in private evidence.
 9. Run `refund ORDER_ID 4000`, wait for refund completion and signed charge.refunded,
-   then reconcile: fee 300 cents, provider 5700 cents. Repeat the same refund command:
+   then reconcile: fee 900 cents, provider 5100 cents. Repeat the same refund command:
    no second refund. Run `refund ORDER_ID 10000`: full cumulative refund, fee zero.
 10. Replay signed events; verify ledger totals unchanged. Restore a private DB backup
     into a separate directory and replay again. Exercise failed/pending refunds and
@@ -115,7 +117,7 @@ Approval of Stripe's business account alone does not satisfy these gates.
 
 Destination charges debit the platform for Stripe fees/refunds/disputes. Application
 fee refunds also require reversing the transfer. Failed refunds can require manual
-fund recovery. Never equate the 5% gross commission with net profit.
+fund recovery. Never equate the 15% gross commission with net profit.
 
 ## Existing Express account selected by operator
 
@@ -153,8 +155,8 @@ onboarding is required. This screenshot is account readiness, NOT payment eviden
 
 `scripts/stripe_sandbox_acceptance.py --exec-session` orchestrates ONE actual
 Stripe-hosted $100 test Checkout, waits for Stripe CLI-forwarded signed events,
-reconciles $5 commission/$95 provider before costs, refunds $40, then the remaining
-$60 (cumulative $100), and reconciles $3/$57 then $0/$0. It replays each actual signed
+reconciles $15 commission/$85 provider before costs, refunds $40, then the remaining
+$60 (cumulative $100), and reconciles $9/$51 then $0/$0. It replays each actual signed
 event through the ledger to check duplicate handling. No synthetic event is generated
 by the runner, and success pages are not treated as payment confirmation.
 
@@ -207,7 +209,7 @@ Stripe destination charges and proportional application-fee refund documentation
 Owner supplied Workbench HTTP400 invalid_request_error for API version
 2026-09-30.endive: payment_method_types is no longer supported in Checkout Session
 creation. Removed the field entirely from the payload; Dashboard-managed dynamic
-payment methods are used. $100 amount, application_fee_amount=500, current existing
+payment methods are used. $100 amount, application_fee_amount=1500, current existing
 connected account and order reference are unchanged. No replacement random key/order
 is created. Validation failures do not start endpoint execution and therefore are not
 saved in Stripe's idempotency cache (official API idempotency docs).
@@ -221,7 +223,7 @@ No expired owner authorization is renewed automatically. Asynchronous success ev
 are also forwarded and verified; unpaid completion events do not accrue commission.
 
 New regression coverage asserts the obsolete parameter is absent from the actual
-form request and checks $100/500-cent fee/destination, stable keys after timeout and
+form request and checks $100/1500-cent fee/destination, stable keys after timeout and
 HTTP400, changed-payload rejection and aged retry refusal. These remain code tests;
 actual Checkout IDs and signed paid/refund evidence must come from the server run.
 

@@ -4,7 +4,7 @@
   "status": "draft_not_deployed",
   "production_mcp": "https://agents.allubiyerbamate.com/mcp",
   "commerce_tools_available_in_production": false,
-  "commission_basis_points": 500,
+  "commission_basis_points": 1500,
   "commission_trigger": "processor_confirmed_eligible_payment",
   "service_completion_required": false,
   "refund_and_dispute_adjustments": true,

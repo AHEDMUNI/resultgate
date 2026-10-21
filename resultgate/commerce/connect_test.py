@@ -183,7 +183,7 @@ class ConnectTest:
         reference=ch.get('application_fee')
         if reference is not None: return self.object('application_fees',reference,'fee')
         # Some Stripe responses do not contain a direct fee reference. Resolve via
-        # the official charge-filtered read endpoint; never assume the 5% was taken.
+        # the official charge-filtered read endpoint; never assume the 15% was taken.
         page=self.stripe.request('GET','/v1/application_fees',{'charge':ch['id'],'limit':'100'})
         if not isinstance(page.get('data'),list) or page.get('has_more') is not False:
             raise ValueError('fee lookup incomplete')

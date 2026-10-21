@@ -10,13 +10,13 @@ from .core import Commerce, TERMS, TERMS_SHA
 def build(commerce, token, stripe=None):
     commerce.actor(token)
     server=FastMCP('ResultGate marketplace sandbox',instructions=
-        'General service marketplace. Fixed 5% on confirmed eligible payment, adjusted for refunds/disputes. '
+        'General service marketplace. Fixed 15% on confirmed eligible payment, adjusted for refunds/disputes. '
         'TEST ONLY. No service completion gate. No real revenue. Owner approval is outside agent tools.')
     def quota(): commerce.market.consume_request(token)
 
     @server.tool()
     def provider_terms() -> dict:
-        """Read versioned 5% sandbox terms; no joining/subscription or requester recommendation fees."""
+        """Read versioned 15% sandbox terms; no joining/subscription or requester recommendation fees."""
         quota(); return {'terms':TERMS,'sha256':TERMS_SHA,'mode':'test'}
 
     @server.tool()
@@ -53,7 +53,7 @@ def build(commerce, token, stripe=None):
 
     @server.tool()
     def provider_dashboard() -> dict:
-        """Read this provider's test orders and adjusted 5% commission; real revenue is always zero."""
+        """Read this provider's test orders and adjusted 15% commission; real revenue is always zero."""
         quota(); return commerce.dashboard(token)
     return server
 

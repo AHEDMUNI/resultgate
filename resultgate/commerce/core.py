@@ -1,4 +1,4 @@
-"""5% marketplace sandbox using existing tenant credentials and atomic store.
+"""15% marketplace sandbox using existing tenant credentials and atomic store.
 
 No live switch exists. Trusted operator decisions are not exposed through MCP.
 """
@@ -10,20 +10,37 @@ import time
 from ..network.registry import atomic
 from ..network.market import identifier
 
-TERMS = ('ResultGate sandbox terms v1: no joining or monthly fee; 5% of eligible USD '
+TERMS = ('ResultGate sandbox terms v2: no joining or monthly fee; 15% of eligible USD '
          'service payment, rounded half-up to cents, due on successful payment, not completion. '
          'No customer recommendation fee. No fee on clicks/unpaid orders. Refunds reverse '
          'the fee proportionately; disputes suspend entitlement, lost disputes reverse it. '
-         'Provider remainder is 95% before processing costs/adjustments. Processor costs '
+         'Provider remainder is 85% before processing costs/adjustments. Processor costs '
          'are separate and require agreed allocation. No resale without permission. '
          'This sandbox acceptance is NOT a binding live commercial agreement.')
 TERMS_SHA = hashlib.sha256(TERMS.encode()).hexdigest()
 
 
-def fee(cents):
+COMMISSION_BPS = 1500
+LEGACY_TERMS_SHA = '2e54726ffb21396e3a49e1725cf9f63e3d222cb46885db47fe94b1bd4e814488'
+
+
+def fee(cents, bps=COMMISSION_BPS):
     if type(cents) is not int or not 0 <= cents <= 10000000:
         raise ValueError('bounded integer cents required')
-    return (cents * 5 + 50) // 100
+    if type(bps) is not int or bps not in (500, COMMISSION_BPS):
+        raise ValueError('unsupported commission rate')
+    return (cents * bps + 5000) // 10000
+
+
+def order_rate(order):
+    # Pre-v2 orders are recognized only by the immutable legacy terms digest.
+    bps = order.get('commission_bps')
+    if bps is None and order.get('terms_sha') == LEGACY_TERMS_SHA:
+        bps = 500
+    expected_terms = LEGACY_TERMS_SHA if bps == 500 else TERMS_SHA
+    if order.get('terms_sha') != expected_terms or fee(order['amount'], bps) != order['fee']:
+        raise ValueError('frozen order commission mismatch')
+    return bps
 
 
 def hashed(obj):
@@ -75,20 +92,25 @@ class Commerce:
             raise ValueError('current sandbox terms and signatory declaration required')
         old = self.db.execute('SELECT data FROM commerce_providers WHERE owner=?', (owner,)).fetchone()
         if old:
-            return json.loads(old[0])
+            p = json.loads(old[0])
+            if p['terms_sha'] != TERMS_SHA:
+                p.setdefault('terms_history', []).append({'terms_sha': p['terms_sha'], 'accepted_at': p['accepted_at']})
+                p.update(terms_sha=TERMS_SHA, accepted_at=time.time(), commission_bps=COMMISSION_BPS, state='pending_review', live_agreement=False)
+                self.save('providers', p)
+            return p
         if self.db.execute('SELECT count(*) FROM commerce_providers').fetchone()[0] >= 1000:
             raise ValueError('capacity reached')
         p = {'id': secrets.token_hex(16), 'owner': owner, 'name': name, 'state': 'pending_review',
              'terms_sha': terms_sha, 'accepted_at': time.time(), 'mode': 'test',
              'authorized_signatory_declared': True, 'identity_verified': False,
-             'account': None, 'commission_bps': 500, 'live_agreement': False}
+             'account': None, 'commission_bps': COMMISSION_BPS, 'live_agreement': False}
         self.db.execute('INSERT INTO commerce_providers VALUES(?,?,?)', (p['id'], owner, json.dumps(p)))
         return p
 
     @atomic
     def list_service(self, token, provider_id, service_id, title, capability, price_cents):
         owner = self.actor(token); p = self.load('providers', provider_id)
-        if p['owner'] != owner or p['state'] != 'approved_test':
+        if p['owner'] != owner or p['state'] != 'approved_test' or p['terms_sha'] != TERMS_SHA:
             raise ValueError('reviewed provider ownership required')
         identifier(service_id); identifier(capability); bounded(title)
         fee(price_cents)
@@ -96,7 +118,7 @@ class Commerce:
             raise ValueError('minimum test price is 50 cents')
         # Immutable price/version avoids changing a previously approved offer.
         s = {'id': service_id, 'provider_id': provider_id, 'title': title, 'capability': capability,
-             'price_cents': price_cents, 'currency': 'usd', 'commission_bps': 500,
+             'price_cents': price_cents, 'currency': 'usd', 'commission_bps': COMMISSION_BPS,
              'mode': 'test', 'terms_sha': TERMS_SHA}
         old = self.db.execute('SELECT data FROM commerce_services WHERE id=?', (service_id,)).fetchone()
         if old:
@@ -114,6 +136,7 @@ class Commerce:
         services = [json.loads(r[0]) for r in self.db.execute('SELECT data FROM commerce_services LIMIT 5000')]
         return {'mode': 'test', 'ranking': 'exact capability, then price, then stable id; no commission weighting',
                 'services': sorted([s for s in services if (capability is None or s['capability']==capability)
+                    and s['terms_sha']==TERMS_SHA and self.load('providers', s['provider_id'])['terms_sha']==TERMS_SHA
                     and self.load('providers', s['provider_id'])['state']=='approved_test'],
                     key=lambda s:(s['price_cents'],s['id']))[:50]}
 
@@ -126,12 +149,13 @@ class Commerce:
             if order['service_id'] != service_id: raise ValueError('idempotency conflict')
             return order
         s=self.load('services',service_id); p=self.load('providers',s['provider_id'])
-        if p['state']!='approved_test': raise ValueError('provider unavailable')
+        if p['state']!='approved_test' or p['terms_sha']!=TERMS_SHA or s['terms_sha']!=TERMS_SHA:
+            raise ValueError('provider unavailable or current terms required')
         if self.db.execute('SELECT count(*) FROM commerce_orders').fetchone()[0]>=10000:
             raise ValueError('capacity reached')
         o={'id':secrets.token_hex(16),'owner':owner,'service_id':service_id,'provider_id':p['id'],
            'account':p['account'],'amount':s['price_cents'],'currency':'usd','fee':fee(s['price_cents']),
-           'terms_sha':TERMS_SHA,'expires':int(time.time()+3600),'state':'awaiting_owner',
+           'commission_bps':COMMISSION_BPS,'terms_sha':TERMS_SHA,'expires':int(time.time()+3600),'state':'awaiting_owner',
            'mode':'test','approval':None,'commission_cents':0,'net_eligible_cents':0,
            'real_revenue_cents':0,'settlement_confirmed':False}
         o['quote_sha']=hashed({k:v for k,v in o.items() if k!='approval'})
@@ -152,6 +176,7 @@ class Commerce:
     @atomic
     def checkout_payload(self, token, order_id):
         o=self.get(token,order_id)
+        order_rate(o)
         if o['owner']!=self.actor(token): raise ValueError('requester required')
         p=self.load('providers',o['provider_id'])
         if p['state']!='approved_test' or p['account']!=o['account']:
@@ -201,7 +226,7 @@ class Commerce:
         o=self.load('orders',order_id)
         pay=self.db.execute('SELECT id,gross,refunded FROM commerce_payments WHERE order_id=?',(order_id,)).fetchone()
         disputed=self.db.execute("SELECT coalesce(sum(amount),0) FROM commerce_disputes WHERE payment=? AND status NOT IN ('won','warning_closed')",(pay[0],)).fetchone()[0]
-        net=max(0,pay[1]-pay[2]-disputed); commission=fee(net)
+        net=max(0,pay[1]-pay[2]-disputed); commission=fee(net, order_rate(o))
         delta=net-o['net_eligible_cents']; df=commission-o['commission_cents']
         postings={'test_processor_clearing':delta,'test_provider_entitlement':-(delta-df),'test_platform_commission':-df}
         self.db.execute('INSERT INTO commerce_ledger VALUES(?,?,?)',(event_id,order_id,json.dumps(postings)))
@@ -272,6 +297,7 @@ class CommerceOperator:
     @atomic
     def review_provider(self, pid, account, evidence_sha):
         p=self.c.load('providers',pid)
+        if p['terms_sha'] != TERMS_SHA: raise ValueError('current provider terms required')
         if not re.fullmatch(r'acct_[a-zA-Z0-9]+',account) or not re.fullmatch(r'[a-f0-9]{64}',evidence_sha):
             raise ValueError('test account and reviewer evidence required')
         other=self.db.execute('SELECT data FROM commerce_providers WHERE id<>?',(pid,)).fetchall()

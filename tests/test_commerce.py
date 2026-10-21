@@ -38,7 +38,7 @@ class CommerceTests(unittest.TestCase):
         data=parse_qs(request.content.decode())
         self.assertFalse(any(k=='payment_method_types' or k.startswith('payment_method_types[') for k in data))
         self.assertEqual(['10000'],data['line_items[0][price_data][unit_amount]'])
-        self.assertEqual(['500'],data['payment_intent_data[application_fee_amount]'])
+        self.assertEqual(['1500'],data['payment_intent_data[application_fee_amount]'])
         self.assertEqual(['acct_fixture'],data['payment_intent_data[transfer_data][destination]'])
         self.assertEqual(['1'],data['line_items[0][quantity]'])
         return httpx.Response(200,json={'id':'cs_test_fixture','url':'https://checkout.stripe.com/c/pay/cs_test_fixture',
@@ -66,6 +66,50 @@ class CommerceTests(unittest.TestCase):
             'livemode':False,'created':created,'data':{'object':{'id':'dp_fixture','payment_intent':'pi_fixture',
             'currency':'usd','amount':10000,'status':status}}})
 
+    def test_fifteen_percent_100_dollars_and_40_refund(self):
+        self.assertEqual(1500, self.o['commission_bps'])
+        self.assertEqual(1500, self.o['fee'])
+        self.assertEqual(1500, self.paid()['commission_cents'])
+        self.assertEqual(900, self.refund(4000, 'evt_partial40')['commission_cents'])
+        totals = {}
+        for row in self.c.db.execute('SELECT postings FROM commerce_ledger'):
+            for k, v in json.loads(row[0]).items(): totals[k] = totals.get(k, 0) + v
+        self.assertEqual(-5100, totals['test_provider_entitlement'])
+        self.assertEqual(0, self.refund(10000, 'evt_remaining60')['commission_cents'])
+
+    def test_legacy_paid_order_keeps_five_percent_on_refund(self):
+        from resultgate.commerce.core import LEGACY_TERMS_SHA, order_rate
+        legacy = dict(self.o, terms_sha=LEGACY_TERMS_SHA, fee=500)
+        legacy.pop('commission_bps')
+        self.c.save('orders', legacy)
+        self.assertEqual(500, order_rate(legacy))
+        self.c.bind_session(legacy['id'], {'id':'cs_test_fixture','url':'https://checkout.stripe.com/c/pay/fixture',
+            'livemode':False,'client_reference_id':legacy['id'],'amount_total':10000,'currency':'usd'})
+        self.assertEqual(500, self.c.event(self.payevent())['commission_cents'])
+        self.assertEqual(300, self.refund(4000, 'evt_legacy40')['commission_cents'])
+        self.assertEqual(0, self.refund(10000, 'evt_legacy100')['commission_cents'])
+
+    def test_frozen_rate_mismatch_and_unknown_legacy_fail_closed(self):
+        from resultgate.commerce.core import order_rate
+        for changed in (dict(self.o, fee=500), dict(self.o, commission_bps=500), dict(self.o, terms_sha='unknown')):
+            with self.assertRaises(ValueError): order_rate(changed)
+        missing = dict(self.o); missing.pop('commission_bps')
+        with self.assertRaises(ValueError): order_rate(missing)
+
+    def test_old_provider_requires_explicit_reacceptance_and_review(self):
+        from resultgate.commerce.core import LEGACY_TERMS_SHA
+        p = dict(self.p, terms_sha=LEGACY_TERMS_SHA, commission_bps=500)
+        self.c.save('providers', p)
+        self.assertEqual([], self.c.search(self.buyer)['services'])
+        with self.assertRaises(ValueError): self.c.order(self.buyer, 'analysis-v1', 'new-order')
+        with self.assertRaises(ValueError): self.op.review_provider(p['id'], 'acct_fixture', 'a'*64)
+        with self.assertRaises(ValueError): self.c.apply(self.seller, p['name'], LEGACY_TERMS_SHA, True)
+        updated = self.c.apply(self.seller, p['name'], TERMS_SHA, True)
+        self.assertEqual('pending_review', updated['state'])
+        self.assertEqual(1500, updated['commission_bps'])
+        self.assertEqual(LEGACY_TERMS_SHA, updated['terms_history'][0]['terms_sha'])
+        self.assertFalse(updated['live_agreement'])
+
     def test_onboarding_terms_and_review_gate(self):
         with self.assertRaises(ValueError): self.c.apply(self.other,'Other','bad',True)
         other=self.c.apply(self.other,'Other',TERMS_SHA,True)
@@ -82,11 +126,11 @@ class CommerceTests(unittest.TestCase):
 
     def test_paid_accrues_without_completion_and_balances(self):
         result=self.paid()
-        self.assertEqual(500,result['commission_cents']); self.assertEqual(0,result['real_revenue_cents'])
+        self.assertEqual(1500,result['commission_cents']); self.assertEqual(0,result['real_revenue_cents'])
         o=self.c.get(self.buyer,self.o['id'])
         self.assertEqual('paid_test',o['state']); self.assertFalse(o['settlement_confirmed'])
         postings=json.loads(self.c.db.execute('SELECT postings FROM commerce_ledger').fetchone()[0])
-        self.assertEqual(0,sum(postings.values())); self.assertEqual(-9500,postings['test_provider_entitlement'])
+        self.assertEqual(0,sum(postings.values())); self.assertEqual(-8500,postings['test_provider_entitlement'])
 
     def test_session_and_payment_replays_do_not_double_count(self):
         self.paid(); self.adapter.checkout(self.c,self.buyer,self.o['id'])
@@ -101,8 +145,8 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(0,self.c.db.execute('SELECT count(*) FROM commerce_payments').fetchone()[0])
 
     def test_full_partial_refund_and_stale_delivery(self):
-        self.paid(); self.assertEqual(375,self.refund(2500,'evt_refund1')['commission_cents'])
-        self.assertEqual(375,self.refund(1000,'evt_old_refund')['commission_cents'])
+        self.paid(); self.assertEqual(1125,self.refund(2500,'evt_refund1')['commission_cents'])
+        self.assertEqual(1125,self.refund(1000,'evt_old_refund')['commission_cents'])
         self.assertEqual(0,self.refund(10000,'evt_refund2')['commission_cents'])
         total={}
         for row in self.c.db.execute('SELECT postings FROM commerce_ledger'):
@@ -111,8 +155,8 @@ class CommerceTests(unittest.TestCase):
 
     def test_dispute_won_stale_created_and_lost(self):
         self.paid(); self.assertEqual(0,self.dispute('needs_response','evt_dp',10)['commission_cents'])
-        self.assertEqual(500,self.dispute('won','evt_win',11)['commission_cents'])
-        self.assertEqual(500,self.dispute('needs_response','evt_stale',9)['commission_cents'])
+        self.assertEqual(1500,self.dispute('won','evt_win',11)['commission_cents'])
+        self.assertEqual(1500,self.dispute('needs_response','evt_stale',9)['commission_cents'])
 
     def test_dispute_loss(self):
         self.paid(); self.assertEqual(0,self.dispute('lost','evt_lost',10)['commission_cents'])
@@ -159,7 +203,7 @@ class CommerceTests(unittest.TestCase):
         with self.assertRaises(ValueError): self.c.event(e)
 
     def test_rounding_and_refund_flags(self):
-        self.assertEqual(0,fee(0)); self.assertEqual(1,fee(10)); self.assertEqual(500,fee(10000))
+        self.assertEqual(0,fee(0)); self.assertEqual(2,fee(10)); self.assertEqual(1500,fee(10000))
         for invalid in (True,-1,1.5):
             with self.assertRaises(ValueError): fee(invalid)
         p=refund_plan('pi_fixture',2500)
@@ -221,7 +265,7 @@ class CommerceTests(unittest.TestCase):
         post=next(r for r in self.calls if r.method=='POST')
         data=parse_qs(post.content.decode())
         self.assertEqual(['10000'],data['line_items[0][price_data][unit_amount]'])
-        self.assertEqual(['500'],data['payment_intent_data[application_fee_amount]'])
+        self.assertEqual(['1500'],data['payment_intent_data[application_fee_amount]'])
         self.assertEqual(['acct_fixture'],data['payment_intent_data[transfer_data][destination]'])
 
     def test_checkout_timeout_reuses_same_key_and_frozen_parameters(self):

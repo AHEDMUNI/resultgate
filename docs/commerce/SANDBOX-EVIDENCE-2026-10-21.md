@@ -1,3 +1,5 @@
+> Historical 5% acceptance evidence, retained unchanged below. New orders now require 15% terms v2; this record does not prove a hosted 15% payment.
+
 # Stripe Sandbox acceptance evidence — 2026-10-21
 
 ## Provenance and scope

@@ -36,9 +36,9 @@ class ConnectTests(unittest.TestCase):
             return httpx.Response(200,json={'id':'re_'+str(self.refunded),'payment_intent':'pi_fixture','amount':int(data['amount'][0]),'currency':'usd','status':self.refund_status})
         if path.startswith('/v1/refunds/re_'): return httpx.Response(200,json={'id':path.rsplit('/',1)[1],'status':self.refund_status})
         objs={
-            '/v1/payment_intents/pi_fixture':{'id':'pi_fixture','livemode':False,'status':'succeeded','amount':10000,'currency':'usd','metadata':{'order_id':self.o['id']},'transfer_data':{'destination':'acct_fixture'},'application_fee_amount':500,'latest_charge':'ch_fixture'},
+            '/v1/payment_intents/pi_fixture':{'id':'pi_fixture','livemode':False,'status':'succeeded','amount':10000,'currency':'usd','metadata':{'order_id':self.o['id']},'transfer_data':{'destination':'acct_fixture'},'application_fee_amount':1500,'latest_charge':'ch_fixture'},
             '/v1/charges/ch_fixture':{'id':'ch_fixture','livemode':False,'paid':True,'captured':True,'payment_intent':'pi_fixture','amount':10000,'currency':'usd','amount_refunded':self.refunded,'application_fee':'fee_fixture','transfer':'tr_fixture','balance_transaction':'txn_fixture'},
-            '/v1/application_fees/fee_fixture':{'id':'fee_fixture','livemode':False,'charge':'ch_fixture','account':'acct_fixture','currency':'usd','amount':500,'amount_refunded':self.refunded//20},
+            '/v1/application_fees/fee_fixture':{'id':'fee_fixture','livemode':False,'charge':'ch_fixture','account':'acct_fixture','currency':'usd','amount':1500,'amount_refunded':self.refunded*15//100},
             '/v1/transfers/tr_fixture':{'id':'tr_fixture','livemode':False,'source_transaction':'ch_fixture','destination':'acct_wrong' if self.corrupt else 'acct_fixture','currency':'usd','amount':10000,'amount_reversed':self.refunded},
             '/v1/balance_transactions/txn_fixture':{'id':'txn_fixture','source':'ch_fixture','currency':'usd','fee':320,'status':'available'}}
         return httpx.Response(200,json=objs[path])
@@ -60,10 +60,10 @@ class ConnectTests(unittest.TestCase):
 
     def test_full_lifecycle_fee_partial_full_refund_and_reconciliation(self):
         self.pay(); first=self.op.reconcile(self.o['id'])
-        self.assertTrue(first['matched']); self.assertEqual(500,first['net_commission_cents']); self.assertEqual(9500,first['provider_net_before_costs_cents'])
+        self.assertTrue(first['matched']); self.assertEqual(1500,first['net_commission_cents']); self.assertEqual(8500,first['provider_net_before_costs_cents'])
         self.assertTrue(self.c.event(self.event)['duplicate'])
         self.op.refund(self.o['id'],4000); self.sync_refund()
-        partial=self.op.reconcile(self.o['id']); self.assertTrue(partial['matched']); self.assertEqual(300,partial['net_commission_cents']); self.assertEqual(5700,partial['provider_net_before_costs_cents'])
+        partial=self.op.reconcile(self.o['id']); self.assertTrue(partial['matched']); self.assertEqual(900,partial['net_commission_cents']); self.assertEqual(5100,partial['provider_net_before_costs_cents'])
         self.op.refund(self.o['id'],4000); self.assertEqual(4000,self.refunded)
         self.op.refund(self.o['id'],10000); self.sync_refund()
         final=self.op.reconcile(self.o['id']); self.assertTrue(final['matched']); self.assertEqual(0,final['net_commission_cents']); self.assertEqual(0,final['real_revenue_cents']); self.assertFalse(final['settlement_confirmed'])
@@ -136,7 +136,7 @@ class ConnectTests(unittest.TestCase):
                 self.assertTrue(c.event(self.event)['duplicate'])
                 op.refund(self.o['id'],4000)
                 self.assertEqual(4000,self.refunded)
-                self.assertEqual(300,c.load('orders',self.o['id'])['commission_cents'])
+                self.assertEqual(900,c.load('orders',self.o['id'])['commission_cents'])
             finally: restored.db.close()
 
     def test_incomplete_account_cannot_be_approved(self):
@@ -184,7 +184,7 @@ class ConnectTests(unittest.TestCase):
             return obj
         self.stripe.request=resolve
         report=self.op.reconcile(self.o['id'])
-        self.assertTrue(report['matched']);self.assertEqual(500,report['net_commission_cents'])
+        self.assertTrue(report['matched']);self.assertEqual(1500,report['net_commission_cents'])
 
     def test_missing_fee_is_pending_and_never_assumed_earned(self):
         from resultgate.commerce.connect_test import SettlementPending

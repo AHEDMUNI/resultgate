@@ -5,7 +5,7 @@ This is a reviewed-source shortlist, not an enrolled provider list. No new messa
 ## Fastest bounded route
 
 Start with one independent provider who owns a low-risk service (e.g. public-data
-format conversion or analysis), accepts the 5% contract, and can pass Stripe onboarding.
+format conversion or analysis), accepts the 15% contract, and can pass Stripe onboarding.
 This avoids assuming resale rights to a SaaS subscription. The provider still has to
 be recruited/qualified; no current buyer or provider acceptance is proved.
 
@@ -15,10 +15,10 @@ no general right to resell every Actor or collect its price is implied.
 Sources: https://apify.com/partners and https://apify.com/partners/join
 Independent creators can be approached for an explicit listing/collection agreement
 only after outreach approval. Their own IP/licensing and platform terms require review.
-The public affiliate commission is a different model, NOT our chosen 5% marketplace.
+The public affiliate commission is a different model, NOT our chosen 15% marketplace.
 
 BrowserAct/Firecrawl/ScraperAPI inquiries previously concerned referrals. A referral
-reply does not authorize marketplace collection, a 5% split, account resale or payment
+reply does not authorize marketplace collection, a 15% split, account resale or payment
 on their behalf. They must not be listed as contracted providers under this new model.
 PR #11's Firecrawl-specific plan and varying commissions do not govern this module.
 
@@ -42,8 +42,8 @@ PR #11's Firecrawl-specific plan and varying commissions do not govern this modu
   Signature verification uses the unchanged raw body; duplicate and out-of-order events
   must be expected. No success-page-based commission booking.
 
-Illustrative economics, not a transaction: on $100, gross 5% is $5. At the published
-starting card rate, $3.20 processing would leave $1.80 before Connect/payout costs,
+Illustrative economics, not a transaction: on $100, gross 15% is $15. At the published
+starting card rate, $3.20 processing would leave $11.80 before Connect/payout costs,
 refunds, disputes and taxes if the platform bears those fees. We have not approved a
 surcharge or shifted fees to a provider. Final cost allocation requires explicit agreement.
 

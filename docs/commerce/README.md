@@ -1,4 +1,4 @@
-# ResultGate general marketplace — 5% payment sandbox
+# ResultGate general marketplace — 15% payment sandbox
 
 Status: review-only branch, not deployed. Does not depend on PR #11. Existing
 production MCP and discovery schedules are unchanged. No live payment switch exists.
@@ -12,7 +12,7 @@ Invited tenants apply as providers and acknowledge versioned **sandbox** terms.
 An operator reviews their test account/authority evidence before service listing.
 Services have immutable USD prices and arbitrary bounded capability labels. Discovery
 sorts exact capability matches by price and stable ID; no fabricated quality scores.
-An order freezes service, provider, price, terms and 5% fee. Existing credentials
+An order freezes service, provider, price, terms and 15% fee. Existing credentials
 provide tenant isolation, revocation and quotas. No completion/quality field gates fees.
 
 Owner approval binds the exact quote, amount and expiry. Alternatively an operator
@@ -109,7 +109,7 @@ external user adoption and third-party client certification are not claimed.
    Create an invited sandbox provider/service and approve a quote using the owner CLI.
 5. Open the returned Stripe TEST Checkout URL. Use Stripe's documented test payment
    methods. Capture event/session IDs in a redacted acceptance report.
-6. Confirm the signed payment creates exactly one 5% entry before any service completion.
+6. Confirm the signed payment creates exactly one 15% entry before any service completion.
    Trigger replay, partial/full refund and disputes in the sandbox. Reconcile actual
    Stripe test application fees/transfers against the internal ledger.
 7. Restore a copied sandbox DB and replay an event to verify no duplicate accrual.
@@ -121,7 +121,7 @@ They do not prove a transaction reached Stripe or an independent customer paid.
 
 Required: Stripe account eligibility for the operating entity, accepted Connect costs
 and liability allocation, completed hosted KYC/capabilities, authorized provider's live
-5% agreement and resale rights, customer terms/refund policy/tax treatment, verified
+15% agreement and resale rights, customer terms/refund policy/tax treatment, verified
 owner identity and consent, credential-safe hosted routes, security review, sandbox
 end-to-end evidence, payment/fee/refund/dispute reconciliation, monitoring and tested
 backup/rollback. Then obtain separate explicit approval for real collection and deployment.

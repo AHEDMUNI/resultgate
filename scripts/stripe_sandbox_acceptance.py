@@ -242,7 +242,11 @@ def execute(directory):
                 pump(server,proc,lambda: bool(payment()),1200)
             report_path = directory / 'report.json'
             reports = json.loads(report_path.read_text()) if report_path.exists() else {'mode':'test','account':ACCOUNT,'order_id':order['id'],'stages':{},'real_revenue_cents':0}
-            for target, commission, provider_cents, label in ((0,500,9500,'paid'),(4000,300,5700,'partial_refund'),(10000,0,0,'full_refund')):
+            from resultgate.commerce.core import fee, order_rate
+            frozen_rate = order_rate(order)
+            for target, label in ((0,'paid'),(4000,'partial_refund'),(10000,'full_refund')):
+                commission = fee(10000-target, frozen_rate)
+                provider_cents = 10000-target-commission
                 if label in reports['stages']: continue
                 print('SAFE PROGRESS: '+label,flush=True)
                 current = payment()[1]

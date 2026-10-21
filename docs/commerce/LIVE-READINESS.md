@@ -12,7 +12,7 @@ Updated 2026-10-21 after owner reported completion of company/identity details f
 1. Owner completes Stripe onboarding and reviews charges, Connect model, liability and restrictions.
 2. Confirm approved platform/account identity privately; no account secrets in code or chat.
 3. Complete a genuine Stripe Sandbox Checkout, signed webhook, replay, refund and dispute round trip; reconcile application fee and destination transfer.
-4. Review provider identity/contracting authority, accepted 5% terms and right to offer services. No service-completion condition on fee entitlement.
+4. Review provider identity/contracting authority, accepted 15% terms and right to offer services. No service-completion condition on fee entitlement.
 5. Complete hosted owner consent identity, price/terms binding, grant limits, session cancellation and immutable payment/order mapping.
 6. Complete ledger reconciliation for processing costs, refunds, application-fee reversals, failed refunds, disputes and transfers. Do not mark payout confirmed merely on Checkout success.
 7. Review live adapter separately: platform and connected account allowlists, secrets outside git, live/test data separation, signature/version validation, kill switch, alerts, backup/restore, rollback and concurrency tests.

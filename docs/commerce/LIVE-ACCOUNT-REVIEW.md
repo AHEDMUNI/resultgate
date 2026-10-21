@@ -1,7 +1,7 @@
 # Production readiness — 2026-10-21
 
 Status: NOT ready for live collection. The owner authorized preparation and account
-review, but requires a separate final confirmation before real Checkout opens.
+review and conditionally authorized deployment at 15% after all production gates pass. This is not permission to bypass those gates.
 No live key or API call, financial deployment, contract acceptance or expenditure
 has been made in this preparation step. Existing Sandbox acceptance is retained.
 
@@ -40,10 +40,10 @@ Official sources checked on 2026-10-21:
 - https://docs.stripe.com/connect/destination-charges — destination-charge
   processing fees, refunds and chargebacks debit the platform balance.
 
-At the standard domestic card rate, a $100 destination charge with a $5 application
-fee leaves $1.80 before Connect fees, hosting, refunds, disputes and taxes.
+At the standard domestic card rate, a $100 destination charge with a $15 application
+fee leaves $11.80 before Connect fees, hosting, refunds, disputes and taxes.
 This is illustrative arithmetic, not verified account-specific pricing or profit.
-The 95% provider entitlement is before agreed costs; automatically taking an extra
+The 85% provider entitlement is before agreed costs; automatically taking an extra
 processing fee from the provider is NOT authorized. Fixed costs can make a first
 small transaction unprofitable. The owner and provider must agree cost allocation,
 loss responsibility, settlement timing and tax treatment before activation.
@@ -59,7 +59,7 @@ are test-only. No live-key switch is added. Production still needs:
    immutable quote, amount, currency, merchant, expiry and revocable delegation.
    A tenant bearer token or Stripe customer email is not proof of owner consent.
 2. A genuine provider: verified service control and contracting authority, explicit
-   marketplace rights, signed 5% agreement, price/scope/support/refund terms and
+   marketplace rights, signed 15% agreement, price/scope/support/refund terms and
    live connected-account binding. A provider application is not acceptance.
 3. Separately reviewed live adapter and private production storage; durable signed
    webhook ingestion, bounded retries and operational alerting. Never interpret
@@ -75,3 +75,6 @@ Glama submission requires an authenticated session. The public notice must say
 prelaunch/simulation and voluntary provider applications; there are no verified
 commercial sellers or live offers at this checkpoint. No external submission is
 claimed without a Glama confirmation.
+
+## Dashboard observation after owner setup
+On 2026-10-21 the authenticated Live Connect dashboard displayed “Connect setup complete”. Business, identity and integration choices were marked complete. Review your profile and API keys were not started; Create a live connected account was disabled. This does not establish production charge capability. No live secret was opened. The owner conditionally authorized 15% deployment after all operational/provider gates pass, without new expenses or financial agreements.
