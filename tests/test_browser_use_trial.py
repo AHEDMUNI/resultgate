@@ -2,7 +2,7 @@ import json
 import tempfile
 import unittest
 from unittest.mock import patch
-from resultgate.delegation.browser_use_trial import Trial, TrialError, Transport, identifier, amount
+from resultgate.delegation.browser_use_trial import Trial, TrialError, Transport, identifier, amount, PageFacts
 
 RID='11111111-1111-4111-8111-111111111111'
 SID='22222222-2222-4222-8222-222222222222'
@@ -79,3 +79,9 @@ class BrowserUseTrialTests(unittest.TestCase):
         with self.assertRaises(TrialError):identifier('../secret')
     def test_preflight_does_not_claim_credit_origin_or_recharge(self):
         r=self.trial.preflight();self.assertFalse(r['promotional_origin_verified_by_api']);self.assertFalse(r['recharge_setting_verified_by_api'])
+
+    def test_public_fixture_may_have_no_title_but_requires_heading(self):
+        p=PageFacts();p.feed('<html><h1>Public test fixture</h1><p>Some text</p></html>')
+        self.assertEqual(p.facts(), {'title':'','heading':'Public test fixture','documentation_example':False})
+        p=PageFacts();p.feed('<title>Example Domain</title><p>No heading</p>')
+        with self.assertRaises(TrialError):p.facts()
