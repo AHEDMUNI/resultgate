@@ -1,0 +1,72 @@
+{
+  "reviewed_on": "2026-10-21",
+  "scope": "operator research, not automatic discovery output or customer acquisition",
+  "providers": [
+    {
+      "id": "firecrawl-standard",
+      "source": "https://www.firecrawl.dev/firecrawl-for-platforms",
+      "api_docs": "https://docs.firecrawl.dev/firecrawl-for-platforms",
+      "capability": "web_extraction",
+      "status": "awaiting_partner_approval",
+      "customer_pays_provider": true,
+      "commission_rate": null,
+      "agent_referral_eligibility": "platform program supports API integration; ResultGate approval required",
+      "retroactive_commission": false,
+      "settlement_evidence": "not agreed",
+      "refund_terms": "not agreed",
+      "execution_enabled": false,
+      "next_step": "Locate existing inquiry and obtain Standard partner approval and written attribution/payout terms before referring paying users."
+    },
+    {
+      "id": "browseract",
+      "source": "https://www.browseract.com/affiliate",
+      "capability": "browser_automation",
+      "status": "inquiry_sent_no_reply_observed",
+      "advertised_first_order_basis_points": 3000,
+      "advertised_following_six_months_basis_points": 2000,
+      "agent_referral_eligibility": "unconfirmed",
+      "settlement_evidence": "dashboard advertised, machine-verifiable reconciliation not agreed",
+      "execution_enabled": false
+    },
+    {
+      "id": "scrapingbee",
+      "source": "https://www.scrapingbee.com/affiliates/",
+      "capability": "web_extraction",
+      "status": "candidate_not_contacted",
+      "advertised_recurring_basis_points": 2500,
+      "agent_referral_eligibility": "unconfirmed",
+      "execution_enabled": false,
+      "next_step": "Review link-only attribution and minimum payout conditions before requesting outreach approval."
+    }
+  ],
+  "demand": [
+    {
+      "id": "onlinejobs-1551357",
+      "source": "https://www.onlinejobs.ph/jobseekers/job/Data-Extraction-Web-Scraping-Assistant-1551357",
+      "source_date": "2026-01-10",
+      "need": "Recurring extraction, CSV schema validation and deduplication",
+      "requester_scope": "Canadian AI startup described in public listing; identity not independently verified",
+      "status": "stale_signal_not_sales_qualified",
+      "economic_fit": "Provider extracts permitted public data; ResultGate validates required columns and duplicates",
+      "blockers": ["Old listing; availability unknown", "Human employment listing, not agent procurement", "No provider agreement", "No ResultGate customer consent"],
+      "outreach_allowed": false,
+      "customer": false
+    },
+    {
+      "id": "make-110926",
+      "source": "https://community.make.com/t/looking-to-hire-an-ai-expert-for-a-fixed-term-contract-project/110926",
+      "source_date": "2026-06-16",
+      "need": "Business systems and AI automation",
+      "requester_scope": "Willow Grey Interiors as stated in public post",
+      "status": "out_of_scope_for_first_low_risk_pilot",
+      "economic_fit": "Potential specialist referral; not a current ready-to-execute service",
+      "blockers": ["Broad 6-12 month human role", "Sensitive business integrations", "Current opening unconfirmed", "No approved qualified provider"],
+      "outreach_allowed": false,
+      "customer": false
+    }
+  ],
+  "verified_independent_customers": 0,
+  "verified_paid_transactions": 0,
+  "verified_commission_due_micros": 0,
+  "verified_cash_received_micros": 0
+}
