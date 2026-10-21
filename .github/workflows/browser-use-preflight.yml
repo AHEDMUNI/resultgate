@@ -1,4 +1,4 @@
-name: Browser Use read-only preflight (no agent execution)
+name: Browser Use existing trial cleanup only
 on:
   push:
     branches: [trial/browser-use-preflight]
@@ -19,48 +19,36 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
-      - name: Read eligibility only, never submit a task
+      - name: Stop and reconcile existing task only
         env:
           BROWSER_USE_API_KEY: ${{ secrets.BROWSER_USE_API_KEY }}
         run: |
           python - <<'PY'
-          import json, os, tempfile
-          from decimal import Decimal
-          from resultgate.delegation.browser_use_trial import Trial, Transport, TrialError, PageFacts
+          import json, os
+          from resultgate.delegation.browser_use_trial import Transport, TrialError, stop_session_browsers, amount
+          SID='f148cb66-d9ad-4718-8c6a-df41e552b858'
+          RID='c73bb06a-6d66-407a-99a1-c949ad519932'
+          class CleanupOnly(Transport):
+              def request(self, method, path, payload=None, **kwargs):
+                  if method not in ('GET', 'PATCH') or (method == 'PATCH' and payload != {'action':'stop'}):
+                      raise TrialError('cleanup_only')
+                  return super().request(method,path,payload,**kwargs)
+          t=CleanupOnly(os.environ.get('BROWSER_USE_API_KEY'))
           try:
-              with tempfile.TemporaryDirectory() as directory:
-                  trial = Trial(directory, Transport(os.environ.get('BROWSER_USE_API_KEY')))
-                  try:
-                      result = trial.preflight()
-                      print(json.dumps({
-                          'free_tier': result['is_free_tier'],
-                          'at_least_50_cents_credit': Decimal(result['credits_usd']) >= Decimal('0.50'),
-                          'no_active_sessions': result['active_sessions'] == 0,
-                          'promotional_origin_verified': False,
-                          'recharge_verified': False,
-                          'agent_tasks_submitted': 0,
-                      }))
-                  finally:
-                      trial.db.close()
-          except (TrialError, OSError):
-              print('{"preflight":"blocked","agent_tasks_submitted":0}')
-              raise SystemExit(1) from None
-          PY
-      - name: Public fixture diagnostic (no credentials, no agent execution)
-        run: |
-          python - <<'PY'
-          import json
-          from resultgate.delegation.browser_use_trial import Transport, TrialError, PageFacts
-          try:
-              p = PageFacts()
-              page = Transport('unused-placeholder').request('GET', '/', page=True)
-              print(json.dumps({'public_fixture_excerpt': page[:2000]}))
-              p.feed(page)
-              print(json.dumps({'fixture': p.facts(), 'agent_tasks_submitted': 0}))
+              stopped=stop_session_browsers(t,SID)
+              cost=t.request('GET','/api/v4/sessions/'+SID+'/cost')
+              run=t.request('GET','/api/v4/runs/'+RID)
+              account=t.request('GET','/api/v2/billing/account')
+              if cost.get('sessionId')!=SID or run.get('id')!=RID or run.get('sessionId')!=SID:
+                  raise TrialError('binding_failed')
+              out={'run_id':RID,'session_id':SID,'browser_stopped':stopped,'new_tasks_submitted':0,
+                   'state':run.get('status'),'session_run_count':cost.get('numRuns'),
+                   'credits_remaining_usd':amount(account.get('totalCreditsBalanceUsd')),
+                   'active_sessions':account.get('activeSessionCount')}
+              for field in ('llmCostUsd','searchCostUsd','browserCostUsd','proxyCostUsd','totalCostUsd'):
+                  out[field]=amount(cost.get(field))
+              print('RESULTGATE_CLEANUP='+json.dumps(out,sort_keys=True))
           except TrialError as error:
-              allowed = {'non_public_address','transport_failed','response_timeout','response_too_large','fixture_unavailable','unsupported_encoding'}
-              reason = str(error)
-              safe = reason if reason in allowed or reason.startswith('provider_http_') and reason[14:].isdigit() else 'unclassified'
-              print(json.dumps({'fixture_error': safe, 'agent_tasks_submitted': 0}))
+              print('RESULTGATE_CLEANUP='+json.dumps({'error':str(error),'new_tasks_submitted':0}))
               raise SystemExit(1) from None
           PY
