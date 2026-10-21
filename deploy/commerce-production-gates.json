@@ -34,8 +34,8 @@
   "stripe_dashboard_observation": {
     "date": "2026-10-21",
     "connect_setup": "complete",
-    "live_connected_account_create_button": "disabled",
-    "profile_review": "not_started",
+    "live_connected_account_create_button": "enabled_after_dashboard_reload",
+    "profile_review": "public_business_profile_form; not evidence of missing identity verification",
     "payment_eligibility_verified": false
   }
 }

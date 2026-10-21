@@ -78,3 +78,6 @@ claimed without a Glama confirmation.
 
 ## Dashboard observation after owner setup
 On 2026-10-21 the authenticated Live Connect dashboard displayed “Connect setup complete”. Business, identity and integration choices were marked complete. Review your profile and API keys were not started; Create a live connected account was disabled. This does not establish production charge capability. No live secret was opened. The owner conditionally authorized 15% deployment after all operational/provider gates pass, without new expenses or financial agreements.
+
+## Follow-up dashboard correction
+After reloading on 2026-10-21, Create became enabled. Review your profile opens an optional-information public Stripe business profile, not a new identity-document request. No profile was submitted and no personal contact details were published. Earlier disabled-button observation was stale; it must not be reported as a confirmed Stripe restriction. Actual charge capabilities still require account-level verification before release.
