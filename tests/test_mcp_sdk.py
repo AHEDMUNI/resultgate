@@ -19,6 +19,12 @@ spec.loader.exec_module(client_module)
 
 class SdkTests(unittest.TestCase):
     def test_sdk_over_real_tcp(self):
+        self.run_sdk(False)
+
+    def test_preview_sdk_over_real_tcp(self):
+        self.run_sdk(True)
+
+    def run_sdk(self, preview):
         with tempfile.TemporaryDirectory() as directory:
             registry = Registry(directory)
             token = MarketOperator(Market(registry)).issue_credential('sdk-internal-fixture')
@@ -27,7 +33,7 @@ class SdkTests(unittest.TestCase):
                 sock.bind(('127.0.0.1', 0))
                 port = sock.getsockname()[1]
             url = f'http://127.0.0.1:{port}'
-            proc = subprocess.Popen([sys.executable, '-m', 'resultgate.network.gateway', '--directory', directory, '--port', str(port)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            proc = subprocess.Popen([sys.executable, '-m', 'resultgate.network.gateway', '--directory', directory, '--port', str(port)] + (['--marketplace-preview'] if preview else []), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             try:
                 with httpx.Client(trust_env=False, timeout=1) as client:
                     deadline = time.monotonic() + 10
@@ -40,7 +46,7 @@ class SdkTests(unittest.TestCase):
                         if proc.poll() is not None or time.monotonic() > deadline:
                             self.fail('gateway startup failed')
                         time.sleep(.05)
-                result = asyncio.run(client_module.probe(url + '/mcp', token))
+                result = asyncio.run(client_module.probe(url + '/mcp', token, marketplace_preview=preview))
                 self.assertTrue(result['replay_prevented'])
                 self.assertFalse(result['independent_adoption'])
             finally:

@@ -77,7 +77,7 @@ async def body(request, model):
         raise Rejected(400) from None
 
 
-def create_app(directory):
+def create_app(directory, *, marketplace_enabled=False):
     """Open an operator-initialized private Registry; never mint HTTP credentials."""
     path=Path(directory)
     if path.is_symlink() or not path.is_dir() or not (path/'identity.key').is_file() or not (path/'delegation.sqlite3').is_file():
@@ -132,7 +132,7 @@ def create_app(directory):
         token=await authenticate(request)
         return response(market.delete(token,request.path_params['task_id']))
 
-    mcp_endpoint = endpoint(market, registry, authenticate, body, response, Rejected, CreateTask, ProviderSearch)
+    mcp_endpoint = endpoint(market, registry, authenticate, body, response, Rejected, CreateTask, ProviderSearch, marketplace_enabled=marketplace_enabled)
     app=Starlette(routes=[Route('/mcp',mcp_endpoint,methods=['POST','GET','DELETE']),Route('/healthz',health),Route('/v1/capabilities',capabilities),
         Route('/v1/providers/search',providers,methods=['POST']),Route('/v1/tasks',create,methods=['POST']),
         Route('/v1/tasks/{task_id}',get,methods=['GET']),Route('/v1/tasks/{task_id}',delete,methods=['DELETE']),
@@ -168,10 +168,11 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory',required=True)
     parser.add_argument('--port',type=int,default=8765)
+    parser.add_argument('--marketplace-preview', action='store_true', help='Enable reviewed intake/advice/audit tools; no execution or payments')
     args=parser.parse_args()
     if not 1024<=args.port<=65535: parser.error('port must be 1024..65535')
     import uvicorn
-    uvicorn.run(create_app(args.directory),host='127.0.0.1',port=args.port,access_log=False,
+    uvicorn.run(create_app(args.directory, marketplace_enabled=args.marketplace_preview),host='127.0.0.1',port=args.port,access_log=False,
                 proxy_headers=False,server_header=False,timeout_keep_alive=5,limit_concurrency=16)
 
 if __name__=='__main__': main()
