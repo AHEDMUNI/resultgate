@@ -26,7 +26,7 @@ jobs:
           python - <<'PY'
           import json, os, tempfile
           from decimal import Decimal
-          from resultgate.delegation.browser_use_trial import Trial, Transport, TrialError
+          from resultgate.delegation.browser_use_trial import Trial, Transport, TrialError, PageFacts
           try:
               with tempfile.TemporaryDirectory() as directory:
                   trial = Trial(directory, Transport(os.environ.get('BROWSER_USE_API_KEY')))
@@ -44,5 +44,21 @@ jobs:
                       trial.db.close()
           except (TrialError, OSError):
               print('{"preflight":"blocked","agent_tasks_submitted":0}')
+              raise SystemExit(1) from None
+          PY
+      - name: Public fixture diagnostic (no credentials, no agent execution)
+        run: |
+          python - <<'PY'
+          import json
+          from resultgate.delegation.browser_use_trial import Transport, TrialError, PageFacts
+          try:
+              p = PageFacts()
+              p.feed(Transport('unused-placeholder').request('GET', '/', page=True))
+              print(json.dumps({'fixture': p.facts(), 'agent_tasks_submitted': 0}))
+          except TrialError as error:
+              allowed = {'non_public_address','transport_failed','response_timeout','response_too_large','fixture_unavailable','unsupported_encoding'}
+              reason = str(error)
+              safe = reason if reason in allowed or reason.startswith('provider_http_') and reason[14:].isdigit() else 'unclassified'
+              print(json.dumps({'fixture_error': safe, 'agent_tasks_submitted': 0}))
               raise SystemExit(1) from None
           PY
