@@ -15,6 +15,16 @@ class Links(HTMLParser):
         self.links += [v for k,v in attrs if k in ('href','src')]
 
 class BusinessSiteTests(unittest.TestCase):
+    def test_homepage_dollar_example_matches_catalog_commission(self):
+        import json
+        catalog = json.loads((ROOT/'web/business/catalog.json').read_text())
+        self.assertEqual(1500, catalog['commission_basis_points'])
+        commission = 100 * catalog['commission_basis_points'] // 10000
+        text = (ROOT/'web/business/index.html').read_text()
+        self.assertIn(f'USD 100 eligible payment → USD {commission} platform commission + USD {100-commission} provider allocation', text)
+        self.assertNotIn('USD 5 platform commission', text)
+        self.assertNotIn('USD 95 provider allocation', text)
+
     def test_current_commission_is_fifteen_percent_and_checkout_stays_closed(self):
         import json
         catalog = json.loads((ROOT/'web/business/catalog.json').read_text())
