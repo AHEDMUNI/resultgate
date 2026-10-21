@@ -1,0 +1,33 @@
+name: Public demand signals (no outreach or payments)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '47 12 * * *'
+  pull_request:
+    paths:
+      - 'resultgate/operations/**'
+      - 'tests/test_discovery_operations.py'
+      - '.github/workflows/demand-discovery.yml'
+permissions:
+  contents: read
+concurrency:
+  group: demand-discovery-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  collect:
+    if: github.repository == 'AHEDMUNI/resultgate' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Offline failure, deduplication and restore tests (stdlib only)
+        run: python -m unittest discover -s tests -p test_discovery_operations.py
+      - name: Bounded public API collection
+        run: python -m resultgate.operations.discovery --directory "$RUNNER_TEMP/resultgate-discovery" --collect
+      - name: Evidence and public citations (not a persistent production ledger)
+        if: always()
+        run: |
+          python -m resultgate.operations.discovery --directory "$RUNNER_TEMP/resultgate-discovery" >> "$GITHUB_STEP_SUMMARY"
+          python -m resultgate.operations.discovery --directory "$RUNNER_TEMP/resultgate-discovery" --export >> "$GITHUB_STEP_SUMMARY"
