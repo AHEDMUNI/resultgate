@@ -100,6 +100,11 @@ def create_app(directory):
 
     async def capabilities(request): return response(catalog())
 
+    async def health(request):
+        # Local liveness/readability only; not a claim that providers are available.
+        registry.db.execute('SELECT count(*) FROM market_tasks').fetchone()
+        return response({'status': 'ok', 'mode': 'simulation', 'external_execution': False})
+
     async def providers(request):
         await authenticate(request)
         data = await body(request, ProviderSearch)
@@ -126,7 +131,7 @@ def create_app(directory):
         token=await authenticate(request)
         return response(market.delete(token,request.path_params['task_id']))
 
-    app=Starlette(routes=[Route('/v1/capabilities',capabilities),
+    app=Starlette(routes=[Route('/healthz',health),Route('/v1/capabilities',capabilities),
         Route('/v1/providers/search',providers,methods=['POST']),Route('/v1/tasks',create,methods=['POST']),
         Route('/v1/tasks/{task_id}',get,methods=['GET']),Route('/v1/tasks/{task_id}',delete,methods=['DELETE']),
         Route('/v1/tasks/{task_id}/events',advance,methods=['POST'])], lifespan=lifespan)
