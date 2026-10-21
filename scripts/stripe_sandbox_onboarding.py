@@ -50,7 +50,11 @@ def hidden_input(prompt):
 
 def read_test_key():
     while True:
-        key = hidden_input('READY FOR HIDDEN SANDBOX KEY (or type EXIT): ')
+        try:
+            key = hidden_input('READY FOR HIDDEN SANDBOX KEY (or type EXIT): ')
+        except ValueError:
+            print('Input too long; retry inside the secure reader. Value not printed.', flush=True)
+            continue
         if key == 'EXIT': raise EOFError()
         if re.fullmatch(r'sk_test_[A-Za-z0-9_]+', key): return key
         print('Input rejected; still INSIDE the secure reader. Test secret only; value not printed.', flush=True)
@@ -66,6 +70,25 @@ def finish():
             continue
         if value in ('', 'EXIT'): return
         print('Input discarded without display.', flush=True)
+
+
+SAFE_CODES = {'account_id_mismatch', 'account_not_express', 'account_country_not_us'}
+
+def validate_account(account, selected):
+    if account.get('id') != selected: raise RuntimeError('account_id_mismatch')
+    if account.get('type') != 'express': raise RuntimeError('account_not_express')
+    if account.get('country') != 'US': raise RuntimeError('account_country_not_us')
+
+def diagnostic(error):
+    """Fixed diagnostic labels only. Never interpolate exception messages or values."""
+    if isinstance(error, RuntimeError):
+        code = str(error)
+        return code if code in SAFE_CODES or re.fullmatch(r'stripe_http_[0-9]{3}', code) else 'operation_failed'
+    if isinstance(error, urllib.error.URLError): return 'stripe_connection_failed'
+    if isinstance(error, TimeoutError): return 'stripe_connection_timeout'
+    if isinstance(error, json.JSONDecodeError): return 'stripe_response_not_json'
+    if isinstance(error, (OSError, termios.error)): return 'terminal_or_network_os_error'
+    return 'response_validation_failed'
 
 
 def main():
@@ -106,8 +129,7 @@ def main():
         if not isinstance(result,dict) or result.get('livemode') is True: raise ValueError('invalid/test-only response required')
         return result
     account=request('/v1/accounts/'+a.account)
-    if account.get('id') != a.account or account.get('type') != 'express' or account.get('country') != 'US':
-        raise ValueError('Expected the selected existing US Express account')
+    validate_account(account, a.account)
     requirements=account.get('requirements') or {}
     safe={'account':account['id'],'mode':'test','account_created':False,
           'charges_enabled':account.get('charges_enabled'),'payouts_enabled':account.get('payouts_enabled'),
@@ -134,11 +156,11 @@ if __name__=='__main__':
     except RuntimeError as error:
         # Only locally generated HTTP status, never Stripe response text or a key.
         code=str(error)
-        print(code if re.fullmatch(r'stripe_http_[0-9]{3}',code) else 'operation_failed', flush=True)
+        print(diagnostic(error), flush=True)
         try: finish()
         except (EOFError, KeyboardInterrupt, OSError, termios.error): pass
-    except (ValueError, KeyError, TypeError, urllib.error.URLError, OSError, termios.error):
-        print('Stopped: terminal/network/response validation failed; no payment attempted.', flush=True)
+    except (ValueError, KeyError, TypeError, urllib.error.URLError, OSError, termios.error) as error:
+        print('Stopped: ' + diagnostic(error) + '; no payment attempted.', flush=True)
         try: finish()
         except (EOFError, KeyboardInterrupt, OSError, termios.error): pass
     except (EOFError, KeyboardInterrupt):

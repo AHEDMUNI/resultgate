@@ -63,3 +63,19 @@ class SecureInputTests(unittest.TestCase):
         m=module('stripe_sandbox_onboarding')
         with patch.object(m,'hidden_input',side_effect=['عربي', '\ufffd', ValueError('input_too_long'), '']), patch('builtins.print'):
             m.finish()
+
+    def test_diagnostics_never_expose_exception_content(self):
+        m=module('stripe_sandbox_onboarding')
+        for error in (ValueError('sk_test_FAKE'), OSError('sk_test_FAKE'),
+                      m.urllib.error.URLError('sk_test_FAKE'), RuntimeError('sk_test_FAKE')):
+            self.assertNotIn('sk_test', m.diagnostic(error))
+        self.assertEqual('stripe_connection_failed',m.diagnostic(m.urllib.error.URLError('private')))
+        self.assertEqual('stripe_http_401',m.diagnostic(RuntimeError('stripe_http_401')))
+
+    def test_account_validation_distinguishes_fixed_failure_codes(self):
+        m=module('stripe_sandbox_onboarding')
+        for account, code in (({'id':'acct_other'},'account_id_mismatch'),
+                              ({'id':'acct_selected','type':'standard'},'account_not_express'),
+                              ({'id':'acct_selected','type':'express','country':'CA'},'account_country_not_us')):
+            with self.assertRaises(RuntimeError) as raised: m.validate_account(account,'acct_selected')
+            self.assertEqual(code,m.diagnostic(raised.exception))
