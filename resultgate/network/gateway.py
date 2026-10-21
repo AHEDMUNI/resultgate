@@ -16,7 +16,7 @@ from starlette.requests import ClientDisconnect, Request
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 from .catalog import catalog
-from .market import Market
+from .market import Market, RequestBudgetExceeded
 from .registry import Registry
 
 MAX_BODY = 16384
@@ -87,7 +87,8 @@ def create_app(directory):
         values=request.headers.getlist('authorization')
         if len(values)!=1 or not re.fullmatch(r'Bearer [a-f0-9]{64}',values[0]): raise Rejected(401)
         token=values[0][7:]
-        try: market._auth(token)
+        try: market.consume_request(token)
+        except RequestBudgetExceeded: raise Rejected(429) from None
         except ValueError: raise Rejected(401) from None
         return token
 
