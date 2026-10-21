@@ -2,11 +2,13 @@
 """Existing Express Sandbox account only. No account creation, payments or persistence.
 
 Run interactively on the operator's machine/server. Key is read from /dev/tty with
-getpass and retained only for these requests. Do not pipe input or capture output:
+strict no-echo input and retained only for these requests. Do not pipe input or capture output:
 the returned single-use onboarding link is private. No third-party dependencies.
 """
 import argparse
-import getpass
+import os
+import termios
+import resource
 import json
 import re
 import sys
@@ -21,15 +23,61 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
+def hidden_input(prompt):
+    """Linux controlling terminal only; no getpass fallback to echoed stdin."""
+    fd = os.open('/dev/tty', os.O_RDWR | os.O_NOCTTY)
+    previous = termios.tcgetattr(fd)
+    private = list(previous)
+    private[3] &= ~(termios.ECHO | termios.ECHONL)
+    try:
+        termios.tcsetattr(fd, termios.TCSAFLUSH, private)
+        os.write(fd, prompt.encode())
+        data = bytearray()
+        while True:
+            char = os.read(fd, 1)
+            if not char: raise EOFError()
+            if char in (b'\n', b'\r'): break
+            data.extend(char)
+            if len(data) > 512: raise ValueError('input_too_long')
+        return data.decode('ascii')
+    finally:
+        # Discard buffered multiline paste before any possible shell is resumed.
+        termios.tcflush(fd, termios.TCIFLUSH)
+        termios.tcsetattr(fd, termios.TCSANOW, previous)
+        os.write(fd, b'\n')
+        os.close(fd)
+
+
+def read_test_key():
+    while True:
+        key = hidden_input('READY FOR HIDDEN SANDBOX KEY (or type EXIT): ')
+        if key == 'EXIT': raise EOFError()
+        if re.fullmatch(r'sk_test_[A-Za-z0-9_]+', key): return key
+        print('Input rejected; still INSIDE the secure reader. Test secret only; value not printed.', flush=True)
+
+
+def finish():
+    print('Reader finished. Type EXIT to close this SSH session; do not paste another key.', flush=True)
+    while hidden_input('Hidden input; EXIT to close: ') != 'EXIT':
+        print('Input discarded without display.', flush=True)
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--account',required=True)
     p.add_argument('--status-only',action='store_true')
+    p.add_argument('--exec-session',action='store_true')
+    p.add_argument('--input-self-test',action='store_true')
     a=p.parse_args()
     if not re.fullmatch(r'acct_[A-Za-z0-9]+',a.account): p.error('invalid account ID')
     if not sys.stdin.isatty(): p.error('interactive terminal required; never pipe a key')
-    key=getpass.getpass('Paste Sandbox sk_test_ key (hidden; not saved): ')
-    if not re.fullmatch(r'sk_test_[A-Za-z0-9]+',key): p.error('Only sk_test_ keys accepted. No live keys.')
+    resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
+    if not a.exec_session: p.error('Run via exec python3 with --exec-session; do not use the old command')
+    if a.input_self_test:
+        value = hidden_input('SELF TEST: type DEMO_ONLY then Enter (NO API key): ')
+        print('SELF_TEST_OK' if value == 'DEMO_ONLY' else 'SELF_TEST_FAILED')
+        return
+    key=read_test_key()
     opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
     def request(path, params=None):
         data=urllib.parse.urlencode(params).encode() if params is not None else None
@@ -38,7 +86,7 @@ def main():
             with opener.open(req,timeout=20) as response:
                 raw=response.read(1024*1024+1)
         except urllib.error.HTTPError as error:
-            raise ValueError('Stripe HTTP '+str(error.code)+'; check Sandbox/key/account permissions in dashboard') from None
+            raise RuntimeError('stripe_http_'+str(error.code)) from None
         if len(raw)>1024*1024: raise ValueError('oversized Stripe response')
         result=json.loads(raw)
         if not isinstance(result,dict) or result.get('livemode') is True: raise ValueError('invalid/test-only response required')
@@ -66,6 +114,18 @@ def main():
 
 
 if __name__=='__main__':
-    try: main()
-    except (ValueError,KeyError,TypeError,urllib.error.URLError):
-        sys.exit('Stopped safely: check Sandbox account/permissions/network. No account created or payment attempted.')
+    try:
+        main()
+        finish()
+    except RuntimeError as error:
+        # Only locally generated HTTP status, never Stripe response text or a key.
+        code=str(error)
+        print(code if re.fullmatch(r'stripe_http_[0-9]{3}',code) else 'operation_failed', flush=True)
+        try: finish()
+        except (EOFError, KeyboardInterrupt, OSError, termios.error): pass
+    except (ValueError, KeyError, TypeError, urllib.error.URLError, OSError, termios.error):
+        print('Stopped: terminal/network/response validation failed; no payment attempted.', flush=True)
+        try: finish()
+        except (EOFError, KeyboardInterrupt, OSError, termios.error): pass
+    except (EOFError, KeyboardInterrupt):
+        print('Secure session closed.', flush=True)
