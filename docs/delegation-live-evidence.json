@@ -1,0 +1,31 @@
+{
+  "kind": "internal_live_specialist_integration",
+  "timestamp_utc": "2026-10-21T00:44:13.009055+00:00",
+  "provider": "GROBID project demo",
+  "provider_kind": "specialist_ml_service_not_autonomous_agent",
+  "state": "verified",
+  "error": null,
+  "result": {
+    "surnames": [
+      "Graff"
+    ],
+    "years": [
+      "2002"
+    ],
+    "titles": [
+      "Expert. Opin. Ther. Targets"
+    ],
+    "untrusted_data": true,
+    "provider_kind": "specialist_ml_service_not_autonomous_agent"
+  },
+  "result_hash": "1a063a9d58eb47293b700f4bb92d9ced8a3d9fa8836ef9cfbc5559518b8de30c",
+  "criteria": "surname Graff and year 2002, declared before dispatch",
+  "restart_restored": true,
+  "duplicate_not_redispatched": true,
+  "independent_uses": 0,
+  "commission_eligible": false,
+  "revenue_usd": 0,
+  "money_spent_usd": 0,
+  "source_run": "https://github.com/AHEDMUNI/resultgate/actions/runs/39523054395",
+  "tested_commit": "b3edf63c5731c186df52dcca13b57b4482b20a97"
+}

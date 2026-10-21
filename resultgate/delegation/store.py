@@ -72,8 +72,9 @@ class Store:
             if task['state'] in {'dispatching','cancel_requested'}: raise ValueError('resolve in-flight task before deletion')
             self.db.execute('BEGIN IMMEDIATE')
             try:
-                for table,column in [('events','task_id'),('commissions','task_id'),('tasks','id')]:
-                    self.db.execute(f'DELETE FROM {table} WHERE {column}=?',(task_id,))
+                self.db.execute('DELETE FROM events WHERE task_id=?',(task_id,))
+                self.db.execute('DELETE FROM commissions WHERE task_id=?',(task_id,))
+                self.db.execute('DELETE FROM tasks WHERE id=?',(task_id,))
                 self.db.execute('COMMIT')
             except Exception:
                 self.db.execute('ROLLBACK');raise

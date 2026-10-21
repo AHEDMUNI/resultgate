@@ -1,5 +1,7 @@
 # Brokerage execution report — 2026-10-20 (America/Chicago)
 
+Later work: see [Phase 2 delegation results](DELEGATION-RESULTS-2026-10-20.md). This report preserves the phase-1 evidence; its storage limitations are superseded only for the new delegation path.
+
 PR: https://github.com/AHEDMUNI/resultgate/pull/1
 Branch: feature/agent-brokerage
 Implementation tested: 12162da9b8d6dfd06d219e08348f22a133349822
