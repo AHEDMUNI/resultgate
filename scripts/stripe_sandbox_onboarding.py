@@ -74,6 +74,14 @@ def finish():
 
 SAFE_CODES = {'account_id_mismatch', 'account_not_express', 'account_country_not_us'}
 
+def safe_controller(account):
+    controller = account.get('controller') or {}
+    return {'dashboard_type': (controller.get('stripe_dashboard') or {}).get('type'),
+            'requirement_collection': controller.get('requirement_collection'),
+            'fees_payer': (controller.get('fees') or {}).get('payer'),
+            'losses_payments': (controller.get('losses') or {}).get('payments')}
+
+
 def validate_account(account, selected):
     if account.get('id') != selected: raise RuntimeError('account_id_mismatch')
     if account.get('type') != 'express': raise RuntimeError('account_not_express')
@@ -129,14 +137,17 @@ def main():
         if not isinstance(result,dict) or result.get('livemode') is True: raise ValueError('invalid/test-only response required')
         return result
     account=request('/v1/accounts/'+a.account)
-    validate_account(account, a.account)
+    if account.get('id') != a.account: raise RuntimeError('account_id_mismatch')
     requirements=account.get('requirements') or {}
     safe={'account':account['id'],'mode':'test','account_created':False,
+          'type':account.get('type'),'country':account.get('country'),
+          'controller':safe_controller(account),
           'charges_enabled':account.get('charges_enabled'),'payouts_enabled':account.get('payouts_enabled'),
           'details_submitted':account.get('details_submitted'),'capabilities':account.get('capabilities'),
           'requirements':{k:requirements.get(k) for k in ('currently_due','eventually_due','past_due','pending_verification','disabled_reason')}}
     print('SAFE STATUS (may be shared):'); print(json.dumps(safe,indent=2))
     if a.status_only: return
+    validate_account(account, a.account)
     # Existing public informational page; never interprets returning as verification.
     result=request('/v1/account_links',{'account':a.account,'type':'account_onboarding',
         'return_url':'https://agents.allubiyerbamate.com/providers',

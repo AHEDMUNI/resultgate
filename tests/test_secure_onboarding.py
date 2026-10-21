@@ -79,3 +79,9 @@ class SecureInputTests(unittest.TestCase):
                               ({'id':'acct_selected','type':'express','country':'CA'},'account_country_not_us')):
             with self.assertRaises(RuntimeError) as raised: m.validate_account(account,'acct_selected')
             self.assertEqual(code,m.diagnostic(raised.exception))
+
+    def test_controller_diagnostic_is_explicit_allowlist(self):
+        m=module('stripe_sandbox_onboarding')
+        result=m.safe_controller({'controller':{'secret':'DO_NOT_PRINT','stripe_dashboard':{'type':'express','secret':'DO_NOT_PRINT'},'requirement_collection':'stripe','fees':{'payer':'application'}}})
+        self.assertEqual('express',result['dashboard_type'])
+        self.assertNotIn('DO_NOT_PRINT',str(result))
