@@ -14,7 +14,12 @@
     "provider_kyc_and_authority": null,
     "provider_live_five_percent_agreement": null,
     "owner_authentication_and_payment_consent": null,
-    "stripe_hosted_sandbox_payment_refund_reconciliation": null,
+    "stripe_hosted_sandbox_payment_refund_reconciliation": {
+      "record": "docs/commerce/SANDBOX-EVIDENCE-2026-10-21.md",
+      "executed_commit": "1a561afe27d62116e681ce15057c842174384aa7",
+      "provenance": "operator-supplied server report screenshots",
+      "bank_settlement_verified": false
+    },
     "independent_security_review": null,
     "refund_dispute_payout_recovery": null,
     "backup_restore_and_rollback": null,
