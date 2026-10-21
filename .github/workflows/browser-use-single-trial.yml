@@ -1,0 +1,70 @@
+name: Browser Use single authorized free trial
+on:
+  push:
+    branches: [trial/browser-use-single-authorized]
+permissions:
+  contents: read
+concurrency:
+  group: browser-use-single-authorized
+  cancel-in-progress: false
+jobs:
+  one-trial:
+    if: github.repository == 'AHEDMUNI/resultgate' && github.run_number == 1 && github.run_attempt == 1
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: One create attempt, verify, stop and reconcile usage
+        env:
+          BROWSER_USE_API_KEY: ${{ secrets.BROWSER_USE_API_KEY }}
+        run: |
+          python - <<'PY'
+          import json, os, tempfile, time
+          from resultgate.delegation.browser_use_trial import Trial, Transport, TrialError, amount
+          class CountedTransport(Transport):
+              creates = 0
+              def request(self, method, path, payload=None, *, page=False):
+                  if method == 'POST' and path == '/api/v4/runs':
+                      if self.creates: raise TrialError('second_create_refused')
+                      self.creates += 1
+                  return super().request(method, path, payload, page=page)
+          transport = CountedTransport(os.environ.get('BROWSER_USE_API_KEY'))
+          with tempfile.TemporaryDirectory() as directory:
+              trial = Trial(directory, transport)
+              try:
+                  # Owner explicitly confirmed promotional $1, no card, no recharge,
+                  # and authorized exactly one public-fixture task in conversation.
+                  result = trial.run(consent=True, free_no_card_no_recharge_confirmed=True)
+                  print('RESULTGATE_TRIAL=' + json.dumps(result, sort_keys=True), flush=True)
+                  creates_before = transport.creates
+                  replay = trial.run(consent=True, free_no_card_no_recharge_confirmed=True)
+                  evidence = {'create_attempts': transport.creates,
+                              'local_replay_returned_same_record': replay == result,
+                              'local_replay_added_create': transport.creates != creates_before,
+                              'independent_external_use': False, 'commission_eligible': False}
+                  if result.get('session_id'):
+                      time.sleep(5)
+                      cost = transport.request('GET', '/api/v4/sessions/' + result['session_id'] + '/cost')
+                      if cost.get('sessionId') != result['session_id']: raise TrialError('cost_binding_failed')
+                      evidence['session_run_count'] = cost.get('numRuns')
+                      evidence['session_usage_usd'] = amount(cost.get('totalCostUsd'))
+                      evidence['usage_not_invoice'] = True
+                  after = trial.preflight()
+                  evidence['credits_after_usd'] = after['credits_usd']
+                  evidence['active_sessions_after'] = after['active_sessions']
+                  print('RESULTGATE_EVIDENCE=' + json.dumps(evidence, sort_keys=True), flush=True)
+                  if not result.get('verified') or not result.get('browser_stopped'):
+                      raise TrialError('not_verified_or_cleanup_unconfirmed')
+              except (TrialError, OSError):
+                  print('RESULTGATE_STOP=' + json.dumps({'create_attempts': transport.creates,
+                        'automatic_retry': False, 'manual_review_required': True}), flush=True)
+                  raise SystemExit(1) from None
+              finally:
+                  print('RESULTGATE_FINAL_RECORD=' + json.dumps(trial.record(), sort_keys=True), flush=True)
+                  trial.db.close()
+          PY
