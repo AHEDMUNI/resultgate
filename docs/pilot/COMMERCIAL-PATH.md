@@ -2,7 +2,11 @@
 
 Reviewed 2026-10-20 (America/Chicago). Research only: no enrollment, account creation, outreach, agreement acceptance, provisioning, spending, invoice or collection. None of these candidates has accepted ResultGate or authorized its agent-origin commission model. Technical API permission is not referral entitlement. All current commercial fixtures remain simulations.
 
-## Three candidates, ranked by next useful experiment
+## 2026-10-21 qualification update
+
+The current Claix homepage describes database retrieval with configured read-only database/agent setup. The older document-processing materials below are historical research, not a verified ready-to-call current trial or current price. Reconfirm the exact product, entitlement and commercial permission before shortlisting it. For the first specialist execution test, see [the current external-trial quote](EXTERNAL-TRIAL-QUOTE.md): Browser Use no-card promotional credit is a more direct public-fixture candidate; neither it nor Andru has agreed to commissions. Firecrawl Standard remains the strongest documented platform revenue-share lead, subject to approval and agent-origin attribution confirmation.
+
+## Three candidates, ranked in the original research
 
 | Candidate | Fit and commercial evidence | Actual blocker / next authorized decision |
 |---|---|---|
