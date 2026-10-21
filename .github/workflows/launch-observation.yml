@@ -1,6 +1,12 @@
 name: Launch observations (read-only, not adoption)
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/launch_observer.py'
+      - 'docs/launch/readiness.json'
+      - '.github/workflows/launch-observation.yml'
   schedule:
     - cron: '23 */6 * * *'
 permissions:
