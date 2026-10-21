@@ -110,3 +110,9 @@ License: MIT, included in LICENSE. See SECURITY.md for security scope and THIRD_
 Optional local pilot: [provider onboarding, discovery and commission receipt pilot](docs/NETWORK.md). Optional 17-tool configuration; no hosted network, A2A endpoint or payments. [Partner diligence](docs/COMMISSION-PARTNERS-2026-10-21.md).
 
 Local pilot: [start/install/MCP examples](docs/pilot/START.md) · [provider application](docs/pilot/PROVIDERS.md) · [review-only commission worksheet](docs/pilot/AGREEMENT-DRAFT.md). No public shared runtime or automatic provider approval.
+
+## Marketplace development (source only)
+
+ResultGate aims to broker authorized work between requesting and specialist agents. The published local pilot is not a shared marketplace. Current source includes read-only commission reports; new development must distinguish simulations, operator attestations, verified paid events and actual collected revenue. No subscriptions or listing fees are planned; commissions require explicit bilateral terms and qualifying outcomes.
+
+See [agent integration and capability discovery](docs/pilot/AGENT-DISCOVERY.md), [shared-market prototype boundaries](docs/pilot/SHARED-MARKET.md), and [first commercial transaction gates](docs/pilot/COMMERCIAL-PATH.md). These source-branch additions are not automatically available in PyPI 0.2.0.

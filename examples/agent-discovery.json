@@ -1,0 +1,101 @@
+{
+  "format": "resultgate-capability-catalog-v1",
+  "standard": false,
+  "a2a_supported": false,
+  "server_name": "io.github.AHEDMUNI/resultgate",
+  "published_package": {
+    "name": "resultgate-pilot",
+    "version": "0.2.0"
+  },
+  "registry_record": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.AHEDMUNI%2Fresultgate/versions/0.2.0",
+  "transport": "mcp_stdio",
+  "public_execution_endpoint": null,
+  "capabilities": [
+    {
+      "id": "provider_discovery",
+      "tools": [
+        "discover_providers",
+        "discover_agents",
+        "match_task"
+      ],
+      "mode": "brokerage_delegation",
+      "purpose": "Find reviewed providers for supported capabilities.",
+      "external_execution": false
+    },
+    {
+      "id": "doi_metadata",
+      "tools": [
+        "route_task",
+        "execute_route",
+        "track_referral"
+      ],
+      "mode": "brokerage",
+      "purpose": "Retrieve metadata for an explicitly authorized public DOI.",
+      "external_execution": true,
+      "required_operator_flag": "--allow-public-provider-requests",
+      "per_call_consent": "confirm_public_identifier",
+      "provider_kind": "data_api"
+    },
+    {
+      "id": "citation_structuring",
+      "tools": [
+        "prepare_delegation",
+        "execute_delegation",
+        "delegation_status"
+      ],
+      "mode": "brokerage_delegation",
+      "purpose": "Structure a public citation using the reviewed GROBID demo.",
+      "external_execution": true,
+      "required_operator_flag": "--allow-demo-task-requests",
+      "per_call_consent": "consent_to_send_public_citation",
+      "provider_kind": "specialist_ml_demo",
+      "verification_scope": "predeclared surname and year, not full semantic correctness"
+    },
+    {
+      "id": "result_validation",
+      "tools": [
+        "check_extraction",
+        "check_citations"
+      ],
+      "mode": "default",
+      "purpose": "Check supplied extraction contracts and literal citation integrity.",
+      "external_execution": false,
+      "verification_scope": "caller-supplied evidence only"
+    },
+    {
+      "id": "provider_submission",
+      "tools": [
+        "submit_provider",
+        "update_provider",
+        "suspend_provider",
+        "discover_registered_providers"
+      ],
+      "mode": "local_registry",
+      "purpose": "Submit public service metadata for separate ownership and operator review.",
+      "external_execution": false,
+      "automatic_approval": false,
+      "submitted_provider_execution": false
+    }
+  ],
+  "unsupported_capabilities": [],
+  "all_requested_supported": true,
+  "safe_mcp_configuration": {
+    "command": "uvx",
+    "args": [
+      "resultgate-pilot==0.2.0",
+      "--brokerage",
+      "--delegation"
+    ]
+  },
+  "default_tool_count": 2,
+  "safe_configuration_tool_count": 12,
+  "local_registry_tool_count": 17,
+  "external_execution_enabled_by_configuration": false,
+  "operator_installation_approval_required": true,
+  "provider_application": "https://github.com/AHEDMUNI/resultgate/issues/new/choose",
+  "payments_enabled": false,
+  "commission_earned_from_discovery": false,
+  "catalog_scope": "published_local_features_not_global_provider_search",
+  "ranking": "none",
+  "telemetry": "none"
+}
