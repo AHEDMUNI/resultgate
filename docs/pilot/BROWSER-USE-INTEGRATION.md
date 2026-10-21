@@ -1,4 +1,4 @@
-# Browser Use one-shot integration — prepared, not executed
+# Browser Use one-shot integration — executed once
 
 This PR adds a narrow Python agent-callable trial adapter, not a new default MCP
 tool, public server, A2A implementation or commercial integration. Browser Use
@@ -11,7 +11,7 @@ Revoke any key pasted into chat. Generate a replacement in Browser Use, then
 enter it yourself in GitHub repository Settings → Secrets and variables → Actions
 → New repository secret, name `BROWSER_USE_API_KEY`. Do not send it in chat, commit
 it, screenshot it, use it as a URL parameter, or include it in a command argument.
-No existing CI job reads the key. The separate `browser-use-preflight.yml` runs
+Only explicitly reviewed trial workflows read the key. The separate `browser-use-preflight.yml` runs
 only on the dedicated `trial/browser-use-preflight` branch and makes one billing
 GET; it cannot dispatch a task. Logs show eligibility booleans, not names, project
 IDs, keys or exact balances. Creating a secret does not itself trigger execution.
@@ -49,7 +49,7 @@ integration or personal profile is authorized. The guide's free-eligible model
 `gpt-5.6-luna` is explicitly selected instead of the newer default; do not upgrade
 a rejected model automatically.
 
-The fixed task requests only example.com's title, first heading and whether it
+The fixed task requests only httpbin.org/html's title, first heading and whether it
 is for documentation examples. No private task input is accepted. ResultGate
 independently fetches the same fixed public page without credentials, fixes the
 success criteria before dispatch, delegates the task to Browser Use, polls,
@@ -83,12 +83,12 @@ imply the browser stopped, costs finalized or a commission exists.
 
 ## Current evidence
 
-No live task has been submitted, no account balance/recharge setting verified,
-and no execution/cost proof obtained in this session. Browser account observation
-was blocked by credential protection. Offline tests use a fake transport and are
-explicitly simulations. Existing default tools and the published 0.2.0 are unchanged.
-A real run, once authorized gates are satisfied, will still be an INTERNAL
-integration test, never independent adoption, a sale or a commission.
+One authorized task completed and all three independent output checks passed.
+Browser cleanup was corrected and verified separately, with zero active sessions.
+See [the actual execution report](BROWSER-USE-RESULTS-2026-10-21.md) for cost,
+non-duplication evidence, workflow links and limitations. This was an internal
+external-agent integration, not independent adoption. The authorization has been
+consumed; do not execute the run commands again without fresh authorization.
 
 ## Authenticated preflight update
 
@@ -101,8 +101,8 @@ No secret value was read or exported. No agent task was submitted.
 The API cannot establish promotional origin or recharge configuration. The Billing
 page showed Tier 0 and first-purchase checkout information but did not expose an
 explicit no-card/no-auto-recharge status. Invoice-page observation was blocked by
-browser credential protection. Owner confirmation of promotional credit, no saved
-card and no recharge remains the narrow prerequisite before the free run.
+browser credential protection. The owner subsequently explicitly confirmed promotional credit, no card and no
+auto recharge, and authorized the single task documented in the result report.
 
 Evidence: https://github.com/AHEDMUNI/resultgate/actions/runs/39537374520
 This is a genuine authenticated API check, not agent execution or independent use.

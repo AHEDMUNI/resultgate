@@ -1,0 +1,29 @@
+{
+  "active_sessions": 0,
+  "browserCostUsd": "0.001000",
+  "browser_stopped": true,
+  "credits_remaining_usd": "0.9943291611",
+  "llmCostUsd": "0.004661",
+  "new_tasks_submitted": 0,
+  "proxyCostUsd": "0.000010",
+  "run_id": "c73bb06a-6d66-407a-99a1-c949ad519932",
+  "searchCostUsd": "0.000000",
+  "session_id": "f148cb66-d9ad-4718-8c6a-df41e552b858",
+  "session_run_count": 1,
+  "state": "completed",
+  "totalCostUsd": "0.005671",
+  "cohort": "internal",
+  "verified": true,
+  "checks": {
+    "title": true,
+    "heading": true,
+    "documentation_example": true
+  },
+  "create_attempts": 1,
+  "local_replay_added_create": false,
+  "credits_before_usd": "1.0",
+  "commission_eligible": false,
+  "actual_payment_verified": false,
+  "observed_at": "2026-10-21T03:37:54Z"
+}
+

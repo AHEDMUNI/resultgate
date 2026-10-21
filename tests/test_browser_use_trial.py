@@ -2,10 +2,11 @@ import json
 import tempfile
 import unittest
 from unittest.mock import patch
-from resultgate.delegation.browser_use_trial import Trial, TrialError, Transport, identifier, amount, PageFacts
+from resultgate.delegation.browser_use_trial import Trial, TrialError, Transport, identifier, amount, PageFacts, stop_session_browsers
 
 RID='11111111-1111-4111-8111-111111111111'
 SID='22222222-2222-4222-8222-222222222222'
+BID='33333333-3333-4333-8333-333333333333'
 FACTS={'title':'Example Domain','heading':'Example Domain','documentation_example':True}
 HTML='<title>Example Domain</title><h1>Example Domain</h1><p>For documentation examples.</p>'
 class Fake:
@@ -20,9 +21,10 @@ class Fake:
             return {'id':RID,'sessionId':SID}
         if path.endswith('/status'):return {'status':self.state}
         if path.endswith('/cancel'):return {}
+        if '/browsers?' in path:return {'items':[{'id':BID,'agentSessionId':SID,'status':'active'}],'totalItems':1}
         if '/browsers/' in path:
             if self.stop_fail:raise TrialError('transport_failed')
-            return {'status':'stopped'}
+            return {'id':BID,'agentSessionId':SID,'status':'stopped'}
         if path.endswith('/cost'):return {'sessionId':SID,'totalCostUsd':'0.012345'}
         return {'id':RID,'sessionId':SID,'status':self.state,'output':self.output,'totalCostUsd':'0.010000'}
 
@@ -85,3 +87,19 @@ class BrowserUseTrialTests(unittest.TestCase):
         self.assertEqual(p.facts(), {'title':'','heading':'Public test fixture','documentation_example':False})
         p=PageFacts();p.feed('<title>Example Domain</title><p>No heading</p>')
         with self.assertRaises(TrialError):p.facts()
+
+    def test_cleanup_uses_distinct_browser_id(self):
+        self.assertTrue(self.run_trial()['browser_stopped'])
+        patches=[c[1] for c in self.fake.calls if c[0]=='PATCH']
+        self.assertEqual(patches, ['/api/v4/browsers/'+BID])
+
+    def test_cleanup_rejects_unbound_incomplete_or_duplicate_lists(self):
+        for listing in [
+            {'items':[], 'totalItems':0},
+            {'items':[{'id':BID,'agentSessionId':RID,'status':'active'}], 'totalItems':1},
+            {'items':[{'id':BID,'agentSessionId':SID,'status':'active'}], 'totalItems':2},
+            {'items':[{'id':BID,'agentSessionId':SID,'status':'active'}]*2, 'totalItems':2},
+        ]:
+            with patch.object(self.fake, 'request', return_value=listing) as request:
+                with self.assertRaises(TrialError):stop_session_browsers(self.fake,SID)
+                self.assertEqual(request.call_count,1)

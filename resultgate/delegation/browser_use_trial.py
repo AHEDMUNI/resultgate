@@ -69,7 +69,8 @@ class Transport:
         # No URL/host supplied by callers or by provider response bodies.
         import re
         allowed = (method == 'GET' and path == '/api/v2/billing/account') or (
-            method == 'POST' and path == '/api/v4/runs') or bool(re.fullmatch(
+            method == 'POST' and path == '/api/v4/runs') or (method == 'GET' and bool(re.fullmatch(
+            r'/api/v4/browsers\?agentSessionId=[a-f0-9-]{36}&pageSize=100', path))) or bool(re.fullmatch(
             r'/api/v4/(runs/[a-f0-9-]{36}(/status|/cancel)?|browsers/[a-f0-9-]{36}|sessions/[a-f0-9-]{36}/cost)', path))
         if page:
             if method != 'GET' or path != PAGE_PATH: raise TrialError('invalid_route')
@@ -107,6 +108,32 @@ class Transport:
             raise TrialError('transport_failed') from None
         finally:
             if conn: conn.close()
+
+
+def stop_session_browsers(transport, session_id):
+    """Resolve browser IDs through an ownership-bound list; never use agent ID as browser ID."""
+    sid = identifier(session_id)
+    listing = transport.request('GET', '/api/v4/browsers?agentSessionId=' + sid + '&pageSize=100')
+    items = listing.get('items')
+    if (not isinstance(items, list) or not items or len(items) > 100
+            or type(listing.get('totalItems')) is not int or listing['totalItems'] != len(items)):
+        raise TrialError('browser_listing_incomplete')
+    ids = []
+    for browser in items:
+        if not isinstance(browser, dict) or browser.get('agentSessionId') != sid:
+            raise TrialError('browser_binding_failed')
+        bid = identifier(browser.get('id'))
+        if bid in ids or browser.get('status') not in {'active', 'stopped'}:
+            raise TrialError('browser_listing_invalid')
+        ids.append(bid)
+    # Validate the complete list before any mutation.
+    for bid, browser in zip(ids, items):
+        if browser['status'] == 'active':
+            transport.request('PATCH', '/api/v4/browsers/' + bid, {'action': 'stop'})
+        checked = transport.request('GET', '/api/v4/browsers/' + bid)
+        if checked.get('id') != bid or checked.get('agentSessionId') != sid or checked.get('status') != 'stopped':
+            raise TrialError('browser_stop_unverified')
+    return True
 
 
 class PageFacts(HTMLParser):
@@ -229,9 +256,7 @@ class Trial:
                     record['cancel_requested'] = True
                 except TrialError: record['cancel_requested'] = False
             try:
-                self.transport.request('PATCH', '/api/v4/browsers/' + sid, {'action': 'stop'})
-                browser = self.transport.request('GET', '/api/v4/browsers/' + sid)
-                record['browser_stopped'] = browser.get('status') == 'stopped'
+                record['browser_stopped'] = stop_session_browsers(self.transport, sid)
             except TrialError: record['browser_stopped'] = False
             try:
                 cost = self.transport.request('GET', '/api/v4/sessions/' + sid + '/cost')

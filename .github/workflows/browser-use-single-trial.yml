@@ -9,7 +9,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   one-trial:
-    if: github.repository == 'AHEDMUNI/resultgate' && github.run_number == 2 && github.run_attempt == 1
+    if: ${{ false }} # One authorized trial consumed; no further dispatch.
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
