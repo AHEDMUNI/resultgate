@@ -1,0 +1,18 @@
+{
+  "name": "ResultGate general service marketplace",
+  "mode": "test",
+  "status": "draft_not_deployed",
+  "production_mcp": "https://agents.allubiyerbamate.com/mcp",
+  "commerce_tools_available_in_production": false,
+  "commission_basis_points": 1500,
+  "commission_trigger": "processor_confirmed_eligible_payment",
+  "service_completion_required": false,
+  "refund_and_dispute_adjustments": true,
+  "requester_recommendation_fee": 0,
+  "joining_fee": 0,
+  "monthly_platform_fee": 0,
+  "live_payments_supported": false,
+  "documentation": "docs/commerce/README.md",
+  "terms": "docs/commerce/TERMS-DRAFT.md",
+  "tools": ["provider_terms", "apply_as_provider", "publish_test_service", "search_services", "create_purchase_order", "get_purchase_order", "create_test_checkout", "provider_dashboard"]
+}
