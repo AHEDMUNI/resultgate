@@ -108,6 +108,8 @@ class Receipts:
                 d[k]=v
             return d
         receipt=Receipt.model_validate(json.loads(body,object_pairs_hook=unique)).model_dump()
+        if receipt['status']=='succeeded' and receipt['kind'] in {'subscription','transaction'} and receipt['value_micros']==0:
+            raise ValueError('paid conversion requires positive value')
         with self.store.lock:
             self.db.execute('BEGIN IMMEDIATE')
             try:

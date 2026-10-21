@@ -152,3 +152,9 @@ class NetworkTests(unittest.TestCase):
         self.approved();r=self.referral();self.send(r);self.c.attest(r['id'],PROOF)
         r=self.c.get(r['id']);r['expires']=0;self.c.save(r)
         with self.assertRaises(ValueError):self.c.assess(r['id'])
+
+    def test_free_subscription_not_paid_conversion(self):
+        self.approved('subscription','fixed',1000000)
+        r=self.referral(kind='subscription')
+        with self.assertRaises(ValueError):self.send(r,value_micros=0)
+        self.assertEqual(self.c.get(r['id'])['state'],'routed')
