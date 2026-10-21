@@ -10,7 +10,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 description = "Evidence-bounded extraction and citation checks for agent workflows"
 requires-python = ">=3.11"
-dependencies = ["mcp==1.30.0", "uvicorn==0.38.0", "starlette==1.9.0", "pydantic==2.14.1"]
+dependencies = ["defusedxml==0.7.1", "mcp==1.30.0", "uvicorn==0.38.0", "starlette==1.9.0", "pydantic==2.14.1"]
 
 [project.urls]
 Repository = "https://github.com/AHEDMUNI/resultgate"

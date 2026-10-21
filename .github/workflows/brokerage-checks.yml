@@ -6,6 +6,7 @@ on:
       - 'resultgate/**'
       - 'tests/**'
       - 'scripts/brokerage_acceptance.py'
+      - 'scripts/delegation_acceptance.py'
       - '.github/workflows/brokerage-checks.yml'
   pull_request:
     paths:
@@ -34,3 +35,6 @@ jobs:
       - name: Two explicit public DOI calls (internal integration, never adoption)
         if: github.event_name == 'push' && github.repository == 'AHEDMUNI/resultgate'
         run: python scripts/brokerage_acceptance.py --live
+      - name: One free specialist demo task (internal integration only)
+        if: github.event_name == 'push' && github.repository == 'AHEDMUNI/resultgate'
+        run: python scripts/delegation_acceptance.py --live

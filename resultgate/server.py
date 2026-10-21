@@ -94,9 +94,20 @@ def main():
     parser.add_argument('--http',action='store_true')
     parser.add_argument('--brokerage',action='store_true',help='Opt in to experimental provider discovery and routing tools')
     parser.add_argument('--allow-public-provider-requests',action='store_true',help='Permit explicitly consented free public DOI requests through brokerage')
+    parser.add_argument('--delegation',action='store_true',help='Opt in to specialist task delegation tools')
+    parser.add_argument('--delegation-store',help='Opt in to private 30-day SQLite task events')
+    parser.add_argument('--allow-demo-task-requests',action='store_true',help='Allow explicitly approved public citation processing on GROBID demo')
+    parser.add_argument('--internal-delegation-tests',action='store_true',help='Classify this operator process as internal testing')
     parser.add_argument('--port',type=int,default=8765)
     parser.add_argument('--usage-dir',help='Explicitly opt in to local-only MCP real-task counts; no automatic upload')
     args=parser.parse_args()
+    if (args.delegation_store or args.allow_demo_task_requests or args.internal_delegation_tests) and not args.delegation:
+        parser.error('delegation options require --delegation')
+    if args.delegation and (not args.brokerage or args.http):
+        parser.error('--delegation requires --brokerage and MCP stdio')
+    if args.delegation:
+        from .delegation.mcp import register as register_delegation
+        register_delegation(mcp,args.delegation_store,args.allow_demo_task_requests,args.internal_delegation_tests)
     if args.allow_public_provider_requests and not args.brokerage:
         parser.error('--allow-public-provider-requests requires --brokerage')
     if args.brokerage and args.http:
