@@ -53,7 +53,9 @@ jobs:
           from resultgate.delegation.browser_use_trial import Transport, TrialError, PageFacts
           try:
               p = PageFacts()
-              p.feed(Transport('unused-placeholder').request('GET', '/', page=True))
+              page = Transport('unused-placeholder').request('GET', '/', page=True)
+              print(json.dumps({'public_fixture_excerpt': page[:2000]}))
+              p.feed(page)
               print(json.dumps({'fixture': p.facts(), 'agent_tasks_submitted': 0}))
           except TrialError as error:
               allowed = {'non_public_address','transport_failed','response_timeout','response_too_large','fixture_unavailable','unsupported_encoding'}
