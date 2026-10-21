@@ -37,6 +37,26 @@
       "agent_referral_eligibility": "unconfirmed",
       "execution_enabled": false,
       "next_step": "Review link-only attribution and minimum payout conditions before requesting outreach approval."
+    },
+    {
+      "id": "scraperapi",
+      "source": "https://www.scraperapi.com/affiliates/",
+      "terms_source": "https://www.scraperapi.com/affiliate-terms/",
+      "capability": "web_extraction",
+      "status": "candidate_not_contacted",
+      "advertised_recurring_basis_points": 5000,
+      "contracted_rate": null,
+      "agent_referral_eligibility": "unconfirmed",
+      "payout_minimum_usd": {
+        "paypal": 50,
+        "wire_or_ach": 500
+      },
+      "per_customer_commission_cap_usd": 3000,
+      "refund_terms": "Commission removed on refund; already paid amounts offset or repayable under terms.",
+      "attribution": "Unique link; exceptional manual attribution at provider discretion, not guaranteed.",
+      "settlement_evidence": "No verified machine-readable settlement integration established",
+      "execution_enabled": false,
+      "next_step": "Owner approval for DRAFT-SCRAPERAPI.md inquiry; no signup or agreement acceptance."
     }
   ],
   "demand": [
@@ -48,7 +68,12 @@
       "requester_scope": "Canadian AI startup described in public listing; identity not independently verified",
       "status": "stale_signal_not_sales_qualified",
       "economic_fit": "Provider extracts permitted public data; ResultGate validates required columns and duplicates",
-      "blockers": ["Old listing; availability unknown", "Human employment listing, not agent procurement", "No provider agreement", "No ResultGate customer consent"],
+      "blockers": [
+        "Old listing; availability unknown",
+        "Human employment listing, not agent procurement",
+        "No provider agreement",
+        "No ResultGate customer consent"
+      ],
       "outreach_allowed": false,
       "customer": false
     },
@@ -60,7 +85,12 @@
       "requester_scope": "Willow Grey Interiors as stated in public post",
       "status": "out_of_scope_for_first_low_risk_pilot",
       "economic_fit": "Potential specialist referral; not a current ready-to-execute service",
-      "blockers": ["Broad 6-12 month human role", "Sensitive business integrations", "Current opening unconfirmed", "No approved qualified provider"],
+      "blockers": [
+        "Broad 6-12 month human role",
+        "Sensitive business integrations",
+        "Current opening unconfirmed",
+        "No approved qualified provider"
+      ],
       "outreach_allowed": false,
       "customer": false
     }
