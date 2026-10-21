@@ -1,6 +1,6 @@
-# Local provider onboarding and outcome receipts (unreleased PR)
+# Local provider onboarding and outcome receipts (local pilot)
 
-This is an opt-in local pilot, not a public marketplace, not an A2A server and not a payment service. Default tools remain 2; brokerage 7; delegation 12. Adding `--provider-registry /private/path` enables 5 more tools (17 total with delegation). Published PyPI 0.1.1 does not contain these PR features. Shadow billing is unchanged.
+This is an opt-in local pilot, not a public marketplace, not an A2A server and not a payment service. Default tools remain 2; brokerage 7; delegation 12. Adding `--provider-registry /private/path` enables 5 more tools (17 total with delegation). These opt-in features are included in release 0.2.0. Shadow billing is unchanged.
 
 ## Install and discover
 

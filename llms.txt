@@ -1,7 +1,7 @@
 # ResultGate
 
 Local evidence validation and opt-in provider discovery / consented specialist task delegation.
-This branch is an unreleased pilot, not a hosted agent network or A2A server.
+Release 0.2.0 is a local pilot, not a hosted agent network or A2A server.
 
 - [Network onboarding and operation](docs/NETWORK.md)
 - [Delegation and limitations](docs/DELEGATION.md)

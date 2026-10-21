@@ -6,7 +6,7 @@ Submit your specialized service for review so ResultGate can eventually match su
 
 ## Apply without hosting anything new
 
-Open a [new issue in the existing repository](https://github.com/AHEDMUNI/resultgate/issues/new) with title `[Provider application] YOUR_PUBLIC_SERVICE`. Copy the following public-only fields. A structured form is prepared in `.github/ISSUE_TEMPLATE/provider.yml`; it will appear in the chooser only after an approved default-branch merge. Until then the copy/paste path works with GitHub Issues enabled and a GitHub account. No issue has been created on behalf of a pretend provider.
+Open a [new issue in the existing repository](https://github.com/AHEDMUNI/resultgate/issues/new) with title `[Provider application] YOUR_PUBLIC_SERVICE`. Copy the following public-only fields. Use the Provider application form in the repository issue chooser, or the public-only fields below. GitHub Issues requires a GitHub account. No issue has been created on behalf of a pretend provider.
 
 - Public service name and description.
 - Public terms-of-use and pricing URLs; supported capabilities and operating limits.

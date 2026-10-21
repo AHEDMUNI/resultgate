@@ -1,20 +1,17 @@
 # ResultGate local pilot: start here
 
-Unreleased PR #1. No hosted network, payments or complete A2A transport. You can try the public source without waiting for a PyPI release. Python 3.11+ and Git required; Linux/macOS commands below (Windows: use `client\Scripts\python.exe`). Package installation downloads dependencies; runtime has no external calls by default.
+Release 0.2.0 local pilot. No hosted network, payments or complete A2A transport. Python 3.11+ required; Linux/macOS commands below (Windows: use `client\Scripts\python.exe`). Package installation downloads dependencies; runtime has no external calls by default.
 
 ## Install in a new environment
 
 ```sh
-git clone --branch feature/agent-brokerage --single-branch https://github.com/AHEDMUNI/resultgate.git
-cd resultgate
-git rev-parse HEAD
 python3 -m venv client
-client/bin/python -m pip install .
+client/bin/python -m pip install resultgate-pilot==0.2.0
 client/bin/python -m pip check
 client/bin/python -I -m resultgate.pilot_client --offline
 ```
 
-Tested source snapshot for this guide: `83e730aef7c7479dda6da4304f896df8769d94f1`. Record and review the printed SHA. The branch is mutable; repeat with `git checkout YOUR_REVIEWED_SHA` before installing when reproducibility matters. Do not use `pip install resultgate-pilot` expecting this pilot: the published release is older. CI also installs the exact pushed Git commit directly into a separate environment and runs this packaged command. The offline tutorial discovers17 tools and verifies that a fixture submission remains pending; it sends nothing to providers and counts as internal testing.
+For source installation use `pip install git+https://github.com/AHEDMUNI/resultgate.git@YOUR_REVIEWED_SHA`. Record the installed version and pin a reviewed commit when using source. The offline tutorial discovers17 tools and verifies that a fixture submission remains pending; it sends nothing to providers and counts as internal testing.
 
 ## Connect an independent MCP client
 
@@ -50,6 +47,6 @@ client/bin/python -I -m resultgate.pilot_usage --directory /YOUR/PRIVATE/DIRECTO
 
 Export is opt-in stdout only: aggregate cohort counts, a stable per-installation pseudonym and no task content/IDs. Inspect it before sharing. If you redirect it to a file, protect/delete that file yourself. Pseudonyms permit comparing voluntary repeat reports from one installation, **not proving identity or independent use**; reports are not additive, and copied/replayed reports must never be summed. Verified independent use requires separately reviewed evidence of an unaffiliated user's real task and consent. Internal tutorials/CI must remain excluded. An empty store export is not usage. Different installations may belong to the same person.
 
-Optional feedback: open a [new GitHub issue](https://github.com/AHEDMUNI/resultgate/issues/new) titled `[Pilot feedback]`, state internal tutorial / unaffiliated installation / unaffiliated real task, and share only an aggregate report or non-sensitive problem. No submission is required to use the package. Issues are public and linked to your GitHub account; this is not anonymous telemetry. Do not post secrets or task content. Edit/remove content or request issue deletion from the maintainer; GitHub/backups/third-party copies are outside local30day retention. Templates are prepared in PR and will enter the chooser only after the default-branch merge is approved. No automatic harvesting of issues is enabled.
+Optional feedback: open a [new GitHub issue](https://github.com/AHEDMUNI/resultgate/issues/new) titled `[Pilot feedback]`, state internal tutorial / unaffiliated installation / unaffiliated real task, and share only an aggregate report or non-sensitive problem. No submission is required to use the package. Issues are public and linked to your GitHub account; this is not anonymous telemetry. Do not post secrets or task content. Edit/remove content or request issue deletion from the maintainer; GitHub/backups/third-party copies are outside local30day retention. Use the provider and feedback forms in the repository issue chooser. No automatic harvesting of issues is enabled.
 
 A2A: declared provider protocol fields and custom discovery metadata are preparation only; ResultGate does not implement a conforming public A2A AgentCard/transport. Use MCP stdio.
