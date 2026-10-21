@@ -269,3 +269,52 @@ class CommerceTests(unittest.TestCase):
         self.adapter.checkout(self.c,self.buyer,self.o['id'])
         self.assertEqual(['rg-test-'+self.o['id']]*2,keys)
         self.assertEqual(1,self.c.db.execute('SELECT count(*) FROM commerce_orders').fetchone()[0])
+
+    def rejected_checkout_for_repair(self):
+        from resultgate.commerce.stripe_test import StripeRequestRejected
+        self.approve(); original=self.adapter.request
+        def reject(method,path,data=None,key=None):
+            if method=='POST':raise StripeRequestRejected(400,json.dumps({'error':{'type':'idempotency_error'}}))
+            return original(method,path,data,key)
+        self.adapter.request=reject
+        with self.assertRaises(StripeRequestRejected):self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.adapter.request=original
+
+    def test_confirmed_rejection_audit_uses_one_deterministic_repair_key(self):
+        self.rejected_checkout_for_repair(); original=self.adapter.request; keys=[]
+        def audit(method,path,data=None,key=None):
+            if method=='GET' and path=='/v1/checkout/sessions':return {'data':[],'has_more':False}
+            if method=='POST':keys.append(key)
+            return original(method,path,data,key)
+        self.adapter.request=audit
+        result=self.adapter.repair_dynamic_methods_rejection(self.c,self.o['id'])
+        self.assertEqual(self.o['id'],result['order_id'])
+        self.adapter.repair_dynamic_methods_rejection(self.c,self.o['id'])
+        self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.adapter.checkout(self.c,self.buyer,self.o['id'])
+        self.assertEqual(['rg-test-dynamic-v1-'+self.o['id']],keys)
+        self.assertEqual(1,self.c.db.execute('SELECT count(*) FROM commerce_orders').fetchone()[0])
+        proof=json.loads(self.c.db.execute('SELECT evidence FROM commerce_checkout_repairs').fetchone()[0])
+        self.assertTrue(proof['no_matching_session'])
+
+    def test_repair_refuses_existing_stripe_session(self):
+        self.rejected_checkout_for_repair(); original=self.adapter.request
+        def audit(method,path,data=None,key=None):
+            if path=='/v1/checkout/sessions' and method=='GET':
+                return {'data':[{'id':'cs_test_existing','livemode':False,'client_reference_id':self.o['id']}],'has_more':False}
+            return original(method,path,data,key)
+        self.adapter.request=audit
+        with self.assertRaisesRegex(RuntimeError,'repair_existing_checkout_requires_review'):
+            self.adapter.repair_dynamic_methods_rejection(self.c,self.o['id'])
+        self.assertEqual(0,self.c.db.execute('SELECT count(*) FROM commerce_checkout_repairs').fetchone()[0])
+
+    def test_repair_refuses_unknown_outcome_and_incomplete_audit(self):
+        self.rejected_checkout_for_repair()
+        with self.c.db:self.c.db.execute("UPDATE commerce_checkout_attempts SET state='started'")
+        with self.assertRaisesRegex(RuntimeError,'repair_requires_confirmed_validation_rejection'):
+            self.adapter.repair_dynamic_methods_rejection(self.c,self.o['id'])
+        with self.c.db:self.c.db.execute("UPDATE commerce_checkout_attempts SET state='http_400'")
+        self.adapter.request=lambda *args,**kwargs:{'data':[],'has_more':True}
+        with self.assertRaisesRegex(RuntimeError,'repair_audit_incomplete'):
+            self.adapter.repair_dynamic_methods_rejection(self.c,self.o['id'])
+        self.assertEqual(0,self.c.db.execute('SELECT count(*) FROM commerce_checkout_repairs').fetchone()[0])

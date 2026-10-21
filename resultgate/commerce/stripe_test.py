@@ -46,12 +46,15 @@ class StripeTest:
         allowed_post = {'/v1/checkout/sessions', '/v1/accounts', '/v1/account_links', '/v1/refunds'}
         allowed_get = r'/v1/(accounts/acct_|payment_intents/pi_|charges/ch_|application_fees/fee_|transfers/tr_|balance_transactions/txn_|refunds/re_)[A-Za-z0-9]+'
         if not ((method == 'POST' and path in allowed_post) or
-                (method == 'GET' and re.fullmatch(allowed_get, path))):
+                (method == 'GET' and (re.fullmatch(allowed_get, path) or path=='/v1/checkout/sessions'))):
             raise ValueError('unsupported test operation')
+        if method=='GET' and path=='/v1/checkout/sessions':
+            if not isinstance(data,dict) or set(data)-{'limit','created[gte]','starting_after'} or data.get('limit')!='100':
+                raise ValueError('bounded session audit required')
         headers={'Authorization':'Bearer '+self.secret}
         if key: headers['Idempotency-Key']=key
         with httpx.Client(timeout=15,trust_env=False,follow_redirects=False,transport=self.transport) as client:
-            with client.stream(method,'https://api.stripe.com'+path,headers=headers,data=data) as r:
+            with client.stream(method,'https://api.stripe.com'+path,headers=headers,params=data if method=='GET' else None,data=data if method!='GET' else None) as r:
                 body=bytearray()
                 for chunk in r.iter_bytes():
                     body.extend(chunk)
@@ -61,6 +64,52 @@ class StripeTest:
         if not isinstance(result,dict): raise ValueError('invalid response')
         if result.get('livemode') is True: raise ValueError('live response forbidden')
         return result
+
+    def repair_dynamic_methods_rejection(self, commerce, oid):
+        """Private operator recovery ONLY after confirmed deprecated-parameter 400.
+
+        Audit every Sandbox Checkout since this order began; any matching session
+        or uncertain/truncated scan blocks changing the idempotency key.
+        """
+        from .core import hashed
+        db=commerce.db
+        db.execute('CREATE TABLE IF NOT EXISTS commerce_checkout_repairs (order_id TEXT PRIMARY KEY, digest TEXT, created REAL, state TEXT, evidence TEXT)')
+        if db.execute('SELECT 1 FROM commerce_checkout_repairs WHERE order_id=?',(oid,)).fetchone(): return
+        old=db.execute('SELECT digest,created,state FROM commerce_checkout_attempts WHERE order_id=?',(oid,)).fetchone()
+        if not old or old[2]!='http_400': raise RuntimeError('repair_requires_confirmed_validation_rejection')
+        if db.execute('SELECT 1 FROM commerce_sessions WHERE order_id=?',(oid,)).fetchone() or db.execute('SELECT 1 FROM commerce_payments WHERE order_id=?',(oid,)).fetchone():
+            raise RuntimeError('repair_existing_checkout_requires_review')
+        o=commerce.load('orders',oid)
+        params={'limit':'100','created[gte]':str(o['expires']-3600-60)}
+        scanned=0
+        for _ in range(20):
+            page=self.request('GET','/v1/checkout/sessions',params)
+            if not isinstance(page.get('data'),list) or type(page.get('has_more')) is not bool:
+                raise RuntimeError('repair_audit_incomplete')
+            for session in page['data']:
+                if session.get('livemode') is not False: raise RuntimeError('repair_audit_incomplete')
+                if session.get('client_reference_id')==oid or session.get('metadata',{}).get('order_id')==oid:
+                    raise RuntimeError('repair_existing_checkout_requires_review')
+                scanned+=1
+            if not page['has_more']: break
+            if not page['data'] or not re.fullmatch(r'cs_test_[A-Za-z0-9]+',page['data'][-1].get('id','')):
+                raise RuntimeError('repair_audit_incomplete')
+            params['starting_after']=page['data'][-1]['id']
+        else: raise RuntimeError('repair_audit_incomplete')
+        # Current owner request authorizes this same $100 Sandbox attempt. Renew only
+        # inside the ORIGINAL order lifetime, after no-session proof, before new POST.
+        if o['expires'] < time.time()+1800: raise RuntimeError('repair_original_order_expired_review')
+        if o.get('approval') and o['approval']['expires'] < time.time()+1800:
+            o['approval']['expires']=o['expires']
+        proof={'cause':'owner_confirmed_unsupported_payment_method_types_HTTP400',
+               'original_attempt':list(old),'original_key':'rg-test-'+oid,
+               'audit_lower_bound':params['created[gte]'],'sessions_scanned':scanned,
+               'no_matching_session':True,'reviewed_at':time.time()}
+        with db:
+            commerce.save('orders',o)
+            db.execute('INSERT INTO commerce_checkout_repairs VALUES(?,?,?,?,?)',
+                       (oid,None,time.time(),'prepared',json.dumps(proof)))
+        return {'order_id':oid,'audit_sha':hashed(proof),'sessions_scanned':scanned,'replacement_key':'rg-test-dynamic-v1-'+oid}
 
     def checkout(self, commerce, token, oid):
         payload=commerce.checkout_payload(token,oid)
@@ -84,19 +133,26 @@ class StripeTest:
         digest=hashed(payload)
         with commerce.db:
             commerce.db.execute('INSERT OR IGNORE INTO commerce_checkout_attempts VALUES(?,?,?,?)',(oid,digest,time.time(),'started'))
-        attempt=commerce.db.execute('SELECT digest,created FROM commerce_checkout_attempts WHERE order_id=?',(oid,)).fetchone()
+        commerce.db.execute('CREATE TABLE IF NOT EXISTS commerce_checkout_repairs (order_id TEXT PRIMARY KEY, digest TEXT, created REAL, state TEXT, evidence TEXT)')
+        repaired=commerce.db.execute('SELECT 1 FROM commerce_checkout_repairs WHERE order_id=?',(oid,)).fetchone()
+        attempt_table='commerce_checkout_repairs' if repaired else 'commerce_checkout_attempts'
+        stripe_key=('rg-test-dynamic-v1-' if repaired else 'rg-test-')+oid
+        if repaired:
+            with commerce.db:
+                commerce.db.execute('UPDATE commerce_checkout_repairs SET digest=? WHERE order_id=? AND digest IS NULL',(digest,oid))
+        attempt=commerce.db.execute('SELECT digest,created FROM '+attempt_table+' WHERE order_id=?',(oid,)).fetchone()
         if attempt[0]!=digest: raise ValueError('Checkout parameters changed; inspect original request before retry')
         if time.time()-attempt[1]>23*3600: raise ValueError('Checkout retry window expired; inspect Stripe before retry')
         try:
-            session=self.request('POST','/v1/checkout/sessions',payload,'rg-test-'+oid)
+            session=self.request('POST','/v1/checkout/sessions',payload,stripe_key)
         except StripeRequestRejected as error:
             # A rejection is diagnostic evidence, not authority to change the key.
             with commerce.db:
-                commerce.db.execute('UPDATE commerce_checkout_attempts SET state=? WHERE order_id=?',('http_'+str(error.safe['http_status']),oid))
+                commerce.db.execute('UPDATE '+attempt_table+' SET state=? WHERE order_id=?',('http_'+str(error.safe['http_status']),oid))
             raise
         result=commerce.bind_session(oid,session)
         with commerce.db:
-            commerce.db.execute('UPDATE commerce_checkout_attempts SET state=? WHERE order_id=?',('bound',oid))
+            commerce.db.execute('UPDATE '+attempt_table+' SET state=? WHERE order_id=?',('bound',oid))
         return result
 
 

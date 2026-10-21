@@ -217,6 +217,10 @@ def execute(directory):
                 if prior:
                     checkout_url = prior[0]
                 else:
+                    if '--repair-dynamic-methods-rejection' in sys.argv:
+                        audit=stripe.repair_dynamic_methods_rejection(c,order['id'])
+                        if audit: print('SAFE REPAIR AUDIT: '+json.dumps(audit),flush=True)
+                        order=c.load('orders',order['id'])
                     if not order.get('approval'):
                         CommerceOperator(c).approve_order(order['id'],order['owner'],order['quote_sha'],10000,min(order['expires'],time.time()+3000))
                     # Fixed root return pages already exist; no new public financial route.
@@ -294,6 +298,8 @@ if __name__=='__main__':
         allowed={'cli_integrity_failed','cli_platform_unsupported','cli_archive_invalid','stripe_listener_not_ready',
                  'stripe_listener_stopped','signed_event_timeout_resume_same_run','unexpected_reconciled_amounts',
                  'stripe_ledger_mismatch_review_report','run_binding_invalid','stage_evidence_missing_review_before_resume',
+                 'repair_requires_confirmed_validation_rejection','repair_existing_checkout_requires_review',
+                 'repair_audit_incomplete','repair_original_order_expired_review',
                  'ledger_postings_mismatch','unsafe_state_directory','dedicated_interactive_exec_session_required'}
         code=('sandbox_python_dependency_missing' if isinstance(error,ModuleNotFoundError) else
               str(error) if isinstance(error,RuntimeError) and str(error) in allowed else diagnostic(error))

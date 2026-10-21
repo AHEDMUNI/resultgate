@@ -216,3 +216,30 @@ New regression coverage asserts the obsolete parameter is absent from the actual
 form request and checks $100/500-cent fee/destination, stable keys after timeout and
 HTTP400, changed-payload rejection and aged retry refusal. These remain code tests;
 actual Checkout IDs and signed paid/refund evidence must come from the server run.
+
+## Confirmed rejection recovery
+
+A subsequent operator screenshot established HTTP400 idempotency_error after removing
+payment_method_types. The initial rejected request's parameter set conflicts with the
+original key. Do not repeatedly edit the payload, delete the run, or choose random keys.
+
+The private runner accepts --repair-dynamic-methods-rejection ONLY for this owner-
+confirmed deprecated-field rejection. It requires a persisted HTTP400 attempt and no
+local session/payment, then audits every Stripe Sandbox Checkout since before the
+original order creation. Pagination is bounded at 20 pages; malformed/truncated/live
+results fail closed. ANY session with the original client reference or metadata order
+ID blocks the replacement. A network failure is not treated as evidence of absence.
+
+Only a successful complete no-match audit records a permanent repair journal with the
+original digest/key/status, scan lower bound/count and timestamp. The replacement key
+is deterministic: rg-test-dynamic-v1-ORIGINAL_ORDER_ID. Subsequent runs reuse it with
+frozen parameters and the same 23-hour retention guard. No second order is generated.
+The current owner's request to retry the same $100 Sandbox acceptance permits renewing
+an approval only within the ORIGINAL order lifetime after that audit; price, fee,
+provider account, quote and original order ID remain unchanged. An order with less
+than 30 minutes left stops for explicit review. No financial production deployment.
+
+Focused validation after recovery change: 43 tests (25 commerce, 14 Connect, 4 runner).
+Added checks for a single deterministic repair, refusal when an existing Stripe
+session is found, refusal for unknown outcomes and refusal of incomplete pagination.
+Actual repaired Checkout and payment evidence still await the authorized server run.
