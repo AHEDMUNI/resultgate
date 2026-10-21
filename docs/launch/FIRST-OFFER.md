@@ -12,18 +12,13 @@ below is a ResultGate offer; do not import research candidates into the live cat
 | Apify RAG Web Browser | API and MCP; from $1.33/1,000 fetched pages; tier/scope dependent | https://apify.com/apify/rag-web-browser | Actual service and published price; no accepted ResultGate contract. Apify standard Actor contract excludes resale/redistribution of access; obtain express permission and a provider quote, do not assume reseller rights. |
 | David / 6sigmag Fast Website Content Crawler | from $3/1,000 results; community maintained | https://apify.com/6sigmag/fast-website-content-crawler | Independent creator candidate; reliability and rights need verification, no agreement. Same platform contractual issue. |
 | Firecrawl | Hobby $19 monthly or $16/month billed annually; 5,000 credits | https://www.firecrawl.dev/pricing | API capability and price are public; no 5% agreement or marketplace resale permission established. Do not purchase a plan or repurpose affiliate terms. |
-| BrowserAct | Official workflow API and existing affiliate correspondence | https://www.browseract.com/docs-api | Reply confirms registration-link attribution persists for API usage. Does not approve ResultGate Checkout, a 95/5 split, or an active marketplace seller. Follow-up already sent; do not repeat. |
+| BrowserAct | Official workflow API and public affiliate program | https://www.browseract.com/docs-api | Public API availability does not establish approval of ResultGate Checkout, a 95/5 split, or an active marketplace seller. |
 
 Rights source: https://docs.apify.com/legal/standard-actor-contract (sections 1.1–1.2).
 Firecrawl source: https://www.firecrawl.dev/terms-of-service (access and use restrictions).
 These are operational qualification findings, not a legal opinion or agreement.
 Public Apify usage figures indicate an existing category; they do not prove willingness
 to buy through ResultGate. No customer demand for ResultGate has been established.
-
-The Gmail connection was checked on October 21: BrowserAct response and already-sent
-follow-up present; ScraperAPI inquiry sent, no reply found; no Firecrawl thread found
-in this connected inbox. Absence here does not prove absence in ALLUBI's other mailboxes.
-No new correspondence sent.
 
 ## Offer sheet a volunteer provider must complete
 
