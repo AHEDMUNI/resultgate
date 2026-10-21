@@ -148,3 +148,14 @@ class GatewayTests(unittest.TestCase):
         accepted=self.client.post(path+'/events',headers=self.headers(),json=accept)
         self.assertEqual(accepted.json()['state'],'accepted')
         self.assertIn('task_sha256',self.client.get(path,headers=self.headers(tokens[0])).json())
+
+    def test_authenticated_budget_survives_gateway_restart(self):
+        frozen=time.time()
+        with patch('resultgate.network.market.time.time',return_value=frozen):
+            for _ in range(120):
+                self.assertEqual(self.client.get('/v1/tasks/unknown',headers=self.headers()).status_code,400)
+            with TestClient(create_app(self.tmp.name),base_url='http://127.0.0.1',client=('127.0.0.1',5001)) as second:
+                response=second.get('/v1/tasks/unknown',headers=self.headers())
+                self.assertEqual(response.status_code,429)
+                self.assertEqual(response.json(),{'error':'request_rejected'})
+                self.assertEqual(second.get('/v1/tasks/unknown',headers=self.headers(self.other)).status_code,400)

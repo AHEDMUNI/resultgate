@@ -16,6 +16,11 @@ TRANSITIONS = {
     'commission_eligible': ('transaction_proven', 'operator'),
 }
 TERMINAL = {'failed', 'cancelled', 'refunded', 'disputed'}
+REQUESTS_PER_MINUTE = 120
+
+class RequestBudgetExceeded(ValueError):
+    """Authenticated tenant exhausted its shared UTC-minute request allowance."""
+
 
 def identifier(value):
     if not isinstance(value, str) or not re.fullmatch(r'[a-zA-Z0-9_-]{1,100}', value):
@@ -39,6 +44,8 @@ class Market:
           request_hash TEXT, spec_hash TEXT, data TEXT, created REAL, UNIQUE(tenant_hash,request_hash));
         CREATE TABLE IF NOT EXISTS market_outcomes(provider_id TEXT, outcome_hash TEXT, task_id TEXT, created REAL,
           PRIMARY KEY(provider_id,outcome_hash));
+        CREATE TABLE IF NOT EXISTS market_request_budgets(tenant_hash TEXT, role TEXT, minute INTEGER,
+          used INTEGER NOT NULL, PRIMARY KEY(tenant_hash,role,minute));
         CREATE TABLE IF NOT EXISTS market_events(task_id TEXT, event_hash TEXT, payload_hash TEXT,
           state TEXT, created REAL, PRIMARY KEY(task_id,event_hash));
         ''')
@@ -50,6 +57,25 @@ class Market:
                               (self.store.digest(token), time.time()-30*86400)).fetchone()
         if not row: raise ValueError('unauthorized')
         return dict(tenant_hash=row[0], role=row[1], provider_id=row[2])
+
+    @atomic
+    def consume_request(self, token):
+        """Shared local HTTP quota across processes/credentials; never a money budget.
+
+        Fixed UTC-minute windows permit boundary bursts. Authenticated attempts count
+        even if their operation later fails. No task body, token or IP is retained.
+        The separate process-local gateway bound protects anonymous ingress only.
+        """
+        actor = self._auth(token)
+        minute = int(time.time() // 60)
+        self.db.execute('DELETE FROM market_request_budgets WHERE minute<?', (minute-1,))
+        key = (actor['tenant_hash'], actor['role'], minute)
+        self.db.execute('INSERT OR IGNORE INTO market_request_budgets VALUES(?,?,?,0)', key)
+        used = self.db.execute('SELECT used FROM market_request_budgets WHERE tenant_hash=? AND role=? AND minute=?', key).fetchone()[0]
+        if used >= REQUESTS_PER_MINUTE:
+            raise RequestBudgetExceeded('tenant request budget exhausted')
+        self.db.execute('UPDATE market_request_budgets SET used=used+1 WHERE tenant_hash=? AND role=? AND minute=?', key)
+        return {'remaining_requests': REQUESTS_PER_MINUTE-used-1, 'window_seconds': 60}
 
     def _load(self, task_id):
         identifier(task_id)
@@ -228,6 +254,7 @@ class MarketOperator:
     def purge(self):
         """Explicit 30-day simulation retention; idempotency is guaranteed only within this window."""
         cutoff=time.time()-30*86400
+        self.db.execute('DELETE FROM market_request_budgets WHERE minute<?',(int(time.time()//60)-1,))
         self.db.execute('DELETE FROM market_events WHERE task_id IN (SELECT id FROM market_tasks WHERE created<?)',(cutoff,))
         self.db.execute('DELETE FROM market_tasks WHERE created<?',(cutoff,))
         self.db.execute('DELETE FROM market_credentials WHERE created<?',(cutoff,))

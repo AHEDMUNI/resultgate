@@ -2,9 +2,11 @@ import concurrent.futures
 import json
 import multiprocessing
 import tempfile
+import time
 import unittest
+from unittest.mock import patch
 from resultgate.network.registry import Registry
-from resultgate.network.market import Market, MarketOperator
+from resultgate.network.market import Market, MarketOperator, RequestBudgetExceeded
 from test_network import DATA, PROOF
 
 
@@ -12,6 +14,20 @@ def process_create(args):
     directory, token = args
     r=Registry(directory)
     try: return Market(r).create(token,'shared-request',PROOF,'b'*64)
+    finally: r.db.close()
+
+def process_consume(args):
+    directory, token, frozen = args
+    r=Registry(directory)
+    try:
+        market=Market(r)
+        accepted=0
+        for _ in range(80):
+            try:
+                with patch('resultgate.network.market.time.time',return_value=frozen):market.consume_request(token)
+                accepted+=1
+            except RequestBudgetExceeded: pass
+        return accepted
     finally: r.db.close()
 
 class MarketTests(unittest.TestCase):
@@ -143,3 +159,28 @@ class MarketTests(unittest.TestCase):
             rows=list(pool.map(process_create,[(self.tmp.name,self.requester)]*2))
         self.assertEqual(rows[0]['id'],rows[1]['id'])
         self.assertEqual(sum(r['duplicate'] for r in rows),1)
+
+    def test_budget_shared_across_credentials_and_store_restart(self):
+        frozen=time.time()
+        second_token=self.o.issue_credential('tenant-a')
+        other_registry=Registry(self.tmp.name)
+        try:
+            second=Market(other_registry)
+            with patch('resultgate.network.market.time.time',return_value=frozen):
+                for _ in range(119):self.m.consume_request(self.requester)
+                self.assertEqual(second.consume_request(second_token)['remaining_requests'],0)
+                with self.assertRaises(RequestBudgetExceeded):self.m.consume_request(self.requester)
+                self.assertEqual(second.consume_request(self.other)['remaining_requests'],119)
+            with patch('resultgate.network.market.time.time',return_value=frozen+60):
+                self.assertEqual(second.consume_request(second_token)['remaining_requests'],119)
+            with patch('resultgate.network.market.time.time',return_value=frozen+180):
+                second.consume_request(second_token)
+                self.assertEqual(self.r.db.execute('SELECT count(*) FROM market_request_budgets').fetchone()[0],1)
+        finally:other_registry.db.close()
+
+    def test_multiprocess_budget_cannot_exceed_limit(self):
+        ctx=multiprocessing.get_context('spawn')
+        with concurrent.futures.ProcessPoolExecutor(max_workers=2,mp_context=ctx) as pool:
+            # Freeze one window across both workers to avoid minute-boundary flakiness.
+            rows=list(pool.map(process_consume,[(self.tmp.name,self.requester,time.time())]*2))
+        self.assertEqual(sum(rows),120)
