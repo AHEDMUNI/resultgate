@@ -109,3 +109,26 @@ Approval of Stripe's business account alone does not satisfy these gates.
 Destination charges debit the platform for Stripe fees/refunds/disputes. Application
 fee refunds also require reversing the transfer. Failed refunds can require manual
 fund recovery. Never equate the 5% gross commission with net profit.
+
+## Existing Express account selected by operator
+
+The owner supplied `acct_1UT33gDkMsAxFBbN` as their existing Sandbox Express account.
+Its reported pending capabilities have not yet been read through the API. Reuse it;
+do not run create-account for this onboarding flow.
+
+`scripts/stripe_sandbox_onboarding.py --account acct_1UT33gDkMsAxFBbN` has no package
+dependencies, requires an interactive terminal and prompts invisibly for a Sandbox
+`sk_test_` key. It makes only GET account and POST account_links requests. It never
+creates accounts, changes account details, saves keys, or attempts payments. It prints
+a shareable requirements/status section followed by a PRIVATE single-use link. Do not
+share or capture the link. Complete the hosted flow using Stripe test data. Re-run
+with `--status-only` to retrieve the actual updated requirements/capabilities.
+The existing public /providers page is only an informational return/refresh destination;
+regenerate expired links with the operator command. No automatic verification implied.
+
+For subsequent ResultGate binding, the private Connect operator now supports
+`adopt-account PROVIDER_ID acct_1UT33gDkMsAxFBbN`. It binds the existing API-validated
+US Express test account, rejects conflicting assignments and leaves provider approval
+pending. Empty Stripe metadata is permitted only for this explicit local import;
+foreign provider metadata is rejected. No Stripe account mutation is needed. Then use
+hosted onboarding and the separate review-provider gate as documented above.

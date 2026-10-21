@@ -15,6 +15,7 @@ class ConnectTest:
         self.c, self.stripe, self.db = commerce, stripe, commerce.db
         self.db.execute('CREATE TABLE IF NOT EXISTS commerce_test_operations (key TEXT PRIMARY KEY, digest TEXT, created REAL, result TEXT)')
         self.db.execute('CREATE TABLE IF NOT EXISTS commerce_test_accounts (provider TEXT PRIMARY KEY, account TEXT UNIQUE)')
+        self.db.execute('CREATE TABLE IF NOT EXISTS commerce_test_account_imports (provider TEXT PRIMARY KEY, account TEXT UNIQUE)')
         self.db.execute('CREATE TABLE IF NOT EXISTS commerce_test_reports (digest TEXT PRIMARY KEY, created REAL, data TEXT)')
 
     def object(self, resource, object_id, prefix):
@@ -60,12 +61,34 @@ class ConnectTest:
             self.db.execute('INSERT OR IGNORE INTO commerce_test_accounts VALUES(?,?)',(provider_id,result['account']))
         return result
 
+    def adopt_account(self, provider_id, account_id):
+        """Explicit local operator binding of an existing sandbox account; no creation."""
+        p = self.c.load('providers', provider_id)
+        if p['mode'] != 'test' or p['live_agreement'] or not re.fullmatch(r'acct_[A-Za-z0-9]+', account_id):
+            raise ValueError('test provider and account required')
+        a = self.stripe.request('GET', '/v1/accounts/'+account_id)
+        if (a.get('id') != account_id or a.get('country') != 'US' or a.get('type') != 'express'
+            or a.get('metadata',{}).get('resultgate_provider') not in (None, provider_id)):
+            raise ValueError('existing account binding conflict')
+        existing = self.db.execute('SELECT provider,account FROM commerce_test_accounts WHERE provider=? OR account=?', (provider_id,account_id)).fetchall()
+        if any(row != (provider_id,account_id) for row in existing) or p['account'] not in (None,account_id):
+            raise ValueError('account already assigned; no replacement allowed')
+        providers = self.db.execute('SELECT data FROM commerce_providers WHERE id<>?', (provider_id,)).fetchall()
+        if any(json.loads(row[0]).get('account') == account_id for row in providers):
+            raise ValueError('account already assigned to another provider')
+        with self.db:
+            self.db.execute('INSERT OR IGNORE INTO commerce_test_accounts VALUES(?,?)',(provider_id,account_id))
+            self.db.execute('INSERT OR IGNORE INTO commerce_test_account_imports VALUES(?,?)',(provider_id,account_id))
+        return {'account':account_id,'mode':'test','imported':True,'approved':False}
+
     def account(self, provider_id):
         self.c.load('providers',provider_id)
         row = self.db.execute('SELECT account FROM commerce_test_accounts WHERE provider=?',(provider_id,)).fetchone()
         if not row: raise ValueError('create sandbox account first')
         a = self.stripe.request('GET','/v1/accounts/'+row[0])
-        if a.get('id') != row[0] or a.get('country') != 'US' or a.get('metadata',{}).get('resultgate_provider') != provider_id:
+        imported = self.db.execute('SELECT 1 FROM commerce_test_account_imports WHERE provider=? AND account=?',(provider_id,row[0])).fetchone()
+        marker = a.get('metadata',{}).get('resultgate_provider')
+        if a.get('id') != row[0] or a.get('country') != 'US' or (marker != provider_id and not (imported and marker is None)):
             raise ValueError('account binding mismatch')
         return a
 

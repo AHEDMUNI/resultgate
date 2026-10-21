@@ -155,3 +155,20 @@ class ConnectTests(unittest.TestCase):
             return original(method,path,data,key)
         self.stripe.request=unsafe
         with self.assertRaises(ValueError): self.op.onboarding_link(self.p['id'])
+
+    def test_adopt_existing_account_no_create_and_no_approval(self):
+        original=self.stripe.request
+        def manual(method,path,data=None,key=None):
+            result=original(method,path,data,key)
+            if path=='/v1/accounts/acct_fixture': result.update(type='express',metadata={})
+            return result
+        self.stripe.request=manual
+        self.op.adopt_account(self.p['id'],'acct_fixture')
+        self.op.adopt_account(self.p['id'],'acct_fixture')
+        self.op.onboarding_link(self.p['id'])
+        self.op.create_account(self.p['id'])
+        self.assertFalse(any(method=='POST' and path=='/v1/accounts' for method,path,_,_ in self.calls))
+        self.assertEqual('pending_review',self.c.load('providers',self.p['id'])['state'])
+        other=MarketOperator(self.c.market).issue_credential('other')
+        provider=self.c.apply(other,'Other',TERMS_SHA,True)
+        with self.assertRaises(ValueError): self.op.adopt_account(provider['id'],'acct_fixture')
