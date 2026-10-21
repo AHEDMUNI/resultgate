@@ -2,19 +2,19 @@
 
 <!-- mcp-name: io.github.AHEDMUNI/resultgate -->
 
-Local MCP tools for extraction-contract checks and literal citation integrity. Version 0.1.1 is published on [PyPI](https://pypi.org/project/resultgate-pilot/0.1.1/).
+Local MCP evidence checks, opt-in provider discovery and consented specialist task delegation. Release 0.2.0: [PyPI](https://pypi.org/project/resultgate-pilot/0.2.0/).
 
-**A pass is not a truth guarantee.** ResultGate evaluates the evidence you supply; it does not fetch sources, detect every missing fact, verify source authenticity, or judge semantic support. Incomplete completion evidence returns `unknown`.
+**A pass is not a truth guarantee.** The original checking tools evaluate the evidence you supply; they do not fetch sources, detect every missing fact, verify source authenticity, or judge semantic support. Incomplete completion evidence returns `unknown`.
 
 ## Install from PyPI (Python 3.11+)
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install resultgate-pilot==0.1.1
+.venv/bin/python -m pip install resultgate-pilot==0.2.0
 .venv/bin/resultgate-pilot --help
 ```
 
-For MCP clients with uv installed: `uvx resultgate-pilot==0.1.1`.
+For MCP clients with uv installed: `uvx resultgate-pilot==0.2.0`.
 
 ## Install from GitHub (Python 3.11+ and Git)
 
@@ -32,7 +32,7 @@ On Linux/macOS, after reviewing the artifact and its SHA-256:
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install ./resultgate_pilot-0.1.1-py3-none-any.whl
+.venv/bin/python -m pip install ./resultgate_pilot-0.2.0-py3-none-any.whl
 .venv/bin/resultgate --help
 ```
 
@@ -49,6 +49,14 @@ Configure the absolute installed executable; it runs locally over stdio, without
 ```
 
 Discoverable tools: `check_extraction` and `check_citations`. Each accepts `payload` and an optional `usage` object. Tool input/output schemas are exposed by the official Python MCP SDK. The default makes no network requests and records no usage. This local server trusts the invoking OS user; it is not a sandbox for untrusted processes.
+
+### Enable brokerage and delegation
+
+```json
+{"mcpServers":{"resultgate":{"command":"/ABSOLUTE/PATH/.venv/bin/resultgate","args":["--brokerage","--delegation"]}}}
+```
+
+This exposes 12 tools while keeping external execution disabled. The Registry configuration uses these same safe flags. Local provider onboarding adds 5 tools with an explicit private registry directory. See the [installed-client tutorial](https://github.com/AHEDMUNI/resultgate/blob/main/docs/pilot/START.md) and [provider application process](https://github.com/AHEDMUNI/resultgate/blob/main/docs/pilot/PROVIDERS.md). No shared hosted network, conforming A2A transport, automatic provider execution or payments. GROBID is an opt-in ML demo, not an autonomous agent.
 
 ### Extraction example
 
@@ -98,3 +106,7 @@ python3 -m venv .venv
 Unit and clean-install tests are internal. Synthetic benchmark fixtures measure rule coverage, not production accuracy or superiority over complete competing products. Tests use no paid models, browsers or APIs. Python 3.12/Linux is the tested clean-install environment. There is no payment code, hosted endpoint, or external customer count.
 
 License: MIT, included in LICENSE. See SECURITY.md for security scope and THIRD_PARTY.md for dependencies.
+
+Optional local pilot: [provider onboarding, discovery and commission receipt pilot](docs/NETWORK.md). Optional 17-tool configuration; no hosted network, A2A endpoint or payments. [Partner diligence](docs/COMMISSION-PARTNERS-2026-10-21.md).
+
+Local pilot: [start/install/MCP examples](docs/pilot/START.md) · [provider application](docs/pilot/PROVIDERS.md) · [review-only commission worksheet](docs/pilot/AGREEMENT-DRAFT.md). No public shared runtime or automatic provider approval.

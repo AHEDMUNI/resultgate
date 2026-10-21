@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "resultgate-pilot"
-version = "0.1.1"
+version = "0.2.0"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-description = "Evidence-bounded extraction and citation checks for agent workflows"
+description = "Local evidence checks, provider discovery and consented agent task delegation"
 requires-python = ">=3.11"
-dependencies = ["mcp==1.30.0", "uvicorn==0.38.0", "starlette==1.9.0", "pydantic==2.14.1"]
+dependencies = ["defusedxml==0.7.1", "mcp==1.30.0", "uvicorn==0.38.0", "starlette==1.9.0", "pydantic==2.14.1"]
 
 [project.urls]
 Repository = "https://github.com/AHEDMUNI/resultgate"

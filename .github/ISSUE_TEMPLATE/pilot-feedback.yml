@@ -1,0 +1,28 @@
+name: Optional pilot feedback
+description: Voluntary minimal-data report; not automatically verified independent usage
+title: "[Pilot feedback] "
+body:
+  - type: markdown
+    attributes:
+      value: This issue is PUBLIC. Share only an aggregate report you have reviewed. No task content, keys, raw logs or customer identifiers. This report will initially be classified as unverified; CI/internal tests are never independent use. You may request removal, but GitHub and third-party copies are outside our retention control.
+  - type: dropdown
+    id: origin
+    attributes:
+      label: Origin
+      options:
+        - Internal test or tutorial
+        - Unaffiliated evaluator, installation only
+        - Unaffiliated user, actual task
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Optional aggregate summary or non-sensitive problem description
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Consent
+      options:
+        - label: I choose to publish this limited report and understand it is not proof of independent use or commercial entitlement.
+          required: true

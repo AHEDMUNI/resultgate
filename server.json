@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.AHEDMUNI/resultgate",
   "title": "ResultGate",
-  "description": "Local checks for incomplete extraction results and literal citation integrity. No default telemetry.",
-  "version": "0.1.1",
+  "description": "Local evidence checks, provider discovery and consented task delegation. No hosted network or payments.",
+  "version": "0.2.0",
   "repository": {
     "url": "https://github.com/AHEDMUNI/resultgate",
     "source": "github"
@@ -13,11 +13,21 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "resultgate-pilot",
-      "version": "0.1.1",
+      "version": "0.2.0",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
-      }
+      },
+      "packageArguments": [
+        {
+          "type": "positional",
+          "value": "--brokerage"
+        },
+        {
+          "type": "positional",
+          "value": "--delegation"
+        }
+      ]
     }
   ]
 }

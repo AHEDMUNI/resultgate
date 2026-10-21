@@ -7,3 +7,4 @@ build/
 dist/
 *.sqlite3*
 identity.json
+identity.key

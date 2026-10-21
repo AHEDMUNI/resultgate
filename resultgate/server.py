@@ -1,4 +1,4 @@
-"""Local MCP stdio and authenticated loopback HTTP. No outbound data transfer."""
+"""Local MCP stdio and authenticated loopback HTTP. No outbound data transfer in default mode."""
 from typing import Any
 import argparse
 import asyncio
@@ -18,7 +18,7 @@ from .citations import audit_citations
 from .models import ExtractionInput, CitationInput, UsageContext
 from .local_usage import LocalUsage
 
-mcp = FastMCP('ResultGate', instructions='Check supplied evidence. Pass means contract checks only, never factual truth. No telemetry by default. Optional local metrics require CLI opt-in and a caller-declared real_task usage context.')
+mcp = FastMCP('ResultGate', instructions='Check supplied evidence. Pass means contract checks only, never factual truth. No telemetry by default. Opt-in --brokerage --delegation discovers reviewed providers and delegates public citation structuring with explicit consent; --provider-registry adds locally reviewed provider submissions. No public A2A server or payments. Optional local metrics require CLI opt-in and a caller-declared real_task usage context.')
 usage_store = None
 
 def measure(tool, result, usage):
@@ -40,7 +40,7 @@ def check_citations(payload: CitationInput, usage: UsageContext | None = None) -
     return measure('citations',audit_citations(payload.model_dump(exclude_unset=True)),usage)
 
 async def health(request):
-    return JSONResponse({'service':'ResultGate','version':'0.1.1','mode':'local_pilot'})
+    return JSONResponse({'service':'ResultGate','version':'0.2.0','mode':'local_pilot'})
 
 def strict_object(pairs):
     result={}
@@ -92,9 +92,35 @@ def main():
     global usage_store
     parser=argparse.ArgumentParser()
     parser.add_argument('--http',action='store_true')
+    parser.add_argument('--brokerage',action='store_true',help='Opt in to experimental provider discovery and routing tools')
+    parser.add_argument('--allow-public-provider-requests',action='store_true',help='Permit explicitly consented free public DOI requests through brokerage')
+    parser.add_argument('--delegation',action='store_true',help='Opt in to specialist task delegation tools')
+    parser.add_argument('--delegation-store',help='Opt in to private 30-day SQLite task events')
+    parser.add_argument('--allow-demo-task-requests',action='store_true',help='Allow explicitly approved public citation processing on GROBID demo')
+    parser.add_argument('--internal-delegation-tests',action='store_true',help='Classify this operator process as internal testing')
+    parser.add_argument('--provider-registry',help='Opt in to local reviewed provider submission tools; private directory')
     parser.add_argument('--port',type=int,default=8765)
     parser.add_argument('--usage-dir',help='Explicitly opt in to local-only MCP real-task counts; no automatic upload')
     args=parser.parse_args()
+    if (args.delegation_store or args.allow_demo_task_requests or args.internal_delegation_tests) and not args.delegation:
+        parser.error('delegation options require --delegation')
+    if args.delegation and (not args.brokerage or args.http):
+        parser.error('--delegation requires --brokerage and MCP stdio')
+    if args.provider_registry:
+        if args.http or not args.brokerage:
+            parser.error('--provider-registry requires --brokerage and stdio')
+        from .network.mcp import register as register_network
+        register_network(mcp,args.provider_registry)
+    if args.delegation:
+        from .delegation.mcp import register as register_delegation
+        register_delegation(mcp,args.delegation_store,args.allow_demo_task_requests,args.internal_delegation_tests)
+    if args.allow_public_provider_requests and not args.brokerage:
+        parser.error('--allow-public-provider-requests requires --brokerage')
+    if args.brokerage and args.http:
+        parser.error('brokerage currently supports MCP stdio only')
+    if args.brokerage:
+        from .brokerage.mcp import register
+        register(mcp, args.allow_public_provider_requests)
     if args.http:
         if args.usage_dir:
             parser.error('local usage measurement currently supports MCP only')

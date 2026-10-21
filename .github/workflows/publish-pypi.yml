@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Publish the validated 0.1.1 release to PyPI (requires Pending Publisher)'
+        description: 'Publish the validated 0.2.0 release to PyPI (requires configured Trusted Publisher)'
         type: boolean
         required: true
         default: false
@@ -45,7 +45,7 @@ jobs:
           import pathlib, tomllib, json
           p = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']
           assert p['name'] == 'resultgate-pilot'
-          assert p['version'] == '0.1.1'
+          assert p['version'] == '0.2.0'
           assert p['license'] == 'MIT'
           assert pathlib.Path('LICENSE').is_file()
           assert '<!-- mcp-name: io.github.AHEDMUNI/resultgate -->' in pathlib.Path('README.md').read_text()
@@ -60,6 +60,7 @@ jobs:
           python -m venv "${RUNNER_TEMP}/resultgate-test"
           "${RUNNER_TEMP}/resultgate-test/bin/python" -m pip install dist/*.whl
           "${RUNNER_TEMP}/resultgate-test/bin/python" -I scripts/acceptance.py
+          "${RUNNER_TEMP}/resultgate-test/bin/python" -I -m resultgate.pilot_client --offline
           "${RUNNER_TEMP}/resultgate-test/bin/python" -m pip check
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
