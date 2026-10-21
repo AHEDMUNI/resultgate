@@ -1,0 +1,51 @@
+[Unit]
+Description=ResultGate private loopback pilot (no external execution)
+After=network.target
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+Type=simple
+User=resultgate
+Group=resultgate
+WorkingDirectory=/var/lib/resultgate
+StateDirectory=resultgate
+StateDirectoryMode=0700
+UMask=0077
+ExecStart=/opt/resultgate/venv/bin/python -I -m resultgate.network.gateway --directory /var/lib/resultgate --port 8765
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+MemoryHigh=256M
+MemoryMax=384M
+MemorySwapMax=0
+CPUQuota=70%
+TasksMax=64
+LimitNOFILE=1024
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectKernelLogs=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+IPAddressDeny=any
+IPAddressAllow=localhost
+Environment=PYTHONDONTWRITEBYTECODE=1
+Environment=PYTHONUNBUFFERED=1
+UnsetEnvironment=BROWSER_USE_API_KEY HTTP_PROXY HTTPS_PROXY ALL_PROXY
+StandardOutput=journal
+StandardError=journal
+LogNamespace=resultgate
+LogRateLimitIntervalSec=60s
+LogRateLimitBurst=30
+
+[Install]
+WantedBy=multi-user.target

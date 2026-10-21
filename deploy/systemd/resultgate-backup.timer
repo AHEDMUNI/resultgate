@@ -1,0 +1,8 @@
+[Unit]
+Description=Daily private ResultGate snapshot
+[Timer]
+OnCalendar=daily
+RandomizedDelaySec=15m
+Persistent=true
+[Install]
+WantedBy=timers.target

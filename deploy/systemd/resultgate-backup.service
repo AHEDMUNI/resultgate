@@ -1,0 +1,24 @@
+[Unit]
+Description=ResultGate private local application snapshot
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+UMask=0077
+ExecStart=/opt/resultgate/venv/bin/python -I /opt/resultgate/ops/backup_local.py
+MemoryMax=192M
+CPUQuota=25%
+TimeoutStartSec=120
+Nice=10
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ReadOnlyPaths=/var/lib/resultgate
+ReadWritePaths=/var/backups/resultgate
+InaccessiblePaths=-/var/lib/resultgate/browser-use-trial.sqlite3
+IPAddressDeny=any
+RestrictAddressFamilies=AF_UNIX
+LogNamespace=resultgate
