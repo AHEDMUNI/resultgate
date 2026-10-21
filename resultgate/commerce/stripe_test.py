@@ -46,11 +46,14 @@ class StripeTest:
         allowed_post = {'/v1/checkout/sessions', '/v1/accounts', '/v1/account_links', '/v1/refunds'}
         allowed_get = r'/v1/(accounts/acct_|payment_intents/pi_|charges/ch_|application_fees/fee_|transfers/tr_|balance_transactions/txn_|refunds/re_)[A-Za-z0-9]+'
         if not ((method == 'POST' and path in allowed_post) or
-                (method == 'GET' and (re.fullmatch(allowed_get, path) or path=='/v1/checkout/sessions'))):
+                (method == 'GET' and (re.fullmatch(allowed_get, path) or path in ('/v1/checkout/sessions','/v1/application_fees')))):
             raise ValueError('unsupported test operation')
         if method=='GET' and path=='/v1/checkout/sessions':
             if not isinstance(data,dict) or set(data)-{'limit','created[gte]','starting_after'} or data.get('limit')!='100':
                 raise ValueError('bounded session audit required')
+        if method=='GET' and path=='/v1/application_fees':
+            if not isinstance(data,dict) or set(data)!={'charge','limit'} or data['limit']!='100' or not re.fullmatch(r'ch_[A-Za-z0-9]+',data['charge']):
+                raise ValueError('bounded charge fee audit required')
         headers={'Authorization':'Bearer '+self.secret}
         if key: headers['Idempotency-Key']=key
         with httpx.Client(timeout=15,trust_env=False,follow_redirects=False,transport=self.transport) as client:

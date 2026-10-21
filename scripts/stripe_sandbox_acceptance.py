@@ -155,9 +155,13 @@ def pump(server, proc, predicate, seconds):
 def matched_report(op, order, server, proc, expected_fee, expected_provider):
     # Bounded read-only retry for Stripe object propagation; never retries a mutation.
     report = None
-    for _ in range(8):
-        report = op.reconcile(order)
-        if report['matched']:
+    from resultgate.commerce.connect_test import SettlementPending
+    for _ in range(15):
+        try:
+            report = op.reconcile(order)
+        except SettlementPending:
+            report = None
+        if report and report['matched']:
             if report['net_commission_cents'] != expected_fee or report['provider_net_before_costs_cents'] != expected_provider:
                 raise RuntimeError('unexpected_reconciled_amounts')
             return report
@@ -250,6 +254,10 @@ def execute(directory):
                     pump(server,proc,lambda: payment()[1]>=target,180)
                     # Same cumulative request must not create a second refund.
                     op.refund(order['id'],target)
+                _,_,safe_pi,safe_ch=op.payment(order['id'])
+                print('SAFE PAYMENT OBJECTS: '+json.dumps({'payment_intent':safe_pi['id'],'charge':safe_ch['id'],
+                    'application_fee_reference_type':type(safe_ch.get('application_fee')).__name__,
+                    'transfer_reference_type':type(safe_ch.get('transfer')).__name__}),flush=True)
                 report = matched_report(op,order['id'],server,proc,commission,provider_cents)
                 ledger = [json.loads(r[0]) for r in c.db.execute('SELECT postings FROM commerce_ledger WHERE order_id=?',(order['id'],))]
                 sums = {k:sum(row.get(k,0) for row in ledger) for k in ('test_processor_clearing','test_provider_entitlement','test_platform_commission')}

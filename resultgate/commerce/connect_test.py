@@ -21,6 +21,10 @@ def compatible_express(account):
         and (c.get('losses') or {}).get('payments') == 'application')
 
 
+class SettlementPending(ValueError):
+    """Only missing processor references may be retried read-only."""
+
+
 class ConnectTest:
     def __init__(self, commerce, stripe):
         self.c, self.stripe, self.db = commerce, stripe, commerce.db
@@ -30,6 +34,8 @@ class ConnectTest:
         self.db.execute('CREATE TABLE IF NOT EXISTS commerce_test_reports (digest TEXT PRIMARY KEY, created REAL, data TEXT)')
 
     def object(self, resource, object_id, prefix):
+        if isinstance(object_id,dict): object_id=object_id.get('id')
+        if object_id is None: raise SettlementPending('processor_reference_pending_'+resource)
         if not isinstance(object_id, str) or not re.fullmatch(prefix+r'_[A-Za-z0-9]+', object_id):
             raise ValueError('invalid Stripe object ID')
         obj = self.stripe.request('GET', '/v1/'+resource+'/'+object_id)
@@ -167,12 +173,31 @@ class ConnectTest:
             raise ValueError('ambiguous refund; reconcile Stripe result before retry')
         return self.operation(key,{'order':order_id,'target':cumulative_cents},issue)
 
+    @staticmethod
+    def fee_bound(app, charge_id):
+        source=app.get('fee_source') or {}
+        return (app.get('charge')==charge_id or app.get('originating_transaction')==charge_id
+                or (source.get('type')=='charge' and source.get('charge')==charge_id))
+
+    def application_fee(self, ch, order):
+        reference=ch.get('application_fee')
+        if reference is not None: return self.object('application_fees',reference,'fee')
+        # Some Stripe responses do not contain a direct fee reference. Resolve via
+        # the official charge-filtered read endpoint; never assume the 5% was taken.
+        page=self.stripe.request('GET','/v1/application_fees',{'charge':ch['id'],'limit':'100'})
+        if not isinstance(page.get('data'),list) or page.get('has_more') is not False:
+            raise ValueError('fee lookup incomplete')
+        if not page['data']: raise SettlementPending('processor_application_fee_pending')
+        matches=[a for a in page['data'] if self.fee_bound(a,ch['id']) and a.get('account')==order['account']]
+        if len(matches)!=1: raise ValueError('unique bound application fee required')
+        return self.object('application_fees',matches[0].get('id'),'fee')
+
     def reconcile(self, order_id):
         o,row,pi,ch = self.payment(order_id)
-        app = self.object('application_fees',ch.get('application_fee'),'fee')
+        app = self.application_fee(ch,o)
         transfer = self.object('transfers',ch.get('transfer'),'tr')
         bt = self.stripe.request('GET','/v1/balance_transactions/'+self.valid_balance(ch.get('balance_transaction')))
-        if (app.get('charge') != ch['id'] or app.get('account') != o['account'] or app.get('currency') != 'usd'
+        if (not self.fee_bound(app,ch['id']) or app.get('account') != o['account'] or app.get('currency') != 'usd'
             or transfer.get('source_transaction') != ch['id'] or transfer.get('destination') != o['account']
             or transfer.get('currency') != 'usd' or bt.get('source') != ch['id'] or bt.get('currency') != 'usd'
             or bt.get('id') != ch['balance_transaction']):

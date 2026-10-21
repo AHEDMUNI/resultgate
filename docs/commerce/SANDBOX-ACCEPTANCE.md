@@ -243,3 +243,21 @@ Focused validation after recovery change: 43 tests (25 commerce, 14 Connect, 4 r
 Added checks for a single deterministic repair, refusal when an existing Stripe
 session is found, refusal for unknown outcomes and refusal of incomplete pagination.
 Actual repaired Checkout and payment evidence still await the authorized server run.
+
+## First signed paid event observed; reconciliation not yet complete
+
+The operator screenshot shows the reused Checkout produced a signature-verified
+checkout.session.completed event and reached the paid reconciliation stage. The
+trace passed payment binding checks, then failed validating charge.application_fee
+as an object ID. This is paid Sandbox evidence, not a completed $5 fee/transfer or
+refund reconciliation. No refund stage was reached in that run.
+
+Support expanded references and resolve absent fee references through the official
+GET application_fees?charge=CHARGE_ID&limit=100 endpoint. Require exactly one fee
+bound to the platform charge/originating transaction and selected connected account,
+then retrieve and validate the test fee itself. Missing fees are pending, not assumed
+collected; retry only missing-reference cases read-only for a bounded interval.
+All original amount/currency/fee/transfer/refund/ledger checks remain mandatory.
+Added tests cover missing references, empty/pending fee lookup and destination fee
+origin binding. Focused verification: 17 Connect + 4 runner tests passed.
+Resume the existing directory/order/payment; never request a second Checkout payment.

@@ -173,6 +173,42 @@ class ConnectTests(unittest.TestCase):
         provider=self.c.apply(other,'Other',TERMS_SHA,True)
         with self.assertRaises(ValueError): self.op.adopt_account(provider['id'],'acct_fixture')
 
+    def test_missing_fee_reference_resolves_official_charge_filtered_list(self):
+        self.pay(); original=self.stripe.request
+        def resolve(method,path,data=None,key=None):
+            if path=='/v1/application_fees':
+                self.assertEqual({'charge':'ch_fixture','limit':'100'},data)
+                return {'data':[{'id':'fee_fixture','charge':'ch_fixture','account':'acct_fixture'}],'has_more':False}
+            obj=original(method,path,data,key)
+            if path=='/v1/charges/ch_fixture':obj=dict(obj,application_fee=None)
+            return obj
+        self.stripe.request=resolve
+        report=self.op.reconcile(self.o['id'])
+        self.assertTrue(report['matched']);self.assertEqual(500,report['net_commission_cents'])
+
+    def test_missing_fee_is_pending_and_never_assumed_earned(self):
+        from resultgate.commerce.connect_test import SettlementPending
+        self.pay();original=self.stripe.request
+        def pending(method,path,data=None,key=None):
+            if path=='/v1/application_fees':return {'data':[],'has_more':False}
+            obj=original(method,path,data,key)
+            if path=='/v1/charges/ch_fixture':obj=dict(obj,application_fee=None)
+            return obj
+        self.stripe.request=pending
+        with self.assertRaises(SettlementPending):self.op.reconcile(self.o['id'])
+        self.assertEqual(0,self.r.db.execute('SELECT count(*) FROM commerce_test_reports').fetchone()[0])
+
+    def test_destination_fee_origin_binding_and_expanded_reference(self):
+        self.pay();original=self.stripe.request
+        def expanded(method,path,data=None,key=None):
+            obj=original(method,path,data,key)
+            if path=='/v1/charges/ch_fixture':obj=dict(obj,application_fee={'id':'fee_fixture'})
+            if path=='/v1/application_fees/fee_fixture':obj=dict(obj,charge='ch_destination',originating_transaction='ch_fixture')
+            return obj
+        self.stripe.request=expanded
+        self.assertTrue(self.op.reconcile(self.o['id'])['matched'])
+
+
 
 class ControllerConfigurationTests(unittest.TestCase):
     def test_explicit_controller_compatibility(self):
