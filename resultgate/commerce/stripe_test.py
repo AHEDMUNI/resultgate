@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import time
+import re
 from urllib.parse import urlsplit
 import httpx
 
@@ -17,7 +18,10 @@ class StripeTest:
         self.secret=secret; self.origin=origin.rstrip('/'); self.transport=transport
 
     def request(self, method, path, data=None, key=None):
-        if path!='/v1/checkout/sessions' and not path.startswith('/v1/accounts/acct_'):
+        allowed_post = {'/v1/checkout/sessions', '/v1/accounts', '/v1/account_links', '/v1/refunds'}
+        allowed_get = r'/v1/(accounts/acct_|payment_intents/pi_|charges/ch_|application_fees/fee_|transfers/tr_|balance_transactions/txn_|refunds/re_)[A-Za-z0-9]+'
+        if not ((method == 'POST' and path in allowed_post) or
+                (method == 'GET' and re.fullmatch(allowed_get, path))):
             raise ValueError('unsupported test operation')
         headers={'Authorization':'Bearer '+self.secret}
         if key: headers['Idempotency-Key']=key
@@ -30,6 +34,7 @@ class StripeTest:
                     if len(body)>1024*1024: raise ValueError('Stripe response too large')
         result=json.loads(body)
         if not isinstance(result,dict): raise ValueError('invalid response')
+        if result.get('livemode') is True: raise ValueError('live response forbidden')
         return result
 
     def checkout(self, commerce, token, oid):
@@ -37,13 +42,16 @@ class StripeTest:
         prior=commerce.db.execute('SELECT url FROM commerce_sessions WHERE order_id=?',(oid,)).fetchone()
         if prior: return {'checkout_url':prior[0],'order_id':oid,'mode':'test','duplicate':True}
         o=commerce.get(token,oid)
+        expires = int(min(o['expires'], o['approval']['expires']))
+        if expires < time.time()+1800:
+            raise ValueError('Checkout needs at least 30 minutes of remaining owner authorization')
         account=self.request('GET','/v1/accounts/'+o['account'])
         if (account.get('id')!=o['account'] or account.get('country')!='US'
             or account.get('charges_enabled') is not True or account.get('payouts_enabled') is not True
             or account.get('capabilities',{}).get('transfers')!='active'):
             raise ValueError('eligible US test connected account required')
         payload.update(success_url=self.origin+'/commerce/return',cancel_url=self.origin+'/commerce/cancel',
-                       expires_at=str(o['expires']))
+                       expires_at=str(expires))
         # Same order and parameters after timeout -> same Stripe idempotency key.
         session=self.request('POST','/v1/checkout/sessions',payload,'rg-test-'+oid)
         return commerce.bind_session(oid,session)

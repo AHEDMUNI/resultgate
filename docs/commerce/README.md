@@ -2,7 +2,9 @@
 
 Status: review-only branch, not deployed. Does not depend on PR #11. Existing
 production MCP and discovery schedules are unchanged. No live payment switch exists.
-No provider, account, purchase, payout, message or contract was created by this change.
+No real provider, account, purchase, payout, message or contract was created by this change.
+See SANDBOX-ACCEPTANCE.md for the new operator-only Connect test account, hosted
+onboarding, cumulative refund and processor-object reconciliation workflow.
 
 ## What works
 
@@ -37,10 +39,10 @@ winning restores it, losing leaves it reversed. Adjustments produce balanced led
 postings, never a second sale. Fees use integer cents, half-up rounding.
 
 **All ledger entries are TEST entries. `real_revenue_cents` remains zero.**
-The ledger tracks entitlement, not proven payout. Refund instructions include
-`reverse_transfer` and `refund_application_fee`, but the adapter cannot send refunds,
-transfers or payouts. Application-fee/transfer/balance reconciliation, processing costs,
-refund failures and dispute recovery still need operator reconciliation before live use.
+The ledger tracks entitlement, not proven payout. The private Connect test operator can send sandbox refunds with
+`reverse_transfer` and `refund_application_fee`. No public refund route, standalone
+transfer mutation or payout mutation exists. Test application-fee/transfer/balance matching is implemented. Complete processing
+cost, failed refund, dispute recovery and bank payout reconciliation remain live gates.
 No proof of service completion is needed to accrue commission.
 
 ## Run safely in a separate sandbox directory

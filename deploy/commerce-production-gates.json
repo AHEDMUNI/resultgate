@@ -1,0 +1,24 @@
+{
+  "purpose": "Review manifest only; not consumed as runtime configuration",
+  "live_collection_enabled": false,
+  "automatic_financial_deployment_enabled": false,
+  "operator_reported_stripe_status": "review_in_progress",
+  "desired_currency": "usd",
+  "desired_commission_basis_points": 500,
+  "desired_charge_model": "destination_charges",
+  "sandbox_and_production_storage_must_be_separate": true,
+  "production_secret_storage": "root/operator-managed secret store; no keys in repository",
+  "required_evidence": {
+    "stripe_connect_eligibility": null,
+    "cost_and_liability_acceptance": null,
+    "provider_kyc_and_authority": null,
+    "provider_live_five_percent_agreement": null,
+    "owner_authentication_and_payment_consent": null,
+    "stripe_hosted_sandbox_payment_refund_reconciliation": null,
+    "independent_security_review": null,
+    "refund_dispute_payout_recovery": null,
+    "backup_restore_and_rollback": null,
+    "explicit_owner_live_deployment_approval": null
+  },
+  "note": "Filling this manifest does not enable live keys. A separately reviewed live implementation and explicit approval remain required."
+}

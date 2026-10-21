@@ -43,7 +43,7 @@ class CommerceTests(unittest.TestCase):
             'livemode':False,'client_reference_id':self.o['id'],'amount_total':10000,'currency':'usd'})
 
     def approve(self):
-        self.op.approve_order(self.o['id'],self.o['owner'],self.o['quote_sha'],10000,time.time()+1800)
+        self.op.approve_order(self.o['id'],self.o['owner'],self.o['quote_sha'],10000,time.time()+2400)
 
     def payevent(self,eid='evt_paid',paid=True):
         return {'id':eid,'type':'checkout.session.completed','livemode':False,'created':self.created,
@@ -130,7 +130,7 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual('analysis-v2',self.c.search(self.buyer,'data_analysis')['services'][0]['id'])
 
     def test_predelegated_aggregate_budget_and_revocation(self):
-        gid=self.op.grant(self.o['owner'],'analysis-v1',10000,time.time()+1800)
+        gid=self.op.grant(self.o['owner'],'analysis-v1',10000,time.time()+2400)
         self.op.use_grant(self.o['id'],gid); self.op.use_grant(self.o['id'],gid)
         second=self.c.order(self.buyer,'analysis-v1','order-two')
         with self.assertRaises(ValueError): self.op.use_grant(second['id'],gid)
@@ -184,7 +184,7 @@ class CommerceTests(unittest.TestCase):
         self.assertEqual(8,len(names)); self.assertNotIn('approve_order',names); self.assertNotIn('review_provider',names)
 
     def test_new_order_honors_preexisting_grant_automatically(self):
-        gid=self.op.grant(self.o['owner'],'analysis-v1',10000,time.time()+1800)
+        gid=self.op.grant(self.o['owner'],'analysis-v1',10000,time.time()+2400)
         new=self.c.order(self.buyer,'analysis-v1','auto-approved')
         self.assertEqual(gid,new['approval']['grant'])
         retry=self.c.order(self.buyer,'analysis-v1','auto-approved')
