@@ -1,6 +1,14 @@
 # Connect sandbox acceptance — 2026-10-21
 
-## Evidence actually available
+## Completed Stripe Sandbox acceptance
+
+The operator supplied server-run screenshots on 2026-10-21 proving the existing
+account and order completed hosted Checkout, signed events, partial and full
+refunds, and ledger reconciliation. All three stages matched. See
+[SANDBOX-EVIDENCE-2026-10-21.md](SANDBOX-EVIDENCE-2026-10-21.md).
+This is actual Stripe Sandbox evidence, not a live payment or bank settlement.
+
+## Earlier local validation (historical)
 
 Operator reports the ALLUBI Yerba Mate LLC live account is **Review in progress**.
 This is not verified Connect eligibility or approval. Commercial static site is public;
@@ -91,8 +99,7 @@ manual inspection; do not create a new order or refund target to bypass the stop
 - Provider account binding and capabilities checked; business authority is not inferred.
 - Reports never assert bank settlement or real revenue; mismatch blocks acceptance.
 
-Still required before production: independent financial/security review, actual Stripe
-sandbox evidence, hosted owner/provider authentication and consent UX, full adjustment
+Still required before production: independent financial/security review, hosted owner/provider authentication and consent UX, full adjustment
 and payout reconciliation, a recovery procedure for ambiguous operations, production
 webhook replay/rotation/monitoring/runbook, verified backup restore, contractual costs,
 tax and refund allocation, and explicit owner approval to deploy and collect money.
@@ -113,7 +120,8 @@ fund recovery. Never equate the 5% gross commission with net profit.
 ## Existing Express account selected by operator
 
 The owner supplied `acct_1UT33gDkMsAxFBbN` as their existing Sandbox Express account.
-Its reported pending capabilities have not yet been read through the API. Reuse it;
+The later API validation and successful acceptance supersede its initial pending
+capability report. Reuse it;
 do not run create-account for this onboarding flow.
 
 `scripts/stripe_sandbox_onboarding.py --account acct_1UT33gDkMsAxFBbN` has no package
@@ -186,8 +194,8 @@ settlement, net profit or real revenue. A match requires actual Stripe object am
 and locally balanced ledger postings at all three stages.
 
 New runner boundary tests are necessary code verification, not Stripe transaction
-proof. Actual cs_test_/pi_/ch_/fee_/tr_/re_/evt_ IDs remain pending until the operator
-runs this on the authorized server and completes the hosted test-card Checkout.
+proof. The authorized server run subsequently completed; see the evidence document
+for observed results and the private report location containing exact object IDs.
 
 Sources: official stripe/stripe-cli v1.54.1 release asset digest and source config
 (`STRIPE_API_KEY`, `STRIPE_DEVICE_NAME`); Stripe Accounts object controller/type docs;
@@ -242,9 +250,10 @@ than 30 minutes left stops for explicit review. No financial production deployme
 Focused validation after recovery change: 43 tests (25 commerce, 14 Connect, 4 runner).
 Added checks for a single deterministic repair, refusal when an existing Stripe
 session is found, refusal for unknown outcomes and refusal of incomplete pagination.
-Actual repaired Checkout and payment evidence still await the authorized server run.
+The authorized server run subsequently completed the repaired Checkout and all stages;
+see the evidence document.
 
-## First signed paid event observed; reconciliation not yet complete
+## Earlier reconciliation failure and fix (subsequently verified)
 
 The operator screenshot shows the reused Checkout produced a signature-verified
 checkout.session.completed event and reached the paid reconciliation stage. The
@@ -261,3 +270,7 @@ All original amount/currency/fee/transfer/refund/ledger checks remain mandatory.
 Added tests cover missing references, empty/pending fee lookup and destination fee
 origin binding. Focused verification: 17 Connect + 4 runner tests passed.
 Resume the existing directory/order/payment; never request a second Checkout payment.
+
+The resumed run at commit `1a561afe27d62116e681ce15057c842174384aa7`
+subsequently matched paid, partial-refund and full-refund stages. No second
+payment was required. See the completed acceptance evidence above.
