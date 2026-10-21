@@ -30,13 +30,14 @@ class SecureInputTests(unittest.TestCase):
                 if select.select([fd],[],[],0.2)[0]: output+=os.read(fd,4096)
         try:
             until(b'READY FOR HIDDEN')
-            os.write(fd,b'not_a_key_SECRET_FIXTURE\nPASTED_SECOND_LINE_SECRET\n')
+            os.write(fd,'اختبار_عربي_SECRET_FIXTURE\nPASTED_SECOND_LINE_SECRET\n'.encode('utf-8'))
             until(b'Input rejected')
             # Ensure next no-echo prompt has been emitted before ending the reader.
             while output.count(b'READY FOR HIDDEN')<2:
                 if select.select([fd],[],[],1)[0]:output+=os.read(fd,4096)
                 else:self.fail('reader did not retry')
-            self.assertNotIn(b'not_a_key_SECRET_FIXTURE',output)
+            self.assertNotIn('اختبار_عربي'.encode('utf-8'),output)
+            self.assertNotIn(b'UnicodeDecodeError',output)
             self.assertNotIn(b'PASTED_SECOND_LINE_SECRET',output)
             os.write(fd,b'EXIT\n')
             _,status=os.waitpid(pid,0);self.assertEqual(0,status)
@@ -56,3 +57,9 @@ class SecureInputTests(unittest.TestCase):
             p=pathlib.Path(directory)/'history';p.write_text('ls\n')
             link=pathlib.Path(directory)/'link';link.symlink_to(p)
             with self.assertRaises(ValueError):module('redact_bash_keys').scrub(link)
+
+    def test_finish_handles_unicode_and_malformed_utf8(self):
+        from unittest.mock import patch
+        m=module('stripe_sandbox_onboarding')
+        with patch.object(m,'hidden_input',side_effect=['عربي', '\ufffd', ValueError('input_too_long'), '']), patch('builtins.print'):
+            m.finish()

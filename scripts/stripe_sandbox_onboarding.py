@@ -39,7 +39,7 @@ def hidden_input(prompt):
             if char in (b'\n', b'\r'): break
             data.extend(char)
             if len(data) > 512: raise ValueError('input_too_long')
-        return data.decode('ascii')
+        return data.decode('utf-8', errors='replace')
     finally:
         # Discard buffered multiline paste before any possible shell is resumed.
         termios.tcflush(fd, termios.TCIFLUSH)
@@ -57,8 +57,14 @@ def read_test_key():
 
 
 def finish():
-    print('Reader finished. Type EXIT to close this SSH session; do not paste another key.', flush=True)
-    while hidden_input('Hidden input; EXIT to close: ') != 'EXIT':
+    print('Reader finished. Press Enter to close this SSH session; do not paste another key.', flush=True)
+    while True:
+        try:
+            value = hidden_input('Press Enter to close (no key): ')
+        except ValueError:
+            print('Input discarded without display.', flush=True)
+            continue
+        if value in ('', 'EXIT'): return
         print('Input discarded without display.', flush=True)
 
 
@@ -74,9 +80,17 @@ def main():
     resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
     if not a.exec_session: p.error('Run via exec python3 with --exec-session; do not use the old command')
     if a.input_self_test:
-        value = hidden_input('SELF TEST: type DEMO_ONLY then Enter (NO API key): ')
-        print('SELF_TEST_OK' if value == 'DEMO_ONLY' else 'SELF_TEST_FAILED')
-        return
+        while True:
+            try:
+                value = hidden_input('SELF TEST: type 123456 then Enter (NO API key; EXIT cancels): ')
+            except ValueError:
+                print('Input too long; retry with 123456 only.', flush=True)
+                continue
+            if value == 'EXIT': return
+            if value == '123456':
+                print('SELF_TEST_OK', flush=True)
+                return
+            print('SELF_TEST_RETRY: use the six digits 123456; nothing was sent to Stripe.', flush=True)
     key=read_test_key()
     opener=urllib.request.build_opener(urllib.request.ProxyHandler({}),NoRedirect())
     def request(path, params=None):
