@@ -6,7 +6,7 @@ address, customer figures, provider approvals, payment availability or PCI certi
 
 Nine static pages, one CSS asset and five text/JSON/XML discovery assets, no JavaScript, trackers, card fields, forms,
 external fonts or browser storage. Provider interest goes through email, not an assumed
-contract. Commission is 5% on eligible paid transactions and adjusted for refunds/disputes.
+contract. Commission is 15% on eligible paid transactions and adjusted for refunds/disputes.
 Digital fulfillment/provider responsibilities and current prelaunch status are explicit.
 
 Owner requested publication on agents.allubiyerbamate.com only. The deploy script

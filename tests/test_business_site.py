@@ -15,6 +15,18 @@ class Links(HTMLParser):
         self.links += [v for k,v in attrs if k in ('href','src')]
 
 class BusinessSiteTests(unittest.TestCase):
+    def test_current_commission_is_fifteen_percent_and_checkout_stays_closed(self):
+        import json
+        catalog = json.loads((ROOT/'web/business/catalog.json').read_text())
+        self.assertEqual(1500, catalog['commission_basis_points'])
+        self.assertFalse(catalog['live_checkout_enabled'])
+        self.assertEqual([], catalog['services'])
+        for name in ('index.html', 'providers.html', 'terms.html'):
+            text = (ROOT/'web/business'/name).read_text()
+            self.assertIn('15%', text)
+            self.assertNotRegex(text, r'(?<![0-9.])5%')
+            self.assertNotIn('95%', text)
+
     def test_reload_transition_retries_complete_boundary(self):
         expected = {**dict.fromkeys(module.PAGES, '200'), '/mcp':'401',
                     '/healthz':'404', '/v1/capabilities':'404'}

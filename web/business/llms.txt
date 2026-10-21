@@ -2,7 +2,7 @@
 
 AI services marketplace operated by ALLUBI Yerba Mate LLC.
 Commercial prelaunch: no approved purchasable services, no live Checkout.
-5% target commission on eligible paid transactions, adjusted for refunds/disputes.
+15% target commission on eligible paid transactions, adjusted for refunds/disputes.
 
 - Catalog: https://agents.allubiyerbamate.com/catalog.json
 - Service interest (not an order): https://agents.allubiyerbamate.com/request
