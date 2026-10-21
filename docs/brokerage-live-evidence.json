@@ -1,0 +1,48 @@
+{
+  "kind": "internal_live_provider_integration",
+  "timestamp_utc": "2026-10-21T00:24:45.500953+00:00",
+  "tools_discovered": 7,
+  "checks": [
+    {
+      "provider_id": "crossref",
+      "public_fixture_doi": "10.1038/nphys1170",
+      "status": "succeeded",
+      "evidence": {
+        "kind": "validated_provider_response",
+        "sha256": "b8cd895eb7d754d6e107b454b19a1155e1d98aaff1e112424162d8c19ba16284"
+      },
+      "result": {
+        "doi": "10.1038/nphys1170",
+        "title": "Measured measurement",
+        "provider_id": "crossref",
+        "evidence_scope": "provider metadata response; not factual or semantic verification",
+        "untrusted_data": true
+      },
+      "tracked": true,
+      "retry_did_not_dispatch": true
+    },
+    {
+      "provider_id": "datacite",
+      "public_fixture_doi": "10.6084/m9.figshare.21545982",
+      "status": "succeeded",
+      "evidence": {
+        "kind": "validated_provider_response",
+        "sha256": "5224ebcc9bc90dcdc1b6457b93bc4e6e09bdf4095e7a3bec9af2a635e7f1caea"
+      },
+      "result": {
+        "doi": "10.6084/m9.figshare.21545982",
+        "title": "A modified thickened flame model for simulating extinction",
+        "provider_id": "datacite",
+        "evidence_scope": "provider metadata response; not factual or semantic verification",
+        "untrusted_data": true
+      },
+      "tracked": true,
+      "retry_did_not_dispatch": true
+    }
+  ],
+  "verified_independent_uses": 0,
+  "revenue_usd": 0,
+  "payments_enabled": false,
+  "source_run": "https://github.com/AHEDMUNI/resultgate/actions/runs/39521126825",
+  "tested_commit": "12162da9b8d6dfd06d219e08348f22a133349822"
+}
