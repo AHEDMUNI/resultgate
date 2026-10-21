@@ -21,7 +21,7 @@ Prepared description:
 > ResultGate is an early-stage AI services marketplace for people and authorized
 > agents. Independent providers may apply voluntarily with their service scope,
 > API/MCP documentation, price and ownership evidence. Proposed marketplace terms:
-> no joining or monthly fee; 5% on eligible paid transactions, adjusted for refunds
+> no joining or monthly fee; 15% on eligible paid transactions, adjusted for refunds
 > and disputes. No commercial providers or live purchases are available yet.
 > The existing hosted MCP endpoint requires an individually issued bearer credential
 > and supports simulation only. Provider applications:
@@ -49,7 +49,7 @@ new OAuth feature before the first approved offer.
 
 > Own an AI/API service? Apply to list it on ResultGate. Include your public service
 > documentation, a clear USD price and scope, and your method of proving ownership.
-> Proposed fee: 5% of eligible paid transactions, no joining fee or monthly subscription.
+> Proposed fee: 15% of eligible paid transactions, no joining fee or monthly subscription.
 > Review and a separate agreement are required; we do not promise traffic or income.
 > https://agents.allubiyerbamate.com/providers
 

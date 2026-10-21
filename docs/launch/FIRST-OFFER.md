@@ -2,7 +2,7 @@
 
 Decision: keep ResultGate a general marketplace. Qualify one bounded public-content
 extraction service first (customer-owned/permitted pages -> structured text/JSON).
-No listed commercial supplier has accepted our 5% marketplace arrangement. No price
+No listed commercial supplier has accepted our 15% marketplace arrangement. No price
 below is a ResultGate offer; do not import research candidates into the live catalog.
 
 ## Verified candidates and decisive gaps
@@ -11,7 +11,7 @@ below is a ResultGate offer; do not import research candidates into the live cat
 |---|---|---|---|
 | Apify RAG Web Browser | API and MCP; from $1.33/1,000 fetched pages; tier/scope dependent | https://apify.com/apify/rag-web-browser | Actual service and published price; no accepted ResultGate contract. Apify standard Actor contract excludes resale/redistribution of access; obtain express permission and a provider quote, do not assume reseller rights. |
 | David / 6sigmag Fast Website Content Crawler | from $3/1,000 results; community maintained | https://apify.com/6sigmag/fast-website-content-crawler | Independent creator candidate; reliability and rights need verification, no agreement. Same platform contractual issue. |
-| Firecrawl | Hobby $19 monthly or $16/month billed annually; 5,000 credits | https://www.firecrawl.dev/pricing | API capability and price are public; no 5% agreement or marketplace resale permission established. Do not purchase a plan or repurpose affiliate terms. |
+| Firecrawl | Hobby $19 monthly or $16/month billed annually; 5,000 credits | https://www.firecrawl.dev/pricing | API capability and price are public; no 15% agreement or marketplace resale permission established. Do not purchase a plan or repurpose affiliate terms. |
 | BrowserAct | Official workflow API and public affiliate program | https://www.browseract.com/docs-api | Public API availability does not establish approval of ResultGate Checkout, a 95/5 split, or an active marketplace seller. |
 
 Rights source: https://docs.apify.com/legal/standard-actor-contract (sections 1.1–1.2).
@@ -27,8 +27,8 @@ to buy through ResultGate. No customer demand for ResultGate has been establishe
 - Fixed scope: e.g. permitted public pages, maximum count/size, no login or personal data.
 - Deliverables, USD unit/bundle price, expiry, delivery time and support contact.
 - Official API/MCP documentation, sandbox capability and cancellation/failure handling.
-- Explicit 5% once per eligible successful payment, not tied to completion; proportional
-  refund adjustment and dispute treatment. 95% before separately agreed costs.
+- Explicit 15% once per eligible successful payment, not tied to completion; proportional
+  refund adjustment and dispute treatment. 85% before separately agreed costs.
 - Processing cost allocation, taxes, refunds, disputes and payout timing agreed separately.
 - Stripe connected-account eligibility and secure onboarding; no keys or identity docs by email.
 - Owner review before agreement acceptance and listing publication.

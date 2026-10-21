@@ -47,14 +47,14 @@ the evidence record. It cannot change code, approve providers, send mail or char
 
 ## Necessary launch gates
 
-1. One provider agrees to a clearly priced, authorized offer and the 5% commercial
+1. One provider agrees to a clearly priced, authorized offer and the 15% commercial
    terms, including processing/refund/dispute cost allocation and fulfillment.
 2. Independently reviewed production owner/provider identity and consent path,
    Stripe Connect eligibility, live financial adapter, durable webhook/refund recovery,
    monitoring, backup and rollback; explicit owner live authorization.
 3. Deployed offer and request path plus an approved public acquisition placement.
 
-Before any code accepts live keys, review minimum charge economics: gross 5% is not
+Before any code accepts live keys, review minimum charge economics: gross 15% is not
 net income. Processor fees were $3.20 on the observed $100 test payment; do not assume
 that applies to every transaction, account, payment method or country.
 
