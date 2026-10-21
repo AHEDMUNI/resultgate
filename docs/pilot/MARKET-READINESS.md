@@ -34,3 +34,5 @@ Verified independent uses0; real paid conversions0; real commission agreements0;
 ## Source validation
 
 205 local tests passed, including16 market lifecycle/security tests and6 capability-catalog tests. Bandit on the complete package found no issues. Source/wheel build and Twine strict passed; built artifacts were NOT published. The review found and fixed duplicate transaction attribution across tasks, expired request replay and pre-consent provider visibility. GitHub Actions validation is tracked on the new development PR.
+
+GitHub Actions run [39534387949](https://github.com/AHEDMUNI/resultgate/actions/runs/39534387949) passed205 tests and isolated installed-wheel acceptance for the original2, brokerage7 and onboarding17 tools. Network calls were disabled in this PR run; it is not a new live-agent integration. PR #4 contains the source changes and remains unmerged/unreleased for review.
