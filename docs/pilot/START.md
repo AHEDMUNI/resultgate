@@ -14,7 +14,7 @@ client/bin/python -m pip check
 client/bin/python -I -m resultgate.pilot_client --offline
 ```
 
-Record and review the printed SHA. The branch is mutable; repeat with `git checkout YOUR_REVIEWED_SHA` before installing when reproducibility matters. Do not use `pip install resultgate-pilot` expecting this pilot: the published release is older. CI also installs the exact pushed Git commit directly into a separate environment and runs this packaged command. The offline tutorial discovers17 tools and verifies that a fixture submission remains pending; it sends nothing to providers and counts as internal testing.
+Tested source snapshot for this guide: `83e730aef7c7479dda6da4304f896df8769d94f1`. Record and review the printed SHA. The branch is mutable; repeat with `git checkout YOUR_REVIEWED_SHA` before installing when reproducibility matters. Do not use `pip install resultgate-pilot` expecting this pilot: the published release is older. CI also installs the exact pushed Git commit directly into a separate environment and runs this packaged command. The offline tutorial discovers17 tools and verifies that a fixture submission remains pending; it sends nothing to providers and counts as internal testing.
 
 ## Connect an independent MCP client
 
