@@ -89,3 +89,20 @@ was blocked by credential protection. Offline tests use a fake transport and are
 explicitly simulations. Existing default tools and the published 0.2.0 are unchanged.
 A real run, once authorized gates are satisfied, will still be an INTERNAL
 integration test, never independent adoption, a sale or a commission.
+
+## Authenticated preflight update
+
+The read-only GitHub Actions preflight run 39537374520, retry job 119020447273,
+succeeded after the owner saved the repository secret. The authenticated provider
+response established free-tier status, at least $0.50 credit and no active sessions.
+The account dashboard separately displayed $1.00 credit and no prior runs.
+No secret value was read or exported. No agent task was submitted.
+
+The API cannot establish promotional origin or recharge configuration. The Billing
+page showed Tier 0 and first-purchase checkout information but did not expose an
+explicit no-card/no-auto-recharge status. Invoice-page observation was blocked by
+browser credential protection. Owner confirmation of promotional credit, no saved
+card and no recharge remains the narrow prerequisite before the free run.
+
+Evidence: https://github.com/AHEDMUNI/resultgate/actions/runs/39537374520
+This is a genuine authenticated API check, not agent execution or independent use.
