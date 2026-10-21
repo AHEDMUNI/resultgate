@@ -177,6 +177,7 @@ class Commerce:
     def checkout_payload(self, token, order_id):
         o=self.get(token,order_id)
         order_rate(o)
+        if o['state'] == 'cancelled_test': raise ValueError('order cancelled')
         if o['owner']!=self.actor(token): raise ValueError('requester required')
         p=self.load('providers',o['provider_id'])
         if p['state']!='approved_test' or p['account']!=o['account']:
@@ -184,6 +185,8 @@ class Commerce:
         approval=o['approval']
         if not approval or approval['expires']<=time.time() or o['expires']<=time.time():
             raise ValueError('current owner approval required')
+        if approval.get('quote_sha') != o['quote_sha'] or type(approval.get('cap')) is not int or approval['cap'] < o['amount']:
+            raise ValueError('approval quote or budget mismatch')
         if approval.get('grant'):
             row=self.db.execute('SELECT active,expires FROM commerce_grants WHERE id=?',(approval['grant'],)).fetchone()
             if not row or not row[0] or row[1]<=time.time(): raise ValueError('grant revoked/expired')
@@ -309,6 +312,7 @@ class CommerceOperator:
     @atomic
     def approve_order(self, oid, owner_hash, quote_sha, cap, expires):
         o=self.c.load('orders',oid); fee(cap)
+        if o['state'] == 'cancelled_test': raise ValueError('order cancelled')
         if owner_hash!=o['owner'] or quote_sha!=o['quote_sha'] or cap<o['amount'] or not time.time()<expires<=o['expires']:
             raise ValueError('owner, quote, budget or expiry mismatch')
         o['approval']={'quote_sha':quote_sha,'cap':cap,'expires':expires,'source':'owner_review'}

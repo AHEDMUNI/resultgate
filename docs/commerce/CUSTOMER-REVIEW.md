@@ -1,0 +1,11 @@
+# Separate customer review — sandbox only
+
+`CustomerReview` is a private local component, not a hosted login or proof of human identity. Do not expose `issue` to HTTP/MCP or hand its secret to an agent. Existing operator approvals and grants remain sandbox compatibility paths; this addition does not replace them with a production authentication system.
+
+The operator must first authenticate the actual customer through a separately reviewed channel and check authority over the requester identity. The operator calls `issue` with the exact pending order/owner/quote, a private identity-review evidence digest, and consent expiry within the immutable order lifetime. The one-time secret is delivered privately to that customer. Only its keyed digest is persisted. Reissuing invalidates older challenges. Neither raw identity documents nor secrets belong in audit logs, command-line arguments, URLs or GitHub.
+
+The private customer client calls `accept` with its requester credential, separate review secret, exact quote hash, exact amount and boolean `true`. The challenge expires after ten minutes; consent must still cover more than thirty minutes for Stripe Checkout. An atomic SQLite transaction consumes the challenge and writes approval. Wrong tenant, seller, changed quote/amount, revoked credential, stale/reused challenge and truthy strings are rejected. The result explicitly says `live_authorization: false`.
+
+`cancel_before_checkout` invalidates unused challenges and approval, and prevents future Checkout/legacy operator reapproval. It only succeeds before any journaled Checkout attempt or bound session. After a timeout or issued session, local cancellation cannot prove processor cancellation: stop and reconcile/expire the processor session through a separately reviewed recovery path. Visiting `/commerce/cancel` is not cancellation or a refund.
+
+Before production: hosted independently authenticated human session, identity-to-requester binding, CSRF/session protections, rate limits on review attempts, consent screen containing the complete offer/refund/terms text, secure delivery and revocation, accessible cancellation UX, processor expiry/recovery and independent security review. Never activate production by changing `test` strings or accepting live keys in `StripeTest`.
