@@ -8,6 +8,31 @@ from urllib.parse import urlsplit
 import httpx
 
 
+class StripeRequestRejected(ValueError):
+    """Only approved diagnostic fields; never retains Stripe message/body/headers."""
+    def __init__(self, status, response):
+        self.safe = {'http_status': int(status)}
+        try:
+            error = json.loads(response).get('error', {})
+            kinds = {'invalid_request_error','authentication_error','api_error','card_error','idempotency_error','rate_limit_error'}
+            codes = {'parameter_missing','parameter_unknown','parameter_invalid_integer',
+                     'parameter_invalid_string_blank','parameter_invalid_empty','resource_missing',
+                     'account_invalid','account_country_invalid_address','balance_insufficient',
+                     'transfers_not_allowed','platform_account_required','url_invalid',
+                     'idempotency_key_in_use','testmode_charges_only','payment_intent_invalid_parameter',
+                     'amount_too_small','amount_too_large'}
+            params = {'expires_at','success_url','cancel_url','mode','currency','account','amount',
+                      'payment_intent','reverse_transfer','refund_application_fee',
+                      'payment_intent_data[transfer_data][destination]',
+                      'payment_intent_data[application_fee_amount]',
+                      'line_items[0][price_data][currency]','line_items[0][price_data][unit_amount]'}
+            self.safe.update(error_type=error.get('type') if error.get('type') in kinds else 'other',
+                             error_code=error.get('code') if error.get('code') in codes else 'other',
+                             parameter=error.get('param') if error.get('param') in params else 'other')
+        except (ValueError,TypeError,AttributeError): pass
+        super().__init__('stripe_request_rejected')
+
+
 class StripeTest:
     def __init__(self, secret, origin, enabled=False, transport=None):
         if not enabled or not isinstance(secret,str) or not secret.startswith('sk_test_'):
@@ -27,11 +52,11 @@ class StripeTest:
         if key: headers['Idempotency-Key']=key
         with httpx.Client(timeout=15,trust_env=False,follow_redirects=False,transport=self.transport) as client:
             with client.stream(method,'https://api.stripe.com'+path,headers=headers,data=data) as r:
-                if r.status_code>=300: raise ValueError('Stripe test request rejected; inspect restricted operator logs')
                 body=bytearray()
                 for chunk in r.iter_bytes():
                     body.extend(chunk)
                     if len(body)>1024*1024: raise ValueError('Stripe response too large')
+                if r.status_code>=300: raise StripeRequestRejected(r.status_code,body)
         result=json.loads(body)
         if not isinstance(result,dict): raise ValueError('invalid response')
         if result.get('livemode') is True: raise ValueError('live response forbidden')

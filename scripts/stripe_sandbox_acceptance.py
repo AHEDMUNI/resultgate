@@ -17,6 +17,7 @@ import re
 import resource
 import subprocess
 import sys
+import traceback
 import tarfile
 import tempfile
 import threading
@@ -206,6 +207,7 @@ def execute(directory):
         with tempfile.TemporaryDirectory(prefix='resultgate-stripe-cli-') as config:
             print('SAFE PROGRESS: connecting Stripe signed-event listener.',flush=True)
             proc = start_listener(binary, key, server, config)
+            print('SAFE PROGRESS: signed-event listener ready.',flush=True)
             if not payment():
                 prior = c.db.execute('SELECT url FROM commerce_sessions WHERE order_id=?',(order['id'],)).fetchone()
                 if prior:
@@ -219,6 +221,7 @@ def execute(directory):
                             if method=='POST' and path=='/v1/checkout/sessions':
                                 data=dict(data,success_url=ORIGIN+'/',cancel_url=ORIGIN+'/')
                             return super().request(method,path,data,key)
+                    print('SAFE PROGRESS: requesting existing-order Checkout from Stripe.',flush=True)
                     adapter = AcceptanceStripe(key,ORIGIN,enabled=True)
                     checkout_url = adapter.checkout(c,state['buyer'],order['id'])['checkout_url']
                 print('PRIVATE SANDBOX CHECKOUT — open in browser; do not screenshot URL:',flush=True)
@@ -290,6 +293,11 @@ if __name__=='__main__':
                  'ledger_postings_mismatch','unsafe_state_directory','dedicated_interactive_exec_session_required'}
         code=('sandbox_python_dependency_missing' if isinstance(error,ModuleNotFoundError) else
               str(error) if isinstance(error,RuntimeError) and str(error) in allowed else diagnostic(error))
+        if type(error).__name__=='StripeRequestRejected' and isinstance(getattr(error,'safe',None),dict):
+            print('SAFE STRIPE ERROR: '+json.dumps(error.safe),flush=True)
+        frames=traceback.extract_tb(error.__traceback__)
+        locations=[{'file':Path(f.filename).name,'line':f.lineno} for f in frames if Path(f.filename).name in ('stripe_sandbox_acceptance.py','stripe_test.py','core.py','connect_test.py')]
+        print('SAFE ERROR LOCATION: '+json.dumps(locations),flush=True)
         print('STOPPED: '+code+'; preserve the same run directory; do not start a new order.',flush=True)
     finally:
         try: finish()

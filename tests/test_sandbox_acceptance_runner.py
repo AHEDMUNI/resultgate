@@ -65,3 +65,17 @@ class AcceptanceRunnerTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError,'cli_integrity_failed'):
                 runner.cli_binary(Path(d))
             self.assertFalse((Path(d)/'stripe-1.54.1').exists())
+
+    def test_stripe_rejection_exposes_only_allowlisted_diagnostics(self):
+        import httpx
+        from resultgate.commerce.stripe_test import StripeTest, StripeRequestRejected
+        secret='sk_test_FAKEONLY'
+        payload={'error':{'type':'invalid_request_error','code':'parameter_unknown',
+                          'param':'expires_at','message':secret,'request_log_url':'https://private.example'}}
+        adapter=StripeTest(secret,'https://example.com',True,httpx.MockTransport(lambda req:httpx.Response(400,json=payload)))
+        with self.assertRaises(StripeRequestRejected) as raised:adapter.request('POST','/v1/checkout/sessions',{})
+        e=raised.exception
+        self.assertEqual({'http_status':400,'error_type':'invalid_request_error','error_code':'parameter_unknown','parameter':'expires_at'},e.safe)
+        self.assertNotIn(secret,str(e)+str(vars(e)))
+        poisoned=StripeRequestRejected(400,json.dumps({'error':{'type':secret,'code':secret,'param':secret,'message':secret}}))
+        self.assertNotIn(secret,str(vars(poisoned)))
