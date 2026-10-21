@@ -132,3 +132,63 @@ US Express test account, rejects conflicting assignments and leaves provider app
 pending. Empty Stripe metadata is permitted only for this explicit local import;
 foreign provider metadata is rejected. No Stripe account mutation is needed. Then use
 hosted onboarding and the separate review-provider gate as documented above.
+
+
+## Private resumable acceptance runner (2026-10-21)
+
+The operator's account-read screenshot shows the EXISTING account above has
+`charges_enabled=true`, `payouts_enabled=true`, `details_submitted=true`, active
+card_payments/transfers, and no pending requirements. It has `type=none` with
+Express dashboard, Stripe requirement collection, and application fee/loss payer.
+This supported controller combination is now accepted; no new account or repeat
+onboarding is required. This screenshot is account readiness, NOT payment evidence.
+
+`scripts/stripe_sandbox_acceptance.py --exec-session` orchestrates ONE actual
+Stripe-hosted $100 test Checkout, waits for Stripe CLI-forwarded signed events,
+reconciles $5 commission/$95 provider before costs, refunds $40, then the remaining
+$60 (cumulative $100), and reconciles $3/$57 then $0/$0. It replays each actual signed
+event through the ledger to check duplicate handling. No synthetic event is generated
+by the runner, and success pages are not treated as payment confirmation.
+
+Run via `exec /opt/resultgate/venv/bin/python` in the helper checkout: it imports the
+reviewed source explicitly and only READS existing runtime dependencies. It does not
+install into or change production Python, Nginx, systemd, MCP or any public route.
+It binds only 127.0.0.1:18776, not the MCP port. Return/cancel go to the existing public
+homepage and have no authority to change transaction state.
+
+The runner downloads official Stripe CLI 1.54.1 into the operator's private state and
+checks the archive SHA256 from the release asset metadata:
+`59ac00af3ca11a02f76232642d6d534c5c0e9e433889b86006f5046d33baf657`.
+It fails before requesting a key if download/integrity/dependencies/port checks fail.
+No sudo, purchases or public ingress are needed. Only Linux x86_64 is supported.
+
+Input uses the already PTY-tested no-echo /dev/tty reader. Echo remains disabled
+throughout the run, and queued input is flushed before restoring terminal settings.
+No Stripe key is written to disk or shell argv/history. Stripe CLI receives the test
+key via its child-only environment, with stdin disabled and isolated ephemeral HOME/
+config. Same-UID processes and root can inspect process environments: run only under
+the trusted operator account. CLI raw output/signing secret are captured in memory,
+never printed or saved. Checkout URLs are private and must not be screenshotted.
+
+State and the isolated registry live under
+`~/.local/state/resultgate-stripe-sandbox-acceptance`, mode 0700 (files 0600 via umask).
+The private run state contains LOCAL sandbox buyer/seller credentials, never a Stripe
+API key or webhook signing secret. Report JSON contains test object IDs, amounts,
+ledger totals, event signature/replay evidence and refund IDs. Never copy run.json,
+registry identity.key or the sessions table into a report. A process lock prevents
+concurrent runs. Completed runs print their saved report without new mutations.
+
+On interruption, preserve that exact directory and rerun the SAME command. It reuses
+the same order, Checkout and cumulative refund journal. Unknown refund outcomes stop
+for manual Stripe inspection, not a new refund/order. Expired unpaid Checkout also
+requires review; do not delete state to bypass the gate. Reports never claim bank
+settlement, net profit or real revenue. A match requires actual Stripe object amounts
+and locally balanced ledger postings at all three stages.
+
+New runner boundary tests are necessary code verification, not Stripe transaction
+proof. Actual cs_test_/pi_/ch_/fee_/tr_/re_/evt_ IDs remain pending until the operator
+runs this on the authorized server and completes the hosted test-card Checkout.
+
+Sources: official stripe/stripe-cli v1.54.1 release asset digest and source config
+(`STRIPE_API_KEY`, `STRIPE_DEVICE_NAME`); Stripe Accounts object controller/type docs;
+Stripe destination charges and proportional application-fee refund documentation.
