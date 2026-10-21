@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "marketplace": "ResultGate",
+  "status": "prelaunch",
+  "live_checkout_enabled": false,
+  "services": [],
+  "approved_commercial_providers": 0,
+  "commission_basis_points": 500,
+  "interest_url": "https://agents.allubiyerbamate.com/request",
+  "provider_application_url": "https://agents.allubiyerbamate.com/providers",
+  "note": "Empty catalog means no approved purchasable offer. Interest is not an order."
+}

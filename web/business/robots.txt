@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /mcp
+Sitemap: https://agents.allubiyerbamate.com/sitemap.xml
