@@ -5,6 +5,7 @@ by the caller and must be independently verified before production use.
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Iterable
 
@@ -35,7 +36,7 @@ def route_task(
     required = {s.strip().lower() for s in required_capabilities if s.strip()}
     if not required:
         raise ValueError("At least one required capability is needed")
-    if max_price_usd is not None and max_price_usd < 0:
+    if max_price_usd is not None and (isinstance(max_price_usd, bool) or not math.isfinite(max_price_usd) or max_price_usd < 0):
         raise ValueError("max_price_usd must be nonnegative")
     matches = []
     for provider in providers:
@@ -43,7 +44,7 @@ def route_task(
             continue
         if not required.issubset({c.strip().lower() for c in provider.capabilities}):
             continue
-        if provider.price_usd is not None and provider.price_usd < 0:
+        if provider.price_usd is not None and (isinstance(provider.price_usd, bool) or not math.isfinite(provider.price_usd) or provider.price_usd < 0):
             continue
         if max_price_usd is not None and (
             provider.price_usd is None or provider.price_usd > max_price_usd
@@ -56,7 +57,8 @@ def route_task(
             "price_usd": provider.price_usd,
             "verified": provider.verified,
             "referral_terms_verified": provider.referral_terms_verified,
-            "commission_available": provider.referral_terms_verified,
+            "commission_available": False,  # Caller flags are not an executed agreement.
+            "verification_source": "caller_asserted_not_trusted",
         })
     return sorted(matches, key=lambda p: (
         p["price_usd"] is None,

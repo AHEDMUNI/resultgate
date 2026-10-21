@@ -92,9 +92,18 @@ def main():
     global usage_store
     parser=argparse.ArgumentParser()
     parser.add_argument('--http',action='store_true')
+    parser.add_argument('--brokerage',action='store_true',help='Opt in to experimental provider discovery and routing tools')
+    parser.add_argument('--allow-public-provider-requests',action='store_true',help='Permit explicitly consented free public DOI requests through brokerage')
     parser.add_argument('--port',type=int,default=8765)
     parser.add_argument('--usage-dir',help='Explicitly opt in to local-only MCP real-task counts; no automatic upload')
     args=parser.parse_args()
+    if args.allow_public_provider_requests and not args.brokerage:
+        parser.error('--allow-public-provider-requests requires --brokerage')
+    if args.brokerage and args.http:
+        parser.error('brokerage currently supports MCP stdio only')
+    if args.brokerage:
+        from .brokerage.mcp import register
+        register(mcp, args.allow_public_provider_requests)
     if args.http:
         if args.usage_dir:
             parser.error('local usage measurement currently supports MCP only')
