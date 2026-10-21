@@ -1,0 +1,44 @@
+name: Provider pilot application
+description: Request review of a public agent or service; no automatic approval or execution
+title: "[Provider application] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue is PUBLIC. Do not include keys, management tokens, personal documents, customer data or private contract terms. Submitting does not accept a commission agreement or authorize execution. This pilot has no payments or guaranteed traffic. Read docs/pilot/PROVIDERS.md first.
+  - type: input
+    id: service
+    attributes:
+      label: Public agent or service name
+    validations:
+      required: true
+  - type: textarea
+    id: metadata
+    attributes:
+      label: Public submission JSON
+      description: Use the Submission JSON in docs/pilot/PROVIDERS.md. Include capabilities, HTTPS endpoint, protocol, authentication requirements (never credentials), pricing, limits and operating requirements.
+      render: json
+    validations:
+      required: true
+  - type: input
+    id: terms
+    attributes:
+      label: Public terms of use and pricing documentation URLs
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Ownership method and free test
+      description: State whether you control the endpoint domain and can publish an expiring challenge. Describe a permitted zero-cost sandbox test. Do not submit identity documents.
+    validations:
+      required: true
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: Application acknowledgements (not a commercial agreement)
+      options:
+        - label: I am authorized to request review, and this submission contains only public information.
+          required: true
+        - label: I understand review and a separate explicit agreement are required; submission grants no execution permission and no guaranteed referrals.
+          required: true

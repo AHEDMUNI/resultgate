@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "resultgate": {
+      "command": "/ABSOLUTE/PATH/client/bin/python",
+      "args": ["-I", "-m", "resultgate.server", "--brokerage", "--delegation", "--allow-demo-task-requests", "--internal-delegation-tests"]
+    }
+  }
+}

@@ -7,11 +7,12 @@ from .registry import Registry
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--directory',required=True)
-    parser.add_argument('action',choices=['inspect','propose','review','approve-agreement'])
+    parser.add_argument('action',choices=['import-submission','inspect','propose','review','approve-agreement'])
     args=parser.parse_args()
     data=json.loads(sys.stdin.read(16385))
     r=Registry(args.directory)
-    if args.action=='inspect': result=r.get(data['provider_id'])
+    if args.action=='import-submission': result=r.submit(data)
+    elif args.action=='inspect': result=r.get(data['provider_id'])
     elif args.action=='propose':
         result=r.propose_terms(data['provider_id'],data['terms'],data['kind'],data['rule'],data['amount'])
     elif args.action=='review':

@@ -51,3 +51,12 @@ jobs:
       - name: New installed client discovers and delegates (internal only)
         if: github.event_name == 'push' && github.repository == 'AHEDMUNI/resultgate'
         run: /tmp/resultgate-client/bin/python -I scripts/network_acceptance.py --live
+      - name: Install public commit as a new pilot client (not independent adoption)
+        if: github.event_name == 'push' && github.repository == 'AHEDMUNI/resultgate'
+        run: |
+          python -m venv /tmp/resultgate-source-client
+          /tmp/resultgate-source-client/bin/python -m pip install "git+https://github.com/AHEDMUNI/resultgate.git@$GITHUB_SHA"
+          /tmp/resultgate-source-client/bin/python -m pip check
+          cd /tmp
+          /tmp/resultgate-source-client/bin/python -I -m resultgate.pilot_client --offline
+          /tmp/resultgate-source-client/bin/python -I -m resultgate.pilot_client --live

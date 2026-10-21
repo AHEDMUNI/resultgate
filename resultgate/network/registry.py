@@ -176,7 +176,7 @@ class Registry:
         with self.store.lock:
             p = self.get(pid)
             if not approve:
-                p['state'] = 'rejected'; p['ownership'] = None
+                p['state'] = 'rejected'; p['ownership'] = None; p['agreement'] = None
             else:
                 if time.time() > p['challenge_expires'] or not hmac.compare_digest(p['challenge'], observed_challenge):
                     raise ValueError('ownership challenge missing, wrong or expired')

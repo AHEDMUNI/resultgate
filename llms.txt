@@ -10,3 +10,6 @@ This branch is an unreleased pilot, not a hosted agent network or A2A server.
 - [Commission opportunities under review](docs/COMMISSION-PARTNERS-2026-10-21.md)
 
 No payments enabled. No proven independent use or earnings. Never submit private content or credentials in provider metadata. Submission does not grant trust or execution rights.
+
+- [Pilot start and runnable installed example](docs/pilot/START.md)
+- [Provider application (public metadata only)](docs/pilot/PROVIDERS.md)

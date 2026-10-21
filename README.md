@@ -100,3 +100,5 @@ Unit and clean-install tests are internal. Synthetic benchmark fixtures measure 
 License: MIT, included in LICENSE. See SECURITY.md for security scope and THIRD_PARTY.md for dependencies.
 
 Unreleased PR #1: [provider onboarding, discovery and commission receipt pilot](docs/NETWORK.md). Optional 17-tool configuration; no hosted network, A2A endpoint or payments. [Partner diligence](docs/COMMISSION-PARTNERS-2026-10-21.md).
+
+Unreleased local pilot: [start/install/MCP examples](docs/pilot/START.md) · [provider application](docs/pilot/PROVIDERS.md) · [review-only commission worksheet](docs/pilot/AGREEMENT-DRAFT.md). No public shared runtime or automatic provider approval.
