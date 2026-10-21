@@ -7,6 +7,7 @@ import re
 import shutil
 import subprocess
 import tempfile
+import time
 
 HOST = 'agents.allubiyerbamate.com'
 PAGES = {'/':'index.html','/terms':'terms.html','/privacy':'privacy.html',
@@ -26,8 +27,12 @@ def replacement(content, root):
         raise ValueError('Expected exactly one default 404 route; no configuration changed')
     blocks=['# RESULTGATE BUSINESS START']
     for url,name in PAGES.items():
+        # A slash-ending URI enters nginx's index handler. Map it with try_files
+        # so index.html is served in this exact location, not the fallback 404.
+        mapping = ('root '+root+';\n        try_files /index.html =404;'
+                   if url == '/' else 'alias '+root+'/'+name+';')
         blocks.append('''location = %s {
-        alias %s/%s;
+        %s
         default_type %s;
         limit_except GET { deny all; }
         add_header Strict-Transport-Security "max-age=31536000" always;
@@ -36,7 +41,7 @@ def replacement(content, root):
         add_header Content-Security-Policy "default-src 'none'; style-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'" always;
         add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
         add_header Cache-Control "no-cache" always;
-    }''' % (url,root,name,'text/css' if name.endswith('.css') else 'text/html'))
+    }''' % (url,mapping,'text/css' if name.endswith('.css') else 'text/html'))
     blocks += ['# RESULTGATE BUSINESS END','location / { return 404; }']
     return ROOT_404.sub(lambda _: '\n    '.join(blocks),content,count=1)
 
@@ -48,6 +53,22 @@ def run(*args):
 def probe(path):
     return run('curl','--silent','--show-error','--max-time','15','--resolve',HOST+':443:127.0.0.1',
                '--output','/dev/null','--write-out','%{http_code}','https://'+HOST+path)
+
+
+def verify_routes():
+    expected = {**dict.fromkeys(PAGES, '200'), '/mcp': '401',
+                '/healthz': '404', '/v1/capabilities': '404'}
+    # A successful reload command can return before new workers accept requests.
+    # Require the entire boundary check to pass in one round; never relax it.
+    for attempt in range(5):
+        actual = {path: probe(path) for path in expected}
+        failures = [f'{path}: HTTP {actual[path]} (expected {code})'
+                    for path, code in expected.items() if actual[path] != code]
+        if not failures:
+            return
+        if attempt < 4:
+            time.sleep(0.5)
+    raise ValueError('; '.join(failures))
 
 
 def main():
@@ -81,14 +102,22 @@ def main():
     try:
         config.write_text(after)
         run('nginx','-t'); run('systemctl','reload','nginx')
-        for path in PAGES:
-            if probe(path)!='200': raise ValueError('Static route check failed: '+path)
-        if probe('/mcp')!='401' or probe('/healthz')!='404' or probe('/v1/capabilities')!='404':
-            raise ValueError('Gateway boundary check failed')
-    except Exception:
+        verify_routes()
+    except Exception as error:
+        # Keep command stderr private: nginx errors may include configuration.
+        if isinstance(error, subprocess.CalledProcessError):
+            detail = f'{Path(error.cmd[0]).name} exited with code {error.returncode}'
+            fd, diagnostic = tempfile.mkstemp(prefix='failure-', suffix='.log', dir=backup_dir)
+            with os.fdopen(fd, 'w') as stream:
+                stream.write(error.stderr or '')
+            detail += f'; private diagnostic: {diagnostic}'
+        elif isinstance(error, ValueError):
+            detail = str(error)
+        else:
+            detail = type(error).__name__
         shutil.copy2(backup,config)
         run('nginx','-t'); run('systemctl','reload','nginx')
-        raise SystemExit('Verification failed; previous nginx config restored. Inspect privately before retrying.') from None
+        raise SystemExit('Verification failed; previous nginx config restored. Reason: '+detail) from None
     print('SUCCESS: all 7 public static routes HTTP 200; MCP HTTP 401; private routes HTTP 404.')
     print('No application restart, payment activation, DNS or other hostname changes.')
     print('URL: https://'+HOST+'/')
