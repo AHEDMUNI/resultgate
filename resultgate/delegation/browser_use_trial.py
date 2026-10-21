@@ -68,12 +68,20 @@ class Transport:
     def request(self, method, path, payload=None, *, page=False):
         # No URL/host supplied by callers or by provider response bodies.
         import re
-        allowed = (method == 'GET' and path == '/api/v2/billing/account') or (
-            method == 'POST' and path == '/api/v4/runs') or (method == 'GET' and bool(re.fullmatch(
-            r'/api/v4/browsers\?agentSessionId=[a-f0-9-]{36}&pageSize=100', path))) or bool(re.fullmatch(
-            r'/api/v4/(runs/[a-f0-9-]{36}(/status|/cancel)?|browsers/[a-f0-9-]{36}|sessions/[a-f0-9-]{36}/cost)', path))
+        uid = r'[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}'
+        allowed = (
+            method == 'GET' and payload is None and (
+                path == '/api/v2/billing/account'
+                or re.fullmatch(r'/api/v4/runs/' + uid + r'(/status)?', path)
+                or re.fullmatch(r'/api/v4/browsers/' + uid, path)
+                or re.fullmatch(r'/api/v4/sessions/' + uid + r'/cost', path)
+                or re.fullmatch(r'/api/v4/browsers\?agentSessionId=' + uid + r'&pageSize=100', path))
+            or method == 'POST' and path == '/api/v4/runs'
+            or method == 'POST' and payload is None and re.fullmatch(r'/api/v4/runs/' + uid + r'/cancel', path)
+            or method == 'PATCH' and payload == {'action': 'stop'} and re.fullmatch(r'/api/v4/browsers/' + uid, path)
+        )
         if page:
-            if method != 'GET' or path != PAGE_PATH: raise TrialError('invalid_route')
+            if method != 'GET' or path != PAGE_PATH or payload is not None: raise TrialError('invalid_route')
         elif not allowed: raise TrialError('invalid_route')
         host = PAGE if page else API
         conn = None
@@ -286,6 +294,8 @@ def main():
             elif args.action == 'reconcile': result = trial.reconcile()
             else: result = trial.run(consent=args.consent_public_task, free_no_card_no_recharge_confirmed=args.confirm_free_no_card_no_recharge)
             print(json.dumps(result, sort_keys=True))
+            if args.action in {'run', 'reconcile'} and (not result.get('verified') or not result.get('browser_stopped')):
+                raise SystemExit(1)
         finally: trial.db.close()
     except (TrialError, OSError, sqlite3.Error):
         print(json.dumps({'error': 'trial_blocked_or_local_failure', 'retry_create': False}))

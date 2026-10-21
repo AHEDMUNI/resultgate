@@ -1,8 +1,9 @@
 import json
+import io
 import tempfile
 import unittest
 from unittest.mock import patch
-from resultgate.delegation.browser_use_trial import Trial, TrialError, Transport, identifier, amount, PageFacts, stop_session_browsers
+from resultgate.delegation.browser_use_trial import Trial, TrialError, Transport, identifier, amount, PageFacts, stop_session_browsers, main
 
 RID='11111111-1111-4111-8111-111111111111'
 SID='22222222-2222-4222-8222-222222222222'
@@ -103,3 +104,39 @@ class BrowserUseTrialTests(unittest.TestCase):
             with patch.object(self.fake, 'request', return_value=listing) as request:
                 with self.assertRaises(TrialError):stop_session_browsers(self.fake,SID)
                 self.assertEqual(request.call_count,1)
+
+    def test_disallowed_method_path_pairs_never_reach_network(self):
+        t=Transport('test-only-placeholder')
+        cases=[('POST','/api/v4/browsers/'+BID,None),
+               ('DELETE','/api/v4/runs/'+RID,None),
+               ('PATCH','/api/v4/runs/'+RID,{'action':'stop'}),
+               ('GET','/api/v4/runs/'+RID+'/cancel',None),
+               ('POST','/api/v4/sessions/'+SID+'/cost',None),
+               ('PATCH','/api/v4/browsers/'+BID,{'action':'start'}),
+               ('GET','/api/v2/billing/account',{'unexpected':'body'})]
+        with patch('socket.getaddrinfo') as dns:
+            for method,path,payload in cases:
+                with self.assertRaises(TrialError):t.request(method,path,payload)
+            dns.assert_not_called()
+
+    def test_cli_run_and_reconcile_fail_closed_for_unverified_or_open_browser(self):
+        for action in ('run','reconcile'):
+            for verified,stopped in ((False,True),(True,False),(False,False)):
+                with patch('sys.argv',['trial',action,'--directory',self.tmp.name]), \
+                     patch('os.environ',{'BROWSER_USE_API_KEY':'test-only-placeholder'}), \
+                     patch('resultgate.delegation.browser_use_trial.Trial') as factory, \
+                     patch('sys.stdout',new_callable=io.StringIO):
+                    instance=factory.return_value
+                    getattr(instance, action).return_value={'verified':verified,'browser_stopped':stopped}
+                    with self.assertRaises(SystemExit) as exit_code:main()
+                    self.assertEqual(exit_code.exception.code,1)
+                    instance.db.close.assert_called_once()
+
+    def test_cli_success_requires_verified_and_stopped(self):
+        with patch('sys.argv',['trial','reconcile','--directory',self.tmp.name]), \
+             patch('os.environ',{'BROWSER_USE_API_KEY':'test-only-placeholder'}), \
+             patch('resultgate.delegation.browser_use_trial.Trial') as factory, \
+             patch('sys.stdout',new_callable=io.StringIO):
+            factory.return_value.reconcile.return_value={'verified':True,'browser_stopped':True}
+            main()
+            factory.return_value.db.close.assert_called_once()
