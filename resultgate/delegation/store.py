@@ -17,6 +17,11 @@ class Store:
             self.db=sqlite3.connect(':memory:',check_same_thread=False,isolation_level=None)
         else:
             path=Path(directory)
+            # A recovered snapshot may omit later dispatch reservations. Fail closed
+            # before opening/purging it until a local operator reconciles providers.
+            quarantine=path/'RESTORE-RECONCILIATION-REQUIRED.json'
+            if quarantine.exists() or quarantine.is_symlink():
+                raise ValueError('restored store quarantined; operator reconciliation required')
             if path.is_symlink(): raise ValueError('symlink directory refused')
             path.mkdir(mode=0o700,parents=True,exist_ok=True)
             os.chmod(path,0o700)

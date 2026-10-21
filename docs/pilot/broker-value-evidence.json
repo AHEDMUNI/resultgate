@@ -1,0 +1,118 @@
+{
+  "mode": "internal_offline_simulation",
+  "samples_per_case": 15,
+  "discovery_time_measured": false,
+  "provider_already_known_in_both_cases": true,
+  "network_latency_measured": false,
+  "external_tasks_created": 0,
+  "rows": [
+    {
+      "scenario": "success",
+      "direct_competent": {
+        "local_elapsed_ms": 4.652,
+        "simulated_transport_calls": 9,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": true,
+        "cleanup_confirmed": true
+      },
+      "resultgate": {
+        "local_elapsed_ms": 10.648,
+        "simulated_transport_calls": 9,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": true,
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "scenario": "wrong_output",
+      "direct_competent": {
+        "local_elapsed_ms": 5.782,
+        "simulated_transport_calls": 9,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": false,
+        "cleanup_confirmed": true
+      },
+      "resultgate": {
+        "local_elapsed_ms": 8.688,
+        "simulated_transport_calls": 9,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": false,
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "scenario": "provider_failure",
+      "direct_competent": {
+        "local_elapsed_ms": 4.905,
+        "simulated_transport_calls": 8,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": false,
+        "cleanup_confirmed": true
+      },
+      "resultgate": {
+        "local_elapsed_ms": 7.772,
+        "simulated_transport_calls": 8,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": false,
+        "cleanup_confirmed": true
+      }
+    },
+    {
+      "scenario": "ambiguous_create",
+      "direct_competent": {
+        "local_elapsed_ms": 2.701,
+        "simulated_transport_calls": 3,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": false,
+        "cleanup_confirmed": false
+      },
+      "resultgate": {
+        "local_elapsed_ms": 4.646,
+        "simulated_transport_calls": 3,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": false,
+        "cleanup_confirmed": false
+      }
+    },
+    {
+      "scenario": "cleanup_failure",
+      "direct_competent": {
+        "local_elapsed_ms": 4.74,
+        "simulated_transport_calls": 8,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": true,
+        "cleanup_confirmed": false
+      },
+      "resultgate": {
+        "local_elapsed_ms": 7.062,
+        "simulated_transport_calls": 8,
+        "create_attempts": 1,
+        "restart_added_requests": 0,
+        "verified": true,
+        "cleanup_confirmed": false
+      }
+    }
+  ],
+  "cost_fixture": {
+    "mode": "hypothetical_USD",
+    "direct_customer_total": "1.00",
+    "broker_customer_total_same_retail_price": "1.00",
+    "provider_paid_commission": "0.10",
+    "provider_net_before_own_costs": "0.90",
+    "broker_gross_before_hosting_tax_settlement_fees": "0.10",
+    "if_provider_passes_commission_on_customer_total": "1.10",
+    "historical_single_internal_trial_usage_not_a_quote": "0.005671",
+    "hosting_payment_tax_fx_costs": "unmeasured; excluded, not zero",
+    "real_money_spent_by_benchmark": "0"
+  },
+  "conclusion": "No reliability or request-count advantage over this competent direct baseline on these fixtures. Local timing is wrapper/database overhead, not agent latency. ResultGate reuses safety code; engineering effort and unknown-provider discovery benefit are not measured."
+}

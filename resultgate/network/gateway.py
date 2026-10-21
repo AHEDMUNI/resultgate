@@ -28,6 +28,12 @@ class CreateTask(BaseModel):
     task_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
     success_criteria_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
 
+class ProviderSearch(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True)
+    capability: str | None = Field(default=None, pattern=r'^[a-z][a-z0-9_]{0,63}$')
+    offset: int = Field(default=0, ge=0, le=1000)
+    limit: int = Field(default=25, ge=1, le=50)
+
 class AdvanceTask(BaseModel):
     model_config = ConfigDict(extra='forbid', strict=True)
     event_id: str = Field(pattern=r'^[a-zA-Z0-9_-]{1,100}$')
@@ -94,6 +100,16 @@ def create_app(directory):
 
     async def capabilities(request): return response(catalog())
 
+    async def providers(request):
+        await authenticate(request)
+        data = await body(request, ProviderSearch)
+        candidates = sorted(registry.discover(data['capability']), key=lambda p: p['id'])
+        end = data['offset'] + data['limit']
+        return response({'providers': candidates[data['offset']:end],
+                         'next_offset': end if end < len(candidates) else None,
+                         'scope': 'this_operator_registry', 'public_network': False,
+                         'execution_enabled': False, 'prices_are_provider_declarations': True})
+
     async def create(request):
         token=await authenticate(request); data=await body(request,CreateTask)
         return response(market.create(token,**data))
@@ -110,7 +126,8 @@ def create_app(directory):
         token=await authenticate(request)
         return response(market.delete(token,request.path_params['task_id']))
 
-    app=Starlette(routes=[Route('/v1/capabilities',capabilities),Route('/v1/tasks',create,methods=['POST']),
+    app=Starlette(routes=[Route('/v1/capabilities',capabilities),
+        Route('/v1/providers/search',providers,methods=['POST']),Route('/v1/tasks',create,methods=['POST']),
         Route('/v1/tasks/{task_id}',get,methods=['GET']),Route('/v1/tasks/{task_id}',delete,methods=['DELETE']),
         Route('/v1/tasks/{task_id}/events',advance,methods=['POST'])], lifespan=lifespan)
 
