@@ -1,0 +1,12 @@
+# ResultGate
+
+Local evidence validation and opt-in provider discovery / consented specialist task delegation.
+This branch is an unreleased pilot, not a hosted agent network or A2A server.
+
+- [Network onboarding and operation](docs/NETWORK.md)
+- [Delegation and limitations](docs/DELEGATION.md)
+- [Brokerage](docs/BROKERAGE.md)
+- [Discovery metadata (custom, not an A2A card)](docs/network-discovery.json)
+- [Commission opportunities under review](docs/COMMISSION-PARTNERS-2026-10-21.md)
+
+No payments enabled. No proven independent use or earnings. Never submit private content or credentials in provider metadata. Submission does not grant trust or execution rights.

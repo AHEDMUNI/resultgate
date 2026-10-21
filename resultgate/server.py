@@ -18,7 +18,7 @@ from .citations import audit_citations
 from .models import ExtractionInput, CitationInput, UsageContext
 from .local_usage import LocalUsage
 
-mcp = FastMCP('ResultGate', instructions='Check supplied evidence. Pass means contract checks only, never factual truth. No telemetry by default. Optional local metrics require CLI opt-in and a caller-declared real_task usage context.')
+mcp = FastMCP('ResultGate', instructions='Check supplied evidence. Pass means contract checks only, never factual truth. No telemetry by default. Opt-in --brokerage --delegation discovers reviewed providers and delegates public citation structuring with explicit consent; --provider-registry adds locally reviewed provider submissions. No public A2A server or payments. Optional local metrics require CLI opt-in and a caller-declared real_task usage context.')
 usage_store = None
 
 def measure(tool, result, usage):
@@ -98,6 +98,7 @@ def main():
     parser.add_argument('--delegation-store',help='Opt in to private 30-day SQLite task events')
     parser.add_argument('--allow-demo-task-requests',action='store_true',help='Allow explicitly approved public citation processing on GROBID demo')
     parser.add_argument('--internal-delegation-tests',action='store_true',help='Classify this operator process as internal testing')
+    parser.add_argument('--provider-registry',help='Opt in to local reviewed provider submission tools; private directory')
     parser.add_argument('--port',type=int,default=8765)
     parser.add_argument('--usage-dir',help='Explicitly opt in to local-only MCP real-task counts; no automatic upload')
     args=parser.parse_args()
@@ -105,6 +106,11 @@ def main():
         parser.error('delegation options require --delegation')
     if args.delegation and (not args.brokerage or args.http):
         parser.error('--delegation requires --brokerage and MCP stdio')
+    if args.provider_registry:
+        if args.http or not args.brokerage:
+            parser.error('--provider-registry requires --brokerage and stdio')
+        from .network.mcp import register as register_network
+        register_network(mcp,args.provider_registry)
     if args.delegation:
         from .delegation.mcp import register as register_delegation
         register_delegation(mcp,args.delegation_store,args.allow_demo_task_requests,args.internal_delegation_tests)

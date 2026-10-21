@@ -7,6 +7,7 @@ on:
       - 'tests/**'
       - 'scripts/brokerage_acceptance.py'
       - 'scripts/delegation_acceptance.py'
+      - 'scripts/network_acceptance.py'
       - '.github/workflows/brokerage-checks.yml'
   pull_request:
     paths:
@@ -38,3 +39,14 @@ jobs:
       - name: One free specialist demo task (internal integration only)
         if: github.event_name == 'push' && github.repository == 'AHEDMUNI/resultgate'
         run: python scripts/delegation_acceptance.py --live
+      - name: Build and install into a separate environment
+        run: |
+          python -m pip wheel --no-deps . -w /tmp/resultgate-wheel
+          python -m venv /tmp/resultgate-client
+          /tmp/resultgate-client/bin/python -m pip install /tmp/resultgate-wheel/*.whl
+          /tmp/resultgate-client/bin/python -I scripts/acceptance.py
+          /tmp/resultgate-client/bin/python -I scripts/brokerage_installed_acceptance.py
+          /tmp/resultgate-client/bin/python -I scripts/delegation_installed_acceptance.py
+      - name: New installed client discovers and delegates (internal only)
+        if: github.event_name == 'push' && github.repository == 'AHEDMUNI/resultgate'
+        run: /tmp/resultgate-client/bin/python -I scripts/network_acceptance.py --live

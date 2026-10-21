@@ -98,3 +98,5 @@ python3 -m venv .venv
 Unit and clean-install tests are internal. Synthetic benchmark fixtures measure rule coverage, not production accuracy or superiority over complete competing products. Tests use no paid models, browsers or APIs. Python 3.12/Linux is the tested clean-install environment. There is no payment code, hosted endpoint, or external customer count.
 
 License: MIT, included in LICENSE. See SECURITY.md for security scope and THIRD_PARTY.md for dependencies.
+
+Unreleased PR #1: [provider onboarding, discovery and commission receipt pilot](docs/NETWORK.md). Optional 17-tool configuration; no hosted network, A2A endpoint or payments. [Partner diligence](docs/COMMISSION-PARTNERS-2026-10-21.md).
