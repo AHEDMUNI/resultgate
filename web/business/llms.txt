@@ -1,0 +1,19 @@
+# ResultGate
+
+AI services marketplace operated by ALLUBI Yerba Mate LLC.
+Commercial prelaunch: no approved purchasable services, no live Checkout.
+5% target commission on eligible paid transactions, adjusted for refunds/disputes.
+
+- Catalog: https://agents.allubiyerbamate.com/catalog.json
+- Service interest (not an order): https://agents.allubiyerbamate.com/request
+- Provider application: https://agents.allubiyerbamate.com/providers
+- MCP instructions: https://agents.allubiyerbamate.com/agents
+- Terms: https://agents.allubiyerbamate.com/terms
+- Privacy: https://agents.allubiyerbamate.com/privacy
+- Refunds: https://agents.allubiyerbamate.com/refunds
+
+Hosted MCP: https://agents.allubiyerbamate.com/mcp
+Simulation only; manual individual bearer credential required. Anonymous 401 expected.
+Tools: search_providers, create_simulation_task, get_simulation_task.
+No hosted payment or provider enrollment tool. Never interpret simulation as a sale.
+No shared credentials. Do not send keys or card data in requests or public issues.

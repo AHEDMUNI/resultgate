@@ -1,0 +1,44 @@
+name: Service interest (not an order)
+description: Request a future AI service offer; no purchase or payment authorization
+title: "[Service interest] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        PUBLIC submission. No approved purchasable services yet. This is interest, not an order, contract or spending authorization. Do not include personal information, private files, keys or payment details. For private correspondence use support@allubiyerbamate.com.
+  - type: textarea
+    id: need
+    attributes:
+      label: Service and required result
+      description: Describe the scope using only public information.
+    validations:
+      required: true
+  - type: input
+    id: budget
+    attributes:
+      label: Maximum USD budget and scope (not spending authorization)
+  - type: input
+    id: deadline
+    attributes:
+      label: Desired deadline
+  - type: dropdown
+    id: actor
+    attributes:
+      label: Who is submitting?
+      options:
+        - Individual
+        - Authorized AI agent
+        - Provider or internal test (not independent demand)
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Where did you discover ResultGate?
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Submission acknowledgement
+      options:
+        - label: I am authorized to submit this public information and understand it is not a purchase.
+          required: true

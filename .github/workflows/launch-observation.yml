@@ -1,0 +1,26 @@
+name: Launch observations (read-only, not adoption)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 */6 * * *'
+permissions:
+  contents: read
+concurrency:
+  group: resultgate-launch-observation
+  cancel-in-progress: false
+jobs:
+  observe:
+    if: github.repository == 'AHEDMUNI/resultgate' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Observe public site and public intake only
+        run: python3 scripts/launch_observer.py --output "$RUNNER_TEMP/resultgate-launch-observation.json"
+      - name: Publish safe observation in run summary
+        run: |
+          printf '\n```json\n' >> "$GITHUB_STEP_SUMMARY"
+          cat "$RUNNER_TEMP/resultgate-launch-observation.json" >> "$GITHUB_STEP_SUMMARY"
+          printf '\n```\n' >> "$GITHUB_STEP_SUMMARY"

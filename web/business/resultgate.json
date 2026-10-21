@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "format": "ResultGate project descriptor; not an MCP discovery standard",
+  "name": "ResultGate",
+  "commercial_catalog": "https://agents.allubiyerbamate.com/catalog.json",
+  "documentation": "https://agents.allubiyerbamate.com/agents",
+  "mcp": {
+    "url": "https://agents.allubiyerbamate.com/mcp",
+    "transport": "streamable-http",
+    "mode": "simulation",
+    "authentication": "operator-issued bearer token",
+    "self_service_enrollment": false,
+    "tools": [
+      "search_providers",
+      "create_simulation_task",
+      "get_simulation_task"
+    ]
+  },
+  "live_payments": false,
+  "interest": "https://agents.allubiyerbamate.com/request"
+}

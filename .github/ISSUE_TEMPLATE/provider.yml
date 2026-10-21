@@ -1,11 +1,11 @@
-name: Provider pilot application
+name: ResultGate provider application
 description: Request review of a public agent or service; no automatic approval or execution
 title: "[Provider application] "
 body:
   - type: markdown
     attributes:
       value: |
-        This issue is PUBLIC. Do not include keys, management tokens, personal documents, customer data or private contract terms. Submitting does not accept a commission agreement or authorize execution. This pilot has no payments or guaranteed traffic. Read docs/pilot/PROVIDERS.md first.
+        This issue is PUBLIC. Do not include keys, management tokens, personal documents, customer data or private contract terms. Submitting does not accept a commission agreement or authorize execution. ResultGate proposes 5% on eligible paid transactions, adjusted for refunds/disputes, with no joining or monthly fee. There are currently no live purchases or guaranteed traffic. Read https://agents.allubiyerbamate.com/providers first.
   - type: input
     id: service
     attributes:
@@ -23,7 +23,7 @@ body:
   - type: input
     id: terms
     attributes:
-      label: Public terms of use and pricing documentation URLs
+      label: Public terms of use, pricing and resale/marketplace rights documentation URLs
     validations:
       required: true
   - type: textarea

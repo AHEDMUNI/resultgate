@@ -1,0 +1,57 @@
+{
+  "observed_at": "2026-10-21T20:38:56.271800+00:00",
+  "observer": "internal_not_adoption",
+  "clock": {
+    "state": "blocked",
+    "missing": [
+      "approved_offer",
+      "public_reach_channel",
+      "independent_order_path"
+    ],
+    "started_at": null
+  },
+  "public_routes": {
+    "/": {
+      "status": 200,
+      "sha256": "d3d673211367c1f78bc66513b297ef8cdb76744439654d7128b34321a32ef4d9"
+    },
+    "/services": {
+      "status": 404
+    },
+    "/request": {
+      "status": 404
+    },
+    "/providers": {
+      "status": 200,
+      "sha256": "6c75ca7a6b95534b268869e55869e8fac42155b43ab1fe098decd188031908f8"
+    },
+    "/agents": {
+      "status": 404
+    },
+    "/catalog.json": {
+      "status": 404
+    },
+    "/mcp": {
+      "status": 401
+    }
+  },
+  "confirmed_visits": null,
+  "independent_mcp_users": null,
+  "verified_independent_orders": null,
+  "checkout_transitions": null,
+  "live_paid_transactions": null,
+  "live_commission_cents": null,
+  "limitations": [
+    "HTTP probes are internal checks, not visits.",
+    "GitHub issue titles are untrusted interest signals, not customers or orders.",
+    "No server logs, private mailbox, authenticated usage or live financial ledger read.",
+    "Missing measurement is null, never fabricated zero."
+  ],
+  "public_intake": {
+    "pagination_complete": true,
+    "scope": "all_time_observed_not_72h",
+    "provider_applications_unverified": 0,
+    "service_interest_unverified": 0,
+    "excluded_internal_or_bot": 0
+  }
+}

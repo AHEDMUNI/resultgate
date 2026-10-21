@@ -1,0 +1,8 @@
+{
+  "purpose": "Operator-reviewed evidence record; cannot activate payments",
+  "approved_offer": {"verified": false, "evidence_sha256": null, "reason": "No verified provider agreement or approved priced listing"},
+  "public_reach_channel": {"verified": false, "evidence_sha256": null, "reason": "Site exists; acquisition placement and upgraded request route not verified"},
+  "independent_order_path": {"verified": false, "evidence_sha256": null, "reason": "Only interest and simulation available; no approved offer/order path"},
+  "started_at": null,
+  "live_payments_enabled": false
+}

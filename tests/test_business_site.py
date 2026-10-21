@@ -31,7 +31,7 @@ class BusinessSiteTests(unittest.TestCase):
     def test_navigation_and_no_active_content(self):
         for name in module.PAGES.values():
             text=(ROOT/'web/business'/name).read_text()
-            if name.endswith('.css'): continue
+            if not name.endswith('.html'): continue
             page=Links(); page.feed(text)
             self.assertNotIn('script',page.tags); self.assertNotIn('form',page.tags)
             for link in page.links:
@@ -50,5 +50,24 @@ class BusinessSiteTests(unittest.TestCase):
 
     def test_unknown_config_and_reinstall_fail_closed(self):
         before=(ROOT/'deploy/nginx-agents.conf.staged').read_text()
-        for content in (before.replace('return 404','return 200'),before+'\nserver_name other.example;',module.replacement(before,'/var/www/test')):
-            with self.assertRaises(ValueError): module.replacement(content,'/var/www/test')
+        for content in (before.replace('return 404','return 200'),before+'\nserver_name other.example;'):
+            with self.assertRaises(ValueError): module.replacement(content,'/var/www/resultgate-business/test')
+
+    def test_guarded_update_preserves_everything_outside_managed_block(self):
+        before=(ROOT/'deploy/nginx-agents.conf.staged').read_text()
+        old=module.replacement(before,'/var/www/resultgate-business/old',module.LEGACY_PAGES)
+        new=module.replacement(old,'/var/www/resultgate-business/new')
+        def outside(s): return s[:s.index(module.START)]+s[s.index(module.END)+len(module.END):]
+        self.assertEqual(outside(old),outside(new))
+        self.assertEqual(new,module.replacement(new,'/var/www/resultgate-business/new'))
+        with self.assertRaises(ValueError):
+            module.replacement(old.replace("style-src 'self'", "style-src *"),'/var/www/resultgate-business/new')
+
+    def test_catalog_and_discovery_never_claim_live_services(self):
+        import json
+        c=json.loads((ROOT/'web/business/catalog.json').read_text())
+        d=json.loads((ROOT/'web/business/resultgate.json').read_text())
+        self.assertEqual(c['services'],[])
+        self.assertIs(c['live_checkout_enabled'],False)
+        self.assertEqual(d['mcp']['mode'],'simulation')
+        self.assertNotIn('/mcp',module.PAGES)
