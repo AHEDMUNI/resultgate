@@ -84,7 +84,13 @@ def safe_controller(account):
 
 def validate_account(account, selected):
     if account.get('id') != selected: raise RuntimeError('account_id_mismatch')
-    if account.get('type') != 'express': raise RuntimeError('account_not_express')
+    controller = account.get('controller') or {}
+    compatible = (account.get('type') == 'none'
+                  and (controller.get('stripe_dashboard') or {}).get('type') == 'express'
+                  and controller.get('requirement_collection') == 'stripe'
+                  and (controller.get('fees') or {}).get('payer') == 'application'
+                  and (controller.get('losses') or {}).get('payments') == 'application')
+    if account.get('type') != 'express' and not compatible: raise RuntimeError('account_not_express')
     if account.get('country') != 'US': raise RuntimeError('account_country_not_us')
 
 def diagnostic(error):

@@ -85,3 +85,12 @@ class SecureInputTests(unittest.TestCase):
         result=m.safe_controller({'controller':{'secret':'DO_NOT_PRINT','stripe_dashboard':{'type':'express','secret':'DO_NOT_PRINT'},'requirement_collection':'stripe','fees':{'payer':'application'}}})
         self.assertEqual('express',result['dashboard_type'])
         self.assertNotIn('DO_NOT_PRINT',str(result))
+
+    def test_supported_controller_account_and_reject_incompatible(self):
+        m=module('stripe_sandbox_onboarding')
+        a={'id':'acct_selected','country':'US','type':'none','controller':{
+            'stripe_dashboard':{'type':'express'},'requirement_collection':'stripe',
+            'fees':{'payer':'application'},'losses':{'payments':'application'}}}
+        m.validate_account(a,'acct_selected')
+        a['controller']['requirement_collection']='application'
+        with self.assertRaises(RuntimeError):m.validate_account(a,'acct_selected')

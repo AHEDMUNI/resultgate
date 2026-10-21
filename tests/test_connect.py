@@ -172,3 +172,15 @@ class ConnectTests(unittest.TestCase):
         other=MarketOperator(self.c.market).issue_credential('other')
         provider=self.c.apply(other,'Other',TERMS_SHA,True)
         with self.assertRaises(ValueError): self.op.adopt_account(provider['id'],'acct_fixture')
+
+
+class ControllerConfigurationTests(unittest.TestCase):
+    def test_explicit_controller_compatibility(self):
+        from resultgate.commerce.connect_test import compatible_express
+        a={'type':'none','controller':{'stripe_dashboard':{'type':'express'},
+            'requirement_collection':'stripe','fees':{'payer':'application'},
+            'losses':{'payments':'application'}}}
+        self.assertTrue(compatible_express(a))
+        a['controller']['fees']['payer']='account'
+        self.assertFalse(compatible_express(a))
+        self.assertFalse(compatible_express({'type':'none'}))

@@ -10,6 +10,17 @@ from urllib.parse import urlsplit
 from .core import CommerceOperator, fee, hashed
 
 
+def compatible_express(account):
+    """Accept legacy Express or the explicitly supported controller configuration."""
+    c = account.get('controller') or {}
+    return account.get('type') == 'express' or (
+        account.get('type') == 'none'
+        and (c.get('stripe_dashboard') or {}).get('type') == 'express'
+        and c.get('requirement_collection') == 'stripe'
+        and (c.get('fees') or {}).get('payer') == 'application'
+        and (c.get('losses') or {}).get('payments') == 'application')
+
+
 class ConnectTest:
     def __init__(self, commerce, stripe):
         self.c, self.stripe, self.db = commerce, stripe, commerce.db
@@ -67,7 +78,7 @@ class ConnectTest:
         if p['mode'] != 'test' or p['live_agreement'] or not re.fullmatch(r'acct_[A-Za-z0-9]+', account_id):
             raise ValueError('test provider and account required')
         a = self.stripe.request('GET', '/v1/accounts/'+account_id)
-        if (a.get('id') != account_id or a.get('country') != 'US' or a.get('type') != 'express'
+        if (a.get('id') != account_id or a.get('country') != 'US' or not compatible_express(a)
             or a.get('metadata',{}).get('resultgate_provider') not in (None, provider_id)):
             raise ValueError('existing account binding conflict')
         existing = self.db.execute('SELECT provider,account FROM commerce_test_accounts WHERE provider=? OR account=?', (provider_id,account_id)).fetchall()
