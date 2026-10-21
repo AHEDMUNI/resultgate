@@ -1,0 +1,19 @@
+# HTTP challenge only. No proxy or redirect; unrelated hosts get no service.
+server {
+    listen 80;
+    server_name agents.allubiyerbamate.com;
+    if ($host != agents.allubiyerbamate.com) { return 421; }
+    server_tokens off;
+    access_log off;
+    error_log /var/log/nginx/resultgate-acme-error.log crit;
+    client_max_body_size 1k;
+    client_header_timeout 5s;
+    client_body_timeout 5s;
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/lib/resultgate-acme;
+        default_type text/plain;
+        limit_except GET { deny all; }
+        try_files $uri =404;
+    }
+    location / { return 404; }
+}
