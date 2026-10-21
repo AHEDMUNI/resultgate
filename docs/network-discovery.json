@@ -1,16 +1,26 @@
 {
   "format": "resultgate-local-discovery-v1",
   "service": "ResultGate",
-  "status": "unreleased_pull_request",
+  "status": "published_local_pilot",
   "repository": "https://github.com/AHEDMUNI/resultgate",
-  "branch": "feature/agent-brokerage",
   "transport": "mcp_stdio",
   "public_endpoint": null,
   "a2a_supported": false,
-  "capabilities": ["provider_discovery", "task_matching", "public_citation_structuring", "result_validation", "task_tracking", "reviewed_provider_submission"],
+  "capabilities": [
+    "provider_discovery",
+    "task_matching",
+    "public_citation_structuring",
+    "result_validation",
+    "task_tracking",
+    "reviewed_provider_submission"
+  ],
   "default_tool_count": 2,
   "all_opt_in_tool_count": 17,
   "submitted_provider_execution": false,
   "payment_collection": false,
-  "documentation": "NETWORK.md"
+  "documentation": "NETWORK.md",
+  "published_version": "0.2.0",
+  "catalog_scope": "local_reviewed_providers_not_global_market",
+  "registry_name": "io.github.AHEDMUNI/resultgate",
+  "registry_search_requires": "client integration; official name search is not semantic capability search"
 }
