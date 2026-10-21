@@ -1,0 +1,37 @@
+# STAGED TEMPLATE ONLY. Replace host/certificate paths; do not enable before approval.
+# Requires nginx http context; never log headers, request bodies, query strings or tokens.
+limit_req_zone $binary_remote_addr zone=resultgate_ingress:1m rate=2r/s;
+limit_conn_zone $binary_remote_addr zone=resultgate_connections:1m;
+log_format resultgate_minimal '$time_iso8601 $status $request_time';
+server {
+    listen 443 ssl;
+    server_name REPLACE_WITH_APPROVED_HOST;
+    ssl_certificate /REPLACE/fullchain.pem;
+    ssl_certificate_key /REPLACE/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    client_max_body_size 16k;
+    client_body_timeout 5s;
+    client_header_timeout 5s;
+    keepalive_timeout 5s;
+    access_log /var/log/nginx/resultgate-access.log resultgate_minimal;
+    error_log /var/log/nginx/resultgate-error.log crit;
+    add_header Strict-Transport-Security 'max-age=31536000' always;
+    location = /mcp {
+        limit_req zone=resultgate_ingress burst=10 nodelay;
+        limit_req_status 429;
+        limit_conn resultgate_connections 4;
+        # Preserve Origin so the application can reject browser requests.
+        # Replace forwarding headers; the loopback app deliberately rejects these.
+        proxy_set_header Host 127.0.0.1;
+        proxy_set_header Forwarded '';
+        proxy_set_header X-Forwarded-For '';
+        proxy_set_header X-Forwarded-Host '';
+        proxy_set_header X-Forwarded-Proto '';
+        proxy_set_header Connection '';
+        proxy_http_version 1.1;
+        proxy_read_timeout 10s;
+        proxy_send_timeout 10s;
+        proxy_pass http://127.0.0.1:8765;
+    }
+    location / { return 404; }
+}

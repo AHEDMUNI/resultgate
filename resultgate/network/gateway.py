@@ -18,6 +18,7 @@ from starlette.routing import Route
 from .catalog import catalog
 from .market import Market, RequestBudgetExceeded
 from .registry import Registry
+from .mcp_gateway import endpoint
 
 MAX_BODY = 16384
 BODY_TIMEOUT_SECONDS = 5
@@ -131,7 +132,8 @@ def create_app(directory):
         token=await authenticate(request)
         return response(market.delete(token,request.path_params['task_id']))
 
-    app=Starlette(routes=[Route('/healthz',health),Route('/v1/capabilities',capabilities),
+    mcp_endpoint = endpoint(market, registry, authenticate, body, response, Rejected, CreateTask, ProviderSearch)
+    app=Starlette(routes=[Route('/mcp',mcp_endpoint,methods=['POST','GET','DELETE']),Route('/healthz',health),Route('/v1/capabilities',capabilities),
         Route('/v1/providers/search',providers,methods=['POST']),Route('/v1/tasks',create,methods=['POST']),
         Route('/v1/tasks/{task_id}',get,methods=['GET']),Route('/v1/tasks/{task_id}',delete,methods=['DELETE']),
         Route('/v1/tasks/{task_id}/events',advance,methods=['POST'])], lifespan=lifespan)
