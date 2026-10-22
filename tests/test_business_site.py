@@ -93,3 +93,18 @@ class BusinessSiteTests(unittest.TestCase):
         self.assertIs(c['live_checkout_enabled'],False)
         self.assertEqual(d['mcp']['mode'],'simulation')
         self.assertNotIn('/mcp',module.PAGES)
+
+class BrowserActSiteTests(unittest.TestCase):
+    def test_upgrade_from_pre_demo_layout(self):
+        before=(ROOT/'deploy/nginx-agents.conf.staged').read_text()
+        old=module.replacement(before,'/var/www/resultgate-business/old',module.PRE_DEMO_PAGES)
+        new=module.replacement(old,'/var/www/resultgate-business/new')
+        self.assertIn('location = /browseract ',new)
+        self.assertEqual(old[:old.index(module.START)],new[:new.index(module.START)])
+        self.assertEqual(old[old.index(module.END):],new[new.index(module.END):])
+    def test_offer_matches_mcp_and_is_not_enrolled(self):
+        import json
+        from resultgate.browseract_demo import OFFER
+        self.assertEqual(OFFER,json.loads((ROOT/'web/business/browseract-offer.json').read_text()))
+        self.assertIsNone(OFFER['referral_url'])
+        self.assertIn('untracked',(ROOT/'web/business/browseract.html').read_text())
