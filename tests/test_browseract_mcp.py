@@ -7,7 +7,7 @@ class BrowserActProtocolTests(unittest.IsolatedAsyncioTestCase):
             async with ClientSession(read,write) as session:
                 await session.initialize()
                 tools=await session.list_tools()
-                self.assertEqual({'assess_browseract_fit','validate_browseract_report','validate_browseract_csv'},{t.name for t in tools.tools})
+                self.assertTrue({'assess_browseract_fit','validate_browseract_report','validate_browseract_csv'} <= {t.name for t in tools.tools})
                 result=await session.call_tool('assess_browseract_fit',{'request':{'product_urls':['https://example.com/product'],'sources_permitted':True}})
                 self.assertFalse(result.isError)
                 self.assertEqual('free_first',json.loads(result.content[0].text)['decision'])

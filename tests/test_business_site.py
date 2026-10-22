@@ -70,6 +70,13 @@ class BusinessSiteTests(unittest.TestCase):
         self.assertEqual(before,after[:after.index('# RESULTGATE BUSINESS START')]+after[after.index('location / { return 404; }'):])
         for path in module.PAGES: self.assertIn('location = '+path+' {',after)
 
+    def test_upgrade_from_published_browseract_routes(self):
+        before=(ROOT/'deploy/nginx-agents.conf.staged').read_text()
+        old=module.replacement(before,'/var/www/resultgate-business/old',module.BROWSERACT_PAGES)
+        new=module.replacement(old,'/var/www/resultgate-business/new')
+        self.assertIn('location = /referrals {',new)
+        self.assertEqual(old[old.index(module.END):],new[new.index(module.END):])
+
     def test_unknown_config_and_reinstall_fail_closed(self):
         before=(ROOT/'deploy/nginx-agents.conf.staged').read_text()
         for content in (before.replace('return 404','return 200'),before+'\nserver_name other.example;'):

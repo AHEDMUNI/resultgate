@@ -174,4 +174,7 @@ def validate_browseract_csv(payload: CSVInput) -> dict:
     """Validate a max-20-row BrowserAct CSV against expected URLs. Preserve original strings; no currency inference, provider calls, payment or telemetry."""
     return normalize_csv(payload)
 
+from resultgate.referral_selector import register
+register(mcp)
+
 if __name__=='__main__': mcp.run()
