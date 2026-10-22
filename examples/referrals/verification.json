@@ -16,6 +16,11 @@
   "limits": [
     "No direct-vs-assisted timed comparison",
     "No subscriber attribution or payout tested",
-    "Markdown is not a normalized availability dataset; only URL completeness and five title/price samples checked."
-  ]
+    "Markdown is not a normalized availability dataset; only URL completeness and five title/price samples checked.",
+    "Actual MCP call returned a provider cache hit, not a fresh origin fetch; creditsUsed=1 is provider metadata for the keyless allowance, not a purchased credit or charge."
+  ],
+  "cache_state": "hit",
+  "provider_cached_at": "2026-10-22T02:07:19.076Z",
+  "provider_reported_credits_used": 1,
+  "credit_purchase": false
 }
