@@ -7,7 +7,7 @@ class BrowserActProtocolTests(unittest.IsolatedAsyncioTestCase):
             async with ClientSession(read,write) as session:
                 await session.initialize()
                 tools=await session.list_tools()
-                self.assertEqual({'assess_browseract_fit','validate_browseract_report'},{t.name for t in tools.tools})
+                self.assertEqual({'assess_browseract_fit','validate_browseract_report','validate_browseract_csv'},{t.name for t in tools.tools})
                 result=await session.call_tool('assess_browseract_fit',{'request':{'product_urls':['https://example.com/product'],'sources_permitted':True}})
                 self.assertFalse(result.isError)
                 self.assertEqual('free_first',json.loads(result.content[0].text)['decision'])
@@ -15,3 +15,12 @@ class BrowserActProtocolTests(unittest.IsolatedAsyncioTestCase):
                 self.assertTrue(bad.isError)
                 result=await session.call_tool('validate_browseract_report',{'report':{'expected_urls':['https://example.com/p'],'rows':[],'origin':'internal','engine':'fixture'}})
                 self.assertFalse(json.loads(result.content[0].text)['complete'])
+                from pathlib import Path
+                root=Path(__file__).resolve().parents[1]
+                original=(root/'examples/browseract/accepted/result.csv').read_text()
+                expected=json.loads((root/'examples/browseract/reference/report.json').read_text())['expected_urls']
+                result=await session.call_tool('validate_browseract_csv',{'payload':{'csv_text':original,'expected_urls':expected,'origin':'internal'}})
+                self.assertFalse(result.isError)
+                value=json.loads(result.content[0].text)
+                self.assertTrue(value['validation']['all_successful'])
+                self.assertEqual('£51.77',value['raw_rows'][0]['price'])
