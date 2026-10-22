@@ -1,0 +1,352 @@
+{
+  "schema_version": 1,
+  "checked_on": "2026-10-21",
+  "timezone": "America/Chicago",
+  "scope": "Informational referral candidates, not contracted sellers. No live checkout or provider execution by ResultGate.",
+  "ranking_policy": "Permission and existing/free alternatives first; exact capability fit next; no commission, sponsorship or payout term used in ranking.",
+  "disclosure": "No commercially approved AI/MCP referral path is asserted. All handoffs currently normal untracked provider links; issued affiliate links require explicit enablement after review. No ResultGate referral fee.",
+  "providers": [
+    {
+      "qualification": "issued_link_specific_ai_mcp_eligibility_pending",
+      "ai_mcp_eligibility": "written_confirmation_required",
+      "referral_url": null,
+      "handoff_tracking": "untracked",
+      "commission_approved": null,
+      "payout_received": null,
+      "cross_device": "Not confirmed. Prefer human opening the issued link and registering in the same browser; never promise attribution.",
+      "renewal": "Provider subscription renews under provider terms; human reviews total, tax, cancellation and usage cap before agreeing.",
+      "execution": "Provider executes in customer account. ResultGate prepares instructions only; no credentials or payments collected.",
+      "id": "browseract",
+      "name": "BrowserAct",
+      "need": "browser_interaction",
+      "use_case": "An agent operator needs permitted public pages requiring browser interaction.",
+      "pricing": "Basic USD16/month; 10,000 credits. Annual USD156 billed yearly.",
+      "free_alternative": "Use an existing export or local browser first; archived 20-row example needs no account.",
+      "limits": "Cloud steps consume credits; no guarantee a free balance covers 20 pages.",
+      "integration": {
+        "docs_url": "https://www.browseract.com/integrations",
+        "method": "Official integration / customer-owned account"
+      },
+      "commission_terms": "30% first eligible order, then 20% for six months from first payment.",
+      "attribution": "Last valid link before signup; permanent link is not an unlimited cookie window. Cookie lifetime unconfirmed.",
+      "payout": "$50 confirmed balance; monthly by next month’s 15th after validation. Owner selected PayPal; fees/hold details pending.",
+      "refunds": "Refunds/reversals/disputes cancel commission or deduct future payouts.",
+      "sources": {
+        "pricing": "https://www.browseract.com/pricing",
+        "program": "https://www.browseract.com/affiliate"
+      },
+      "task": "Collect displayed price and stock from permitted public product URLs, including source and UTC time; null plus error when missing.",
+      "input_fields": [
+        "public_urls",
+        "permission"
+      ],
+      "output_fields": [
+        "product",
+        "price",
+        "currency",
+        "availability",
+        "source_url",
+        "checked_at",
+        "error"
+      ],
+      "steps": [
+        "Try the archived CSV through validate_browseract_csv first.",
+        "For a real run, open official integration guide in your own account.",
+        "Review the prepared task and maximum credits; approve separately before executing.",
+        "Export CSV; validate every expected URL and inspect source samples."
+      ],
+      "example": {
+        "public_urls": [
+          "https://books.toscrape.com/"
+        ],
+        "permission": true
+      },
+      "program_url": "https://browseract.firstpromoter.com/",
+      "checked_on": "2026-10-21",
+      "handoff_url": "https://www.browseract.com/pricing",
+      "test_status": "prior_owner_supplied_csv_20_rows_preserved_not_rerun"
+    },
+    {
+      "qualification": "research_candidate_not_commercially_approved",
+      "ai_mcp_eligibility": "written_confirmation_required",
+      "referral_url": null,
+      "handoff_tracking": "untracked",
+      "commission_approved": null,
+      "payout_received": null,
+      "cross_device": "Not confirmed. Prefer human opening the issued link and registering in the same browser; never promise attribution.",
+      "renewal": "Provider subscription renews under provider terms; human reviews total, tax, cancellation and usage cap before agreeing.",
+      "execution": "Provider executes in customer account. ResultGate prepares instructions only; no credentials or payments collected.",
+      "id": "searchapi",
+      "name": "SearchApi",
+      "need": "search_results",
+      "use_case": "A research-agent operator needs structured search results with source links and repeatable queries.",
+      "pricing": "Developer USD40/month for 10,000 standard-speed searches; recurring.",
+      "free_alternative": "100 free signup requests advertised; existing search access or manual search is better for occasional lookups.",
+      "limits": "Search results are leads, not source truth. No promise of comprehensive or current facts.",
+      "integration": {
+        "docs_url": "https://www.searchapi.io/docs/google",
+        "method": "Official Google Search REST API: GET https://www.searchapi.io/api/v1/search ; customer stores key privately"
+      },
+      "commission_terms": "30% of eligible subscription payments for first 12 months.",
+      "attribution": "60-day cookie; correctly formed issued link and tracked paid upgrade required. Landing page differs on signup versus subscription deadline: confirm.",
+      "payout": "$100 threshold; Wise first week monthly, but terms impose 120 days after payment before payable.",
+      "refunds": "Commission on refunded amount deducted from affiliate balance.",
+      "sources": {
+        "pricing": "https://www.searchapi.io/pricing",
+        "program": "https://www.searchapi.io/affiliate-program",
+        "terms": "https://searchapi.getrewardful.com/terms"
+      },
+      "task": "Search a public technical question; return source URLs and snippets; visit primary sources separately before asserting an answer.",
+      "input_fields": [
+        "query",
+        "country",
+        "language"
+      ],
+      "output_fields": [
+        "title",
+        "url",
+        "snippet",
+        "position",
+        "checked_at"
+      ],
+      "steps": [
+        "Use the official docs and customer free allowance only after owner registration.",
+        "Configure customer key privately; never send it to ResultGate or include it in logs.",
+        "Request engine=google with q, gl and hl. Run one query; no automatic pagination.",
+        "Inspect organic_results; report missing links/errors and verify a primary source."
+      ],
+      "example": {
+        "query": "Model Context Protocol specification",
+        "country": "us",
+        "language": "en"
+      },
+      "program_url": "https://searchapi.getrewardful.com/",
+      "checked_on": "2026-10-21",
+      "handoff_url": "https://www.searchapi.io/pricing",
+      "test_status": "local_contract_only_provider_execution_pending_account_approval"
+    },
+    {
+      "qualification": "research_candidate_not_commercially_approved",
+      "ai_mcp_eligibility": "written_confirmation_required",
+      "referral_url": null,
+      "handoff_tracking": "untracked",
+      "commission_approved": null,
+      "payout_received": null,
+      "cross_device": "Not confirmed. Prefer human opening the issued link and registering in the same browser; never promise attribution.",
+      "renewal": "Provider subscription renews under provider terms; human reviews total, tax, cancellation and usage cap before agreeing.",
+      "execution": "Provider executes in customer account. ResultGate prepares instructions only; no credentials or payments collected.",
+      "id": "pdfco",
+      "name": "PDF.co",
+      "need": "document_extraction",
+      "use_case": "A document-agent operator needs text/OCR from a permitted non-sensitive PDF.",
+      "pricing": "Basic annual offer USD107.89/year (displayed USD8.99/month equivalent), 16,500 credits/month; monthly price requires checkout confirmation.",
+      "free_alternative": "Use local PDF text extraction for text-native files; no-card trial advertised, do not register without consent.",
+      "limits": "Credits depend on endpoint/pages. Download links expire; do not use real invoices or sensitive documents in this pilot.",
+      "integration": {
+        "docs_url": "https://developer.pdf.co/api-reference/pdf-to-text/basic",
+        "method": "POST https://api.pdf.co/v1/pdf/convert/to/text ; customer-managed x-api-key header"
+      },
+      "commission_terms": "30% for 12 months, according to official program announcement.",
+      "attribution": "60-day cookie from first click; qualified paid signup through issued link.",
+      "payout": "$100 minimum; announcement says payable after 30 days, PayPal/bank/Wise via Rewardful. Confirm actual available rail and fees.",
+      "refunds": "Affiliate-specific refund/dispute clawback terms not retrieved; confirmation required before commercial enablement.",
+      "sources": {
+        "pricing": "https://pdf.co/pricing",
+        "program": "https://www.pdf.co/resources/blog/introducing-the-pdf-co-affiliate-program",
+        "trial": "https://support.pdf.co/en/articles/11274235-how-to-sign-up-for-a-pdf-co-trial-account",
+        "terms": "https://pdf.co/resources/legal/terms"
+      },
+      "task": "Extract text from one synthetic PDF only; preserve page order, return missing/error status, and compare the output with its known text.",
+      "input_fields": [
+        "document_url",
+        "synthetic_document"
+      ],
+      "output_fields": [
+        "text",
+        "page_count",
+        "error",
+        "checked_at"
+      ],
+      "steps": [
+        "Try local extraction first if the PDF has a text layer.",
+        "If OCR is needed, owner creates the no-card trial after reviewing terms.",
+        "In a private API client set x-api-key and POST a permitted URL with inline=true and async=false per official docs.",
+        "Confirm success/error fields and compare known text; do not infer fields that were not extracted."
+      ],
+      "example": {
+        "document_url": "https://example.com/synthetic-invoice.pdf",
+        "synthetic_document": true,
+        "note": "Illustrative URL, not a claimed hosted document; replace with an owner-controlled test PDF."
+      },
+      "program_url": "https://pdf-co.getrewardful.com/",
+      "checked_on": "2026-10-21",
+      "handoff_url": "https://pdf.co/pricing",
+      "test_status": "local_contract_only_provider_execution_pending_account_approval"
+    },
+    {
+      "qualification": "research_candidate_not_commercially_approved",
+      "ai_mcp_eligibility": "written_confirmation_required",
+      "referral_url": null,
+      "handoff_tracking": "untracked",
+      "commission_approved": null,
+      "payout_received": null,
+      "cross_device": "Not confirmed. Prefer human opening the issued link and registering in the same browser; never promise attribution.",
+      "renewal": "Provider subscription renews under provider terms; human reviews total, tax, cancellation and usage cap before agreeing.",
+      "execution": "Provider executes in customer account. ResultGate prepares instructions only; no credentials or payments collected.",
+      "id": "make",
+      "name": "Make",
+      "need": "app_workflow",
+      "use_case": "An operations-agent operator needs a bounded workflow between already authorized applications.",
+      "pricing": "Free USD0, 1,000 credits/month. Paid plan pricing/billing selection is inconsistent in retrieved official views; reconfirm at provider, no paid recommendation yet.",
+      "free_alternative": "Use existing application automation or a local script for simple one-off transformations.",
+      "limits": "Free scheduled interval at least 15 minutes; modules consume credits, AI may consume more. Disable extra-credit auto-purchase.",
+      "integration": {
+        "docs_url": "https://developers.make.com/mcp-server",
+        "method": "Official OAuth MCP https://mcp.make.com ; request scenario-run scopes only"
+      },
+      "commission_terms": "35% of subscription payments for 12 months from registration; extra operations excluded.",
+      "attribution": "New user must register via issued link; no retroactive attribution. Cookie duration and cross-device handling unconfirmed.",
+      "payout": "$100 and three unique paying users; Wise only; request payout. Public FAQ mentions delays; do not promise a payment date.",
+      "refunds": "Affiliate refund and dispute handling needs written clarification. Public duration copy has a conflicting 24-month passage; use 12-month help article pending confirmation.",
+      "sources": {
+        "pricing": "https://www.make.com/en/pricing",
+        "program": "https://help.make.com/affiliate-program",
+        "faq": "https://www.make.com/en/affiliate"
+      },
+      "task": "Create a manual/on-demand scenario that accepts a synthetic item and returns uppercase text. No external writes, email, schedule or paid AI module.",
+      "input_fields": [
+        "synthetic_text"
+      ],
+      "output_fields": [
+        "original",
+        "uppercase",
+        "execution_status"
+      ],
+      "steps": [
+        "Owner registers Free only after approval; leave payment details and auto-purchase off.",
+        "Build an on-demand scenario with input, local text transform and output.",
+        "Connect OAuth MCP with minimum scenario-run scopes; do not grant account management.",
+        "Run once within free allowance and compare uppercase result."
+      ],
+      "example": {
+        "synthetic_text": "resultgate demo"
+      },
+      "program_url": "https://www.make.com/en/affiliate",
+      "checked_on": "2026-10-21",
+      "handoff_url": "https://www.make.com/en/pricing",
+      "test_status": "local_contract_only_provider_execution_pending_account_approval"
+    },
+    {
+      "qualification": "research_candidate_not_commercially_approved",
+      "ai_mcp_eligibility": "written_confirmation_required",
+      "referral_url": null,
+      "handoff_tracking": "untracked",
+      "commission_approved": null,
+      "payout_received": null,
+      "cross_device": "Not confirmed. Prefer human opening the issued link and registering in the same browser; never promise attribution.",
+      "renewal": "Provider subscription renews under provider terms; human reviews total, tax, cancellation and usage cap before agreeing.",
+      "execution": "Provider executes in customer account. ResultGate prepares instructions only; no credentials or payments collected.",
+      "id": "apify",
+      "name": "Apify",
+      "need": "specialized_actor",
+      "use_case": "An agent operator needs an existing specialized Actor with its own schema, dataset and execution controls.",
+      "pricing": "Starter USD19/month plus usage; includes USD19 spend. Free USD5/month credit, no card required.",
+      "free_alternative": "Use a local script or source API if it already solves the task. Inspect Actor schema/pricing before running.",
+      "limits": "Actor rental/event charges, compute and proxies can differ. No open-ended run, private scraping or pay-per-run wallet.",
+      "integration": {
+        "docs_url": "https://docs.apify.com/mcp",
+        "method": "Official hosted MCP https://mcp.apify.com ; customer OAuth/token stays in client"
+      },
+      "commission_terms": "20% first three paying months, then 30%; starter-tier cap USD2,500 per referred customer.",
+      "attribution": "Legal terms: 45-day cookies. No promise of attribution after cookie loss; discretionary evidence review exists.",
+      "payout": "$100 plus three referred customers; monthly within 15 business days after month end, verified invoice. PayPal/bank/Wise.",
+      "refunds": "Refund/clawback accounting not explicit in reviewed affiliate text; obtain confirmation. Paid advertising prohibited.",
+      "sources": {
+        "pricing": "https://apify.com/pricing",
+        "program": "https://apify.com/partners/affiliate",
+        "terms": "https://docs.apify.com/legal/affiliate-program-terms-and-conditions"
+      },
+      "task": "Discover a suitable Actor, inspect its input schema and price, then prepare a one-item public/synthetic test bounded by the owner’s free balance. Do not execute discovery matches automatically.",
+      "input_fields": [
+        "actor_need",
+        "max_items"
+      ],
+      "output_fields": [
+        "actor_id",
+        "schema_checked",
+        "price_checked",
+        "dataset_id",
+        "items",
+        "errors"
+      ],
+      "steps": [
+        "Connect official MCP after owner grants account access.",
+        "Discover candidate Actor and read its schema, provenance and price; no arbitrary Actor trust.",
+        "Prepare schema-valid input and an explicit maximum charge of zero paid dollars.",
+        "Run only when free credits cover all charges; inspect dataset and stop at item limit."
+      ],
+      "example": {
+        "actor_need": "one-item permitted public product extraction",
+        "max_items": 1
+      },
+      "program_url": "https://affiliate.apify.com/",
+      "checked_on": "2026-10-21",
+      "handoff_url": "https://apify.com/pricing",
+      "test_status": "local_contract_only_provider_execution_pending_account_approval"
+    },
+    {
+      "qualification": "research_candidate_not_commercially_approved",
+      "ai_mcp_eligibility": "written_confirmation_required",
+      "referral_url": null,
+      "handoff_tracking": "untracked",
+      "commission_approved": null,
+      "payout_received": null,
+      "cross_device": "Not confirmed. Prefer human opening the issued link and registering in the same browser; never promise attribution.",
+      "renewal": "Provider subscription renews under provider terms; human reviews total, tax, cancellation and usage cap before agreeing.",
+      "execution": "Provider executes in customer account. ResultGate prepares instructions only; no credentials or payments collected.",
+      "id": "firecrawl",
+      "name": "Firecrawl",
+      "need": "web_to_markdown",
+      "use_case": "A retrieval-agent operator needs source-linked Markdown for a permitted public page, rather than browser interaction.",
+      "pricing": "Hobby USD19/month for 5,000 credits; annual equivalent USD16/month billed yearly. Free account 1,000 credits/month, no card.",
+      "free_alternative": "Use direct HTTP/local parser for simple static pages. Keyless MCP provides a limited free test; stop on limits.",
+      "limits": "Basic scrape one credit/page; enhanced formats cost more. Keyless availability/rate limits vary; no crawl, retries or paid upgrades automatically.",
+      "integration": {
+        "docs_url": "https://docs.firecrawl.dev/mcp-server/keyless",
+        "method": "Keyless MCP https://mcp.firecrawl.dev/v2/mcp ; no Authorization header for limited free trial"
+      },
+      "commission_terms": "25% subscriptions for 12 months, then 15% ongoing, per official affiliate page.",
+      "attribution": "Cookie window, qualification of automated discovery and cross-device attribution not confirmed.",
+      "payout": "$ threshold, payout rail, hold and refund terms unresolved in accessible official affiliate page; Dub portal review required.",
+      "refunds": "Refund/reversal policy must be confirmed before activating a commercial link.",
+      "sources": {
+        "pricing": "https://www.firecrawl.dev/pricing",
+        "program": "https://www.firecrawl.dev/affiliates",
+        "integration": "https://docs.firecrawl.dev/mcp-server/keyless"
+      },
+      "task": "Scrape https://books.toscrape.com/ once to Markdown; preserve the practice-data warning, product links and displayed prices. No cart, login or pagination.",
+      "input_fields": [
+        "public_url"
+      ],
+      "output_fields": [
+        "markdown",
+        "source_url",
+        "metadata",
+        "error"
+      ],
+      "steps": [
+        "Add official keyless MCP URL to client; no account/key needed for supported allowance.",
+        "Discover firecrawl_scrape and request the example URL with formats=[markdown].",
+        "Stop on 401/403/429; no workaround, account creation or paid fallback.",
+        "Check page warning, all 20 product URLs, and five original price samples."
+      ],
+      "example": {
+        "public_url": "https://books.toscrape.com/"
+      },
+      "program_url": "https://partners.dub.co/firecrawl",
+      "checked_on": "2026-10-21",
+      "handoff_url": "https://www.firecrawl.dev/pricing",
+      "test_status": "Actual internal keyless MCP scrape succeeded; 20/20 expected product URLs and five title/price samples match the prior practice CSV. Not a customer, sale, or full structured availability validation."
+    }
+  ]
+}

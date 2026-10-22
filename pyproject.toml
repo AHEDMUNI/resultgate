@@ -25,3 +25,6 @@ resultgate-pilot = "resultgate.server:main"
 
 [tool.setuptools.packages.find]
 include = ["resultgate*"]
+
+[tool.setuptools.package-data]
+resultgate = ["referral_catalog.json"]

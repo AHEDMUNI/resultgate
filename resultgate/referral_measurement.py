@@ -2,15 +2,19 @@
 import argparse, json, sqlite3
 from pathlib import Path
 from datetime import datetime, timezone
-EVENTS={'arrival','request','usage','referral_handoff','registration_confirmed','commission_approved','commission_reversed','payout_received'}
+EVENTS={'arrival','request','usage','referral_handoff','registration_confirmed','commission_approved','commission_reversed','payout_received','attributed_transaction','commission_pending'}
 ORIGINS={'internal','allubi','unknown','independent_verified'}
 def record(db, event):
-    if set(event)-{'id','kind','origin','evidence_ref','subject','amount_cents','currency'}: raise ValueError('Unexpected fields; never log secrets or URLs with tokens')
+    if set(event)-{'id','kind','origin','evidence_ref','subject','amount_cents','currency','provider_id','occurred_at'}: raise ValueError('Unexpected fields; never log secrets or URLs with tokens')
     if event.get('kind') not in EVENTS or event.get('origin') not in ORIGINS: raise ValueError('Invalid classification')
+    if 'provider_id' in event and event['provider_id'] not in {'browseract','searchapi','pdfco','make','apify','firecrawl'}: raise ValueError('Invalid provider')
+    if 'occurred_at' in event:
+        when=datetime.fromisoformat(event['occurred_at'])
+        if when.tzinfo is None or when > datetime.now(timezone.utc): raise ValueError('Require actual past timezone-aware evidence time')
     import re
     for k in ('id','subject','evidence_ref'):
         if not re.fullmatch(r'[A-Za-z0-9_.:-]{1,120}',event.get(k,'')): raise ValueError('Use opaque evidence identifiers, not private content')
-    financial=event['kind'] in {'commission_approved','commission_reversed','payout_received'}
+    financial=event['kind'] in {'commission_approved','commission_reversed','payout_received','commission_pending','attributed_transaction'}
     amount=event.get('amount_cents',0)
     if type(amount)!=int or amount<0 or (financial and (amount==0 or event.get('currency')!='USD')): raise ValueError('Financial evidence requires positive integer USD cents')
     if not financial and amount: raise ValueError('Non-financial events cannot carry revenue')

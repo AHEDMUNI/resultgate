@@ -1,0 +1,15 @@
+# Selection evidence and commercial limits
+
+Sources checked 2026-10-21 America/Chicago. Card JSON contains the official pricing, integration and program URLs per provider. Source statements can change; unknown fields remain explicit. This is a referral pilot, not a 15% marketplace contract. No new provider has accepted our AI/MCP method.
+
+Chosen roles: BrowserAct browser interaction; SearchApi structured search results; PDF.co document extraction; Make cross-app automation; Apify specialized Actor datasets; Firecrawl web-to-Markdown. The last three web-related roles are distinct requirements, not interchangeable paid subscriptions. Existing/local sufficient solutions take precedence. Users must approve scopes/cost with providers.
+
+Economics are illustrative gross commissions, not margins or profit: BrowserAct's $16 monthly example yields $4.80 first eligible order then $3.20 for qualifying subsequent orders in its published period; SearchApi $40 monthly yields $12 per eligible payment, but at least nine such commissions cross $100 and the 120-day hold still applies; PDF.co annual $107.89 yields approximately $32.37 if the whole payment qualifies (provider rounding and eligibility must be confirmed); Apify $19 yields $3.80 at 20%, then $5.70 at 30%, subject to qualified value and tiers; Firecrawl $19 yields $4.75 at 25%, with payout conditions unconfirmed. Make paid quote is not independently resolved, so no current paid-price commission estimate is asserted. A monthly subscription price is neither order frequency nor guaranteed recurring commission.
+
+Provider collects customer payment. ResultGate does not process these referrals with Stripe and does not subtract a guessed card-processing fee. Affiliate payout fees, tax withholding, clawbacks and operating support time remain unmeasured. Existing hosting and assistant costs are not zero merely because this increment buys no credits. No practical minimum profitable order can be proven without measured costs and an accepted agreement.
+
+Attribution: a plain official link is untracked; copied links, cross-device transitions, cookie restrictions and agent/API use can break credit. No sale is credited from an MCP invocation. BrowserAct's permanent link does not establish a cookie duration. Apify's current legal 45-day clause takes precedence over older 60-day marketing. Make help's 12 months from registration is used; conflicting marketing wording requires clarification. Free trials and task executions do not establish affiliate eligibility.
+
+Testing: existing BrowserAct CSV is preserved, no rerun. Actual Firecrawl keyless response plus verification saved under examples/referrals. Other provider runs await authorized accounts; local tool tests are not provider tests. No direct-vs-assisted time advantage established. This pilot cannot assert that any card is commercially qualified yet.
+
+Firecrawl provenance: the actual keyless MCP call returned a cache hit (cachedAt 2026-10-22T02:07:19.076Z), not a new origin fetch. Its metadata reports one credit within the keyless route; no credit purchase, account key or money was used. This does not prove current live stock.

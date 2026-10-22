@@ -1,0 +1,26 @@
+{
+  "origin": "internal",
+  "provider": "firecrawl",
+  "executed": true,
+  "credential_used": false,
+  "source_url": "https://books.toscrape.com/",
+  "started_at": "2026-10-22T02:12:56.163600+00:00",
+  "raw_sha256": "ac4af780b417ceab4520462d9621aa6ca550b6420844436a6db76791abc2b337",
+  "expected_urls": 20,
+  "matched_urls": 20,
+  "sample_title_price_matches": 5,
+  "reference": "Prior owner-supplied BrowserAct CSV; fictional practice catalog, not commercial prices. Matching does not establish timestamp accuracy of prior CSV.",
+  "independent_customer": false,
+  "attributed_sale": false,
+  "commission": null,
+  "limits": [
+    "No direct-vs-assisted timed comparison",
+    "No subscriber attribution or payout tested",
+    "Markdown is not a normalized availability dataset; only URL completeness and five title/price samples checked.",
+    "Actual MCP call returned a provider cache hit, not a fresh origin fetch; creditsUsed=1 is provider metadata for the keyless allowance, not a purchased credit or charge."
+  ],
+  "cache_state": "hit",
+  "provider_cached_at": "2026-10-22T02:07:19.076Z",
+  "provider_reported_credits_used": 1,
+  "credit_purchase": false
+}
