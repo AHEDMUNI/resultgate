@@ -1,24 +1,52 @@
 # BrowserAct referral demo — operator guide
 
-Status: read-only local MCP companion; no BrowserAct execution by ResultGate, no live payments, no affiliate enrollment. Existing hosted `/mcp` remains simulation. Do not expect the new tools on that endpoint. Use this companion via stdio now; publication of the static guide is separate from a runtime update.
+Status: read-only local MCP companion; no BrowserAct execution by ResultGate, no live payments, an owner-issued affiliate link exists, but AI/MCP eligibility remains unconfirmed and the public handoff remains untracked. Existing hosted `/mcp` remains simulation. Do not expect the new tools on that endpoint. Use this companion via stdio now; publication of the static guide is separate from a runtime update.
 
-## Install and connect
+## Start here: no purchase, provider account or API key
 
-Use Python 3.11+ and the reviewed revision of this repository. From its root:
+Prerequisites: Git, Python 3.11 or newer, and Cursor for the interactive step. Cursor's own model access may have its own usage limits; the offline check below needs no model account. This example reuses the original internal CSV; it does NOT run BrowserAct or fetch product pages.
+
+In a terminal clone this repository, then install:
 
 ```sh
+git clone https://github.com/AHEDMUNI/resultgate.git
+cd resultgate
 python -m venv .venv
-.venv/bin/python -m pip install .
-.venv/bin/python -m resultgate.browseract_demo
 ```
 
-The last process speaks MCP stdio and waits for an MCP client, not keyboard input. Configure Cursor / a compatible MCP client using **absolute paths** (Windows: `.venv\\Scripts\\python.exe`):
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install .
+.\.venv\Scripts\python.exe scripts/browseract_demo_check.py
+(Resolve-Path .\.venv\Scripts\python.exe).Path
+```
+
+macOS/Linux:
+
+```sh
+.venv/bin/python -m pip install .
+.venv/bin/python scripts/browseract_demo_check.py
+pwd
+```
+
+Expected: `status: passed`, `rows: 20`, `decision: free_first`, `origin: internal`, `provider_run_started: false`. The command launches and closes a real local MCP process. It does not certify current prices or independently verify the old provider run.
+
+Configuration follows https://cursor.com/docs/mcp (checked 2026-10-22). Open the cloned folder in Cursor. Create `.cursor/mcp.json` in that folder (merge this entry if the file already exists). Replace the command with your absolute Python path from above; Windows JSON paths must use `/` or escaped `\\`:
 
 ```json
-{"mcpServers":{"resultgate-browseract":{"command":"/ABSOLUTE/resultgate/.venv/bin/python","args":["-m","resultgate.browseract_demo"]}}}
+{"mcpServers":{"resultgate-browseract":{"type":"stdio","command":"C:/Users/YOU/resultgate/.venv/Scripts/python.exe","args":["-m","resultgate.browseract_demo"]}}}
 ```
 
-No token is required for this local process; it has no network listener. Tools: `assess_browseract_fit`, `validate_browseract_csv`, and `validate_browseract_report`. Never paste provider API keys into either tool. Public production `/mcp` authorization is unchanged.
+macOS/Linux command example: `/Users/YOU/resultgate/.venv/bin/python`. Enable this server in Cursor's MCP settings and verify these three tools appear: `assess_browseract_fit`, `validate_browseract_csv`, `validate_browseract_report`. Do not run the server manually in a terminal: stdio waits silently for its client.
+
+Paste this into Cursor Agent chat, allowing the local tool calls when prompted:
+
+> Read examples/browseract/accepted/mcp-input.json. This is archived INTERNAL practice data, not a fresh scrape. Call assess_browseract_fit with request.product_urls equal to payload.expected_urls, sources_permitted=true and local_execution_sufficient=true. Then call validate_browseract_csv using the entire JSON object from the file as the tool arguments (including its payload wrapper). Do not open BrowserAct, fetch sites, request keys or run a paid task. Show the decision, expected and received counts, missing/errors, original first price, preserved timestamp and provenance limits. Do not claim a new extraction, customer or commission.
+
+The example has 20 fictional books, all accounted for, original first price `£51.77`, and recorded time `2026-10-22T00:39:41Z`. That is the saved run's timestamp, not today. Values are preserved alongside normalized fields. No automatic telemetry is sent.
+
+Troubleshooting: if tools are absent, check the absolute executable path and reload the MCP server; if `ModuleNotFoundError` appears, reinstall with that exact interpreter. If Cursor cannot read the fixture, open the cloned repository as the project. If the call fails, save the error with secrets removed; do not buy credits to repair this offline demo.
 
 ## Complete one task
 
