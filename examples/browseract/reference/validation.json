@@ -1,0 +1,38 @@
+{
+  "origin": "internal",
+  "engine_claim": "direct_http",
+  "execution_independently_verified": false,
+  "expected": 20,
+  "received_unique": 20,
+  "missing": [],
+  "errors": 0,
+  "issues": [],
+  "complete": true,
+  "all_successful": true,
+  "sample_comparisons": [
+    {
+      "source_url": "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+      "matched": true
+    },
+    {
+      "source_url": "https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html",
+      "matched": true
+    },
+    {
+      "source_url": "https://books.toscrape.com/catalogue/the-black-maria_991/index.html",
+      "matched": true
+    },
+    {
+      "source_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+      "matched": true
+    },
+    {
+      "source_url": "https://books.toscrape.com/catalogue/its-only-the-himalayas_981/index.html",
+      "matched": true
+    }
+  ],
+  "sample_matches": 5,
+  "sample_evidence": "Caller-supplied observations; not independent proof of BrowserAct execution.",
+  "commission_approved": false,
+  "paid_out": false
+}

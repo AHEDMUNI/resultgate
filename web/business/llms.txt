@@ -17,3 +17,6 @@ Simulation only; manual individual bearer credential required. Anonymous 401 exp
 Tools: search_providers, create_simulation_task, get_simulation_task.
 No hosted payment or provider enrollment tool. Never interpret simulation as a sale.
 No shared credentials. Do not send keys or card data in requests or public issues.
+
+BrowserAct referral pilot: /browseract
+Read-only local MCP companion; hosted /mcp unchanged. Offer: /browseract-offer.json. Internal direct-HTTP example: /browseract-report.json. No approved affiliate link or BrowserAct execution evidence.

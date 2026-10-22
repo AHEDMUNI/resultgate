@@ -8,3 +8,5 @@ dist/
 *.sqlite3*
 identity.json
 identity.key
+# Local raw reference captures; publish minimal extracted data and hashes only.
+/examples/browseract/reference/source-*.html

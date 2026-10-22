@@ -1,0 +1,305 @@
+{
+  "report": {
+    "expected_urls": [
+      "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+      "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+      "https://books.toscrape.com/catalogue/soumission_998/index.html",
+      "https://books.toscrape.com/catalogue/sharp-objects_997/index.html",
+      "https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html",
+      "https://books.toscrape.com/catalogue/the-requiem-red_995/index.html",
+      "https://books.toscrape.com/catalogue/the-dirty-little-secrets-of-getting-your-dream-job_994/index.html",
+      "https://books.toscrape.com/catalogue/the-coming-woman-a-novel-based-on-the-life-of-the-infamous-feminist-victoria-woodhull_993/index.html",
+      "https://books.toscrape.com/catalogue/the-boys-in-the-boat-nine-americans-and-their-epic-quest-for-gold-at-the-1936-berlin-olympics_992/index.html",
+      "https://books.toscrape.com/catalogue/the-black-maria_991/index.html",
+      "https://books.toscrape.com/catalogue/starving-hearts-triangular-trade-trilogy-1_990/index.html",
+      "https://books.toscrape.com/catalogue/shakespeares-sonnets_989/index.html",
+      "https://books.toscrape.com/catalogue/set-me-free_988/index.html",
+      "https://books.toscrape.com/catalogue/scott-pilgrims-precious-little-life-scott-pilgrim-1_987/index.html",
+      "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+      "https://books.toscrape.com/catalogue/our-band-could-be-your-life-scenes-from-the-american-indie-underground-1981-1991_985/index.html",
+      "https://books.toscrape.com/catalogue/olio_984/index.html",
+      "https://books.toscrape.com/catalogue/mesaerion-the-best-science-fiction-stories-1800-1849_983/index.html",
+      "https://books.toscrape.com/catalogue/libertarianism-for-beginners_982/index.html",
+      "https://books.toscrape.com/catalogue/its-only-the-himalayas_981/index.html"
+    ],
+    "rows": [
+      {
+        "source_url": "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+        "checked_at": "2026-10-22T00:20:40.993646+00:00",
+        "error": null,
+        "product": "A Light in the Attic",
+        "price": "51.77",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/tipping-the-velvet_999/index.html",
+        "checked_at": "2026-10-22T00:20:44.446434+00:00",
+        "error": null,
+        "product": "Tipping the Velvet",
+        "price": "53.74",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/soumission_998/index.html",
+        "checked_at": "2026-10-22T00:20:48.167844+00:00",
+        "error": null,
+        "product": "Soumission",
+        "price": "50.10",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/sharp-objects_997/index.html",
+        "checked_at": "2026-10-22T00:20:51.806106+00:00",
+        "error": null,
+        "product": "Sharp Objects",
+        "price": "47.82",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html",
+        "checked_at": "2026-10-22T00:20:55.017762+00:00",
+        "error": null,
+        "product": "Sapiens: A Brief History of Humankind",
+        "price": "54.23",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/the-requiem-red_995/index.html",
+        "checked_at": "2026-10-22T00:20:57.886466+00:00",
+        "error": null,
+        "product": "The Requiem Red",
+        "price": "22.65",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/the-dirty-little-secrets-of-getting-your-dream-job_994/index.html",
+        "checked_at": "2026-10-22T00:21:01.638785+00:00",
+        "error": null,
+        "product": "The Dirty Little Secrets of Getting Your Dream Job",
+        "price": "33.34",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/the-coming-woman-a-novel-based-on-the-life-of-the-infamous-feminist-victoria-woodhull_993/index.html",
+        "checked_at": "2026-10-22T00:21:05.349033+00:00",
+        "error": null,
+        "product": "The Coming Woman: A Novel Based on the Life of the Infamous Feminist, Victoria Woodhull",
+        "price": "17.93",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/the-boys-in-the-boat-nine-americans-and-their-epic-quest-for-gold-at-the-1936-berlin-olympics_992/index.html",
+        "checked_at": "2026-10-22T00:21:08.594118+00:00",
+        "error": null,
+        "product": "The Boys in the Boat: Nine Americans and Their Epic Quest for Gold at the 1936 Berlin Olympics",
+        "price": "22.60",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/the-black-maria_991/index.html",
+        "checked_at": "2026-10-22T00:21:11.495023+00:00",
+        "error": null,
+        "product": "The Black Maria",
+        "price": "52.15",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/starving-hearts-triangular-trade-trilogy-1_990/index.html",
+        "checked_at": "2026-10-22T00:21:14.486896+00:00",
+        "error": null,
+        "product": "Starving Hearts (Triangular Trade Trilogy, #1)",
+        "price": "13.99",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/shakespeares-sonnets_989/index.html",
+        "checked_at": "2026-10-22T00:21:17.351016+00:00",
+        "error": null,
+        "product": "Shakespeare's Sonnets",
+        "price": "20.66",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/set-me-free_988/index.html",
+        "checked_at": "2026-10-22T00:21:20.211916+00:00",
+        "error": null,
+        "product": "Set Me Free",
+        "price": "17.46",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/scott-pilgrims-precious-little-life-scott-pilgrim-1_987/index.html",
+        "checked_at": "2026-10-22T00:21:22.917244+00:00",
+        "error": null,
+        "product": "Scott Pilgrim's Precious Little Life (Scott Pilgrim #1)",
+        "price": "52.29",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+        "checked_at": "2026-10-22T00:21:25.826187+00:00",
+        "error": null,
+        "product": "Rip it Up and Start Again",
+        "price": "35.02",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/our-band-could-be-your-life-scenes-from-the-american-indie-underground-1981-1991_985/index.html",
+        "checked_at": "2026-10-22T00:21:30.183587+00:00",
+        "error": null,
+        "product": "Our Band Could Be Your Life: Scenes from the American Indie Underground, 1981-1991",
+        "price": "57.25",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/olio_984/index.html",
+        "checked_at": "2026-10-22T00:21:33.096115+00:00",
+        "error": null,
+        "product": "Olio",
+        "price": "23.88",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/mesaerion-the-best-science-fiction-stories-1800-1849_983/index.html",
+        "checked_at": "2026-10-22T00:21:36.225380+00:00",
+        "error": null,
+        "product": "Mesaerion: The Best Science Fiction Stories 1800-1849",
+        "price": "37.59",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/libertarianism-for-beginners_982/index.html",
+        "checked_at": "2026-10-22T00:21:39.355133+00:00",
+        "error": null,
+        "product": "Libertarianism for Beginners",
+        "price": "51.33",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/its-only-the-himalayas_981/index.html",
+        "checked_at": "2026-10-22T00:21:43.158239+00:00",
+        "error": null,
+        "product": "It's Only the Himalayas",
+        "price": "45.17",
+        "currency": "GBP",
+        "availability": "in_stock"
+      }
+    ],
+    "sample_rows": [
+      {
+        "source_url": "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+        "checked_at": "2026-10-22T00:21:46.742836+00:00",
+        "error": null,
+        "product": "A Light in the Attic",
+        "price": "51.77",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html",
+        "checked_at": "2026-10-22T00:21:49.598306+00:00",
+        "error": null,
+        "product": "Sapiens: A Brief History of Humankind",
+        "price": "54.23",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/the-black-maria_991/index.html",
+        "checked_at": "2026-10-22T00:21:52.593266+00:00",
+        "error": null,
+        "product": "The Black Maria",
+        "price": "52.15",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+        "checked_at": "2026-10-22T00:21:55.481543+00:00",
+        "error": null,
+        "product": "Rip it Up and Start Again",
+        "price": "35.02",
+        "currency": "GBP",
+        "availability": "in_stock"
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/its-only-the-himalayas_981/index.html",
+        "checked_at": "2026-10-22T00:21:58.501547+00:00",
+        "error": null,
+        "product": "It's Only the Himalayas",
+        "price": "45.17",
+        "currency": "GBP",
+        "availability": "in_stock"
+      }
+    ],
+    "origin": "internal",
+    "engine": "direct_http"
+  },
+  "validation": {
+    "origin": "internal",
+    "engine_claim": "direct_http",
+    "execution_independently_verified": false,
+    "expected": 20,
+    "received_unique": 20,
+    "missing": [],
+    "errors": 0,
+    "issues": [],
+    "complete": true,
+    "all_successful": true,
+    "sample_comparisons": [
+      {
+        "source_url": "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+        "matched": true
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/sapiens-a-brief-history-of-humankind_996/index.html",
+        "matched": true
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/the-black-maria_991/index.html",
+        "matched": true
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/rip-it-up-and-start-again_986/index.html",
+        "matched": true
+      },
+      {
+        "source_url": "https://books.toscrape.com/catalogue/its-only-the-himalayas_981/index.html",
+        "matched": true
+      }
+    ],
+    "sample_matches": 5,
+    "sample_evidence": "Caller-supplied observations; not independent proof of BrowserAct execution.",
+    "commission_approved": false,
+    "paid_out": false
+  },
+  "measurement": {
+    "source_permission": "https://books.toscrape.com/ - scraping practice site; fictional products/prices, not merchant offers",
+    "engine": "direct_http",
+    "origin": "internal",
+    "collection_seconds": 69.459,
+    "human_setup_seconds": null,
+    "human_interventions": null,
+    "browseract_runtime_seconds": null,
+    "comparison": "BrowserAct vs direct integration not measured; no performance advantage claimed."
+  }
+}
