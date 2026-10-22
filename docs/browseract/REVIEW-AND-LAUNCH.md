@@ -16,7 +16,7 @@ A follow-up was already sent the same day asking AI/MCP recommendation eligibili
 - Contact: support@allubiyerbamate.com; owner must confirm preferred application address.
 - Audience: operators of AI agents, initially Cursor users collecting permitted public product data. No claimed audience size, independent customers, approved partners or sales.
 - Promotion method: public tutorial and local read-only MCP tool evaluating fit; return disclosed provider link to the human account owner. User registers and pays BrowserAct directly. No hidden redirect, cookie stuffing, automatic signup, purchase automation or self-referral.
-- Demonstration: 20-product price/availability report. Current reference is internal direct HTTP against fictional practice products. Not advertised as a BrowserAct run.
+- Demonstration: 20-product price/availability report. Accepted example is an owner-supplied BrowserAct build/test CSV against fictional practice products, validated against the direct-HTTP reference. No claim of independent adoption or verified provider billing.
 - Ranking: fit, permissions, available API/export and free/local alternatives. Commission excluded.
 - Expected volume: unknown; 21-day opt-in pilot, no guaranteed conversions.
 - Financial acceptance / payout account: **owner only after reviewing program terms; not filled or accepted here**.
@@ -40,10 +40,10 @@ Post body:
 
 I’m building ResultGate and looking for up to five independent Cursor operators who already need to collect prices and availability from public sources they are allowed to use. This local MCP companion first checks whether an existing API or free/local option is better, then prepares a bounded BrowserAct task and checks the exported result for missing pages and mismatched samples.
 
-You keep your BrowserAct account and credentials. The companion cannot buy, run paid tasks or enroll you. The included 20-book report uses fictional products from Books to Scrape and was collected directly over HTTP; it is not evidence of a BrowserAct execution or customer adoption. We have no active affiliate link today. If approved later, provider-funded commissions will be disclosed and will not influence recommendations.
+You keep your BrowserAct account and credentials. The companion cannot buy, run paid tasks or enroll you. The 20-book example is an owner-supplied BrowserAct build/test CSV from a fictional practice catalogue. We validated its 20 rows and checked five source samples; the provider reports zero credits. This is an internal test, not customer adoption or proof of API execution. We have no active affiliate link today. If approved later, provider-funded commissions will be disclosed and will not influence recommendations.
 
-Setup and source: https://github.com/AHEDMUNI/resultgate/blob/feature/browseract-referral-demo/docs/browseract/OPERATOR.md
-Demo guide (publish and verify before posting): https://agents.allubiyerbamate.com/browseract
+Setup and source: https://github.com/AHEDMUNI/resultgate/blob/main/docs/browseract/OPERATOR.md
+Published demo guide (verify latest evidence update before posting): https://agents.allubiyerbamate.com/browseract
 
 If this matches an existing need, try it with permitted non-sensitive sources and report setup time, manual fixes, and missing/wrong results. Do not buy a plan just to test it. Please avoid posting keys, private URLs or customer data. Feedback via a GitHub issue or support@allubiyerbamate.com. I want to learn whether the prepared task and report checks save effort compared with the official integration alone.
 
@@ -66,3 +66,13 @@ Decision on day 21: continue only if useful independent usage and viable attribu
 Static publisher supports upgrade from the previous exact managed block and preserves all non-static routes. Publish only reviewed pinned code with `sudo python3 deploy/publish_business_site.py`. Rollback is handled by the publisher on route/content verification failure. Local companion does not need a production MCP restart. No financial code changes.
 
 User actions consolidated: (1) run the reviewed pinned static publish command on the existing server if remote access is unavailable; (2) owner reviews/accepts affiliate enrollment and payout setup only after eligibility answers, then supplies only non-secret acceptance/link/reporting evidence; (3) authorize the prepared single Cursor post after demo verification; (4) authorize/use an existing BrowserAct free account locally for the actual provider run and timed comparison, never share its key. No spend requested. No duplicate partnership email or Glama submission.
+
+## Closure update — accepted export
+
+Static pilot from PR16 was published by the owner; external checks returned 200 for guide/report/offer, 401 for unauthenticated MCP. Accepted CSV now requires only a static evidence refresh plus installing the updated local companion. No provider rerun or credits requested. Provider duration and credits remain reported, not independently authenticated; direct/assisted human timing remains unmeasured.
+
+Mailbox recheck found the same three BrowserAct messages and no later response. Public Glama search for the repository returned no result; do not treat this as rejection or duplicate the prior submission. Enrollment portal linked by the official affiliate page: https://browseract.firstpromoter.com/ . Owner must review terms and payout fields there; no enrollment is authorized by this document.
+
+Before enabling a commercial link: obtain provider-issued exact HTTPS link and acceptance evidence for the disclosed flow; record date and applicable terms privately; verify no secret token is being published; update only the handoff URL, disclosure and status together and test external redirect. Preserve existing ordinary-provider handoffs as untracked; never retroactively assign commission. Validate registrations and eligible sales against provider records with stable IDs; approval needs confirmed statement, payout needs payment receipt. Payout rail/fees and pre-signup cross-device behavior remain unconfirmed.
+
+Consolidated owner actions: publish this static evidence refresh using pinned reviewed commit; review/complete affiliate enrollment and payment account setup after resolving the already-sent eligibility questions; authorize the prepared single Cursor post; provide prior Glama submission reference only if available (no duplicate application). No new email requested, no account key needed, no purchase requested. The fair human setup benchmark remains an optional consented observation during the pilot, not a fabricated completed test or a reason to rerun this internal task.

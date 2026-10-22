@@ -94,7 +94,10 @@ def validate(report: Report) -> dict:
             value=Decimal(str(row.get('price')))
             if not value.is_finite() or value<0: raise InvalidOperation()
         except InvalidOperation: issues.append(f'row {i}: invalid price')
-        if not isinstance(row.get('currency'),str) or len(row['currency'])!=3 or not row['currency'].isupper(): issues.append(f'row {i}: invalid currency')
+        currency=row.get('currency')
+        iso=isinstance(currency,str) and len(currency)==3 and currency.isascii() and currency.isalpha() and currency.isupper()
+        symbol=row.get('currency_representation')=='displayed_symbol' and currency in ('£','$','€','¥')
+        if not (iso or symbol): issues.append(f'row {i}: invalid currency')
         if row.get('availability') not in ('in_stock','out_of_stock','preorder','unknown'): issues.append(f'row {i}: invalid availability')
         if row.get('availability')=='unknown': issues.append(f'row {i}: unknown availability needs error')
     missing=[u for u in expected if u not in by_url]
@@ -122,4 +125,53 @@ def assess_browseract_fit(request: Request) -> dict:
 def validate_browseract_report(report: Report) -> dict:
     """Check completeness of up to 20 product results and supplied samples. No fetching or truth certification; errors stay explicit."""
     return validate(report)
+class CSVInput(BaseModel):
+    model_config=ConfigDict(extra='forbid', strict=True)
+    csv_text: str = Field(min_length=1,max_length=65536)
+    expected_urls: list[str] = Field(min_length=1,max_length=20)
+    origin: str = Field(default='internal',pattern='^(internal|allubi|independent_unverified)$')
+
+
+def normalize_csv(payload: CSVInput) -> dict:
+    import csv, io, re, hashlib
+    if len(payload.csv_text.encode('utf-8'))>65536: raise ValueError('CSV exceeds 64 KiB')
+    headers=['product_name','price','currency','availability','product_url','extracted_at_utc','error']
+    reader=csv.DictReader(io.StringIO(payload.csv_text),strict=True)
+    if reader.fieldnames!=headers: raise ValueError('Unexpected or duplicate CSV headers')
+    raw=[]; rows=[]
+    try:
+        for item in reader:
+            if len(raw)>=20 or None in item or any(v is None for v in item.values()): raise ValueError('Invalid row count or columns')
+            raw.append(dict(item))
+            currency=item['currency']; price=item['price']; errors=[]
+            symbol=currency in ('£','$','€','¥')
+            # Remove only the exact supplied symbol; never infer an ISO currency.
+            number=price[len(currency):] if symbol and price.startswith(currency) else price
+            if not re.fullmatch(r'[0-9]+(?:\.[0-9]+)?',number):
+                number=None; errors.append('Missing or ambiguous price')
+            availability={'In stock':'in_stock','Out of stock':'out_of_stock','Preorder':'preorder'}.get(item['availability'],'unknown')
+            if availability=='unknown': errors.append('Missing or ambiguous availability')
+            if not item['product_name']: errors.append('Missing product name')
+            if not currency: errors.append('Missing currency')
+            if item['error']: errors.append(item['error'])
+            rows.append({'product':item['product_name'] or None,'price':number,'currency':currency or None,
+                'currency_representation':'displayed_symbol' if symbol else 'iso_code',
+                'currency_iso':None if symbol else currency or None,
+                'availability':availability,'source_url':item['product_url'],
+                'checked_at':item['extracted_at_utc'] or None,'error':'; '.join(errors) or None})
+    except csv.Error as e: raise ValueError('Malformed CSV') from e
+    report=Report(expected_urls=payload.expected_urls,rows=rows,origin=payload.origin,engine='browseract')
+    return {'raw_csv_sha256':hashlib.sha256(payload.csv_text.encode('utf-8')).hexdigest(),
+        'raw_rows':raw,'normalized_report':report.model_dump(),'validation':validate(report),
+        'provenance':'User-supplied export; no authenticated provider API receipt. Timestamp preserved, not independently verified.',
+        'currency_policy':'Displayed symbols preserved. No ISO currency inferred; do not use this output for payment calculation.',
+        'transformations':{'product_name':'product','product_url':'source_url','extracted_at_utc':'checked_at',
+            'price':'exact supplied currency symbol removed when present; decimal text retained',
+            'availability':'explicit mapping only; unknown becomes an error'}}
+
+@mcp.tool()
+def validate_browseract_csv(payload: CSVInput) -> dict:
+    """Validate a max-20-row BrowserAct CSV against expected URLs. Preserve original strings; no currency inference, provider calls, payment or telemetry."""
+    return normalize_csv(payload)
+
 if __name__=='__main__': mcp.run()

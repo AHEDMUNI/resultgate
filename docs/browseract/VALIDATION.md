@@ -11,3 +11,11 @@
 ## Security review scope
 
 No change to hosted MCP authentication, tenancy, administration or financial modules. Local tools do not fetch URLs or execute provider actions. URLs reject credentials, query strings, IP literals and local names; source permission is caller attestation, not a legal certification. Page content is explicitly untrusted in task instructions. Static pages have no forms, scripts or third-party assets and retain strict existing CSP. Measurement imports are operator-only, local, idempotent and separate internal/ALLUBI/unknown/independent evidence. Evidence origin is reviewed by an operator, not inferred from clicks. No approved commission or payout is inferred from a handoff.
+
+## Subsequent closure update (supersedes earlier deployment/CSV status)
+
+PR16 static guide was published successfully by the owner (release a8702c4a4bcdf980); external verification returned guide/report/offer 200 and MCP 401. The owner then supplied BrowserAct Task 125028432827822096 output. Original CSV is preserved in examples/browseract/accepted/result.csv. It contains 20 unique product URLs, no missing required values and no reported errors; all 20 names/prices/availability/URLs match the retained reference. The assistant separately checked source pages 1,5,10,15,20 on 2026-10-22; all matched. These are 20 cards on one practice homepage. The reported 209 seconds and zero credits are user-supplied provider-log claims, not authenticated billing or comparable human setup measurements.
+
+The new CSV adapter preserves raw strings and hashes the supplied CSV, never infers ISO currency from a symbol, never invents timestamps, rejects malformed/duplicate headers and column counts, and exposes missing/duplicate results and ambiguous values. It runs locally with no provider calls. Tests include actual export, comma-containing names, missing/duplicate rows, ambiguous prices, absent timestamps and real MCP CSV calls. No rerun or spend.
+
+This closure revision updates existing static pages only; there are no new nginx routes or authentication/payment changes. Production still needs this separate static content refresh. The local companion requires installing the merged revision; it is not added to the hosted simulation endpoint. Affiliate link remains null and acquisition post remains unsent.

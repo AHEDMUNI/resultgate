@@ -18,7 +18,7 @@ The last process speaks MCP stdio and waits for an MCP client, not keyboard inpu
 {"mcpServers":{"resultgate-browseract":{"command":"/ABSOLUTE/resultgate/.venv/bin/python","args":["-m","resultgate.browseract_demo"]}}}
 ```
 
-No token is required for this local process; it has no network listener. Tools: `assess_browseract_fit` and `validate_browseract_report`. Never paste provider API keys into either tool. Public production `/mcp` authorization is unchanged.
+No token is required for this local process; it has no network listener. Tools: `assess_browseract_fit`, `validate_browseract_csv`, and `validate_browseract_report`. Never paste provider API keys into either tool. Public production `/mcp` authorization is unchanged.
 
 ## Complete one task
 
@@ -52,3 +52,29 @@ Optional operator-import event file via `--event /PRIVATE/event.json`. Each even
 ```
 
 Kinds separate arrival/request/usage/referral_handoff/registration_confirmed/commission_approved/commission_reversed/payout_received. Default uncertain visitors are unknown, never independent. ALLUBI stays allubi. Operator must review provenance before independent_verified. Access logs prove requests, not people or agent independence; exclude bots, probes, internal IPs/identifiers using private records. Approval requires provider statement; payout requires remittance/receipt. Deduplicate using provider event IDs. Never expose this import command as a public endpoint. Retain minimal private evidence 30 days unless legally required; delete obsolete evidence and its local DB together. No automatic external telemetry is enabled.
+
+## Accepted BrowserAct CSV workflow
+
+The original owner-supplied export is `examples/browseract/accepted/result.csv`; validation and evidence limits are in the adjacent `validation.json`. Use `validate_browseract_csv` with `payload.csv_text` (unmodified CSV), `payload.expected_urls` (from the approved task, not inferred from results), and `payload.origin` (`internal` for this experiment). The adapter keeps all original strings and a SHA-256, maps field names, parses unambiguous decimal price text, and maps explicit stock labels. Displayed £ remains £ with `currency_iso:null`; it must not be used as payment currency. Unknown values become errors rather than guesses.
+
+A stdio client invocation after initialization:
+
+```python
+result = await session.call_tool("validate_browseract_csv", {"payload": {
+    "csv_text": original_csv_text,
+    "expected_urls": approved_product_urls,
+    "origin": "internal"
+}})
+```
+
+Install the merged version, not an older PyPI release. New local checkout:
+
+```sh
+git clone https://github.com/AHEDMUNI/resultgate.git
+cd resultgate
+git rev-parse HEAD
+python -m venv .venv
+.venv/bin/python -m pip install .
+```
+
+On Windows replace `.venv/bin/python` with `.venv\\Scripts\\python.exe`. Use that absolute executable path in MCP configuration above. Do not run an unbounded paid workflow. The actual accepted experiment covered 20 cards on ONE homepage, not 20 page visits. Existing reference timing is not a fair direct-vs-assisted setup comparison. No rerun is required to validate this accepted CSV.
