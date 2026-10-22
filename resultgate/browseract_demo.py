@@ -16,7 +16,7 @@ OFFER = {
     'integration_url': 'https://www.browseract.com/integrations',
     'api_url': 'https://www.browseract.com/docs-api',
     'handoff_url': 'https://www.browseract.com/', 'referral_url': None,
-    'affiliate_status': 'not_enrolled_or_approved',
+    'affiliate_status': 'issued_link_ai_mcp_eligibility_pending',
     'disclosure': 'No active referral link. If approved, ResultGate may earn a provider-funded commission. Recommendations exclude commission as a ranking factor. No ResultGate customer fee.',
     'published_commission': '30% first eligible paid order; 20% subsequent eligible purchases for six months from first payment; subject to refunds/disputes. Not a ResultGate entitlement.',
 }
