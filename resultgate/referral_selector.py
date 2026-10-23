@@ -58,26 +58,35 @@ def prepare(request: Preparation):
     return {'status':'instructions_only','provider':p['name'],'task':p['task'],
         'input_fields':p['input_fields'],'example_inputs':p['example'],'output_fields':p['output_fields'],
         'steps':p['steps'],'integration':p['integration'],'free_alternative':p['free_alternative'],
-        'handoff':{'url':p['handoff_url'],'tracking':p['handoff_tracking'] if p.get('referral_url') else 'none','affiliate_link':bool(p.get('referral_url'))},
+        'handoff':{'url':'https://agents.allubiyerbamate.com/go/browseract' if p['id']=='browseract' and p.get('referral_url') else p['handoff_url'],
+                   'provider_url':p['handoff_url'],'tracking':p['handoff_tracking'] if p.get('referral_url') else 'none','affiliate_link':bool(p.get('referral_url'))},
         'qualification':p['qualification'],'test_status':p['test_status'],
         'ai_mcp_eligibility':p['ai_mcp_eligibility'],
         'commercial_blockers':p.get('commercial_blockers', ['Provider qualification and issued link remain pending.']),
         'disclosure':catalog()['disclosure'],'execution_started':False,'purchase_authorized':False,
         'approval_boundary':'Owner reviews provider terms, any account registration, OAuth scopes and maximum cost. ResultGate accepts no credentials; never infer spending consent from this task.',
         'evidence_to_keep':['provider run id if available','input hash','output with errors','actual UTC time','credit consumption shown by provider'],
+        'measurement_notice':'The BrowserAct handoff URL counts a redirect request without visitor identifiers. The provider_url is the direct affiliate alternative; opening it bypasses ResultGate counting. Neither proves a provider-confirmed click. Local tool counts, when enabled, stay on the operator device.',
         'attribution_warning':'API calls, link handoffs and clicks are not attributed sales. For affiliate attribution, the human customer must open the issued link and register through it before an eligible purchase. Attribution is determined by the provider.'}
 
 
 def register(mcp):
+    from .referral_observation import observe
     @mcp.tool()
     def list_referral_providers() -> dict:
         """List six researched provider cards and unresolved eligibility, prices and payout terms. Not contracted sellers; no execution. Affiliate status and disclosure are explicit."""
-        return catalog()
+        result = catalog()
+        result["local_observation"] = observe("list_referral_providers")
+        return result
     @mcp.tool()
     def recommend_referral_service(request: Selection) -> dict:
         """Match an explicit need to capability; reject unsafe scope, prefer existing/local/free. Budget is not authorization. No commission-based ranking."""
-        return select(request)
+        result = select(request)
+        result["local_observation"] = observe("recommend_referral_service")
+        return result
     @mcp.tool()
     def prepare_referral_task(request: Preparation) -> dict:
         """Return provider-specific task, example, output fields and official connection steps. No execution, account creation, secrets, purchase or attribution."""
-        return prepare(request)
+        result = prepare(request)
+        result["local_observation"] = observe("prepare_referral_task")
+        return result
