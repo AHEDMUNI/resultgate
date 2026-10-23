@@ -10,7 +10,7 @@ Use the [public catalog](https://agents.allubiyerbamate.com/referrals) or add th
 local stdio server to your MCP client (Python 3.11+, Git and uv required):
 
 ```json
-{"mcpServers":{"resultgate-referrals":{"command":"uv","args":["run","--no-project","--with","git+https://github.com/AHEDMUNI/resultgate.git@REVIEWED_MEASUREMENT_COMMIT","python","-m","resultgate.browseract_demo"]}}}
+{"mcpServers":{"resultgate-referrals":{"command":"uv","args":["run","--no-project","--with","git+https://github.com/AHEDMUNI/resultgate.git@7050c3ee1c67179db41ead2a1f96f52016ad6f2a","python","-m","resultgate.browseract_demo"]}}}
 ```
 
 This pins reviewed source, installs it in an isolated environment and exposes
