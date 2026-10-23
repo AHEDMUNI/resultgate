@@ -4,6 +4,18 @@
 
 Local MCP evidence checks, opt-in provider discovery and consented specialist task delegation. Release 0.2.0: [PyPI](https://pypi.org/project/resultgate-pilot/0.2.0/).
 
+## Looking for service recommendations?
+
+Start with the [public six-provider catalog](https://agents.allubiyerbamate.com/referrals)
+and [local MCP setup](docs/referrals/OPERATOR.md). The referral companion runs as
+`python -m resultgate.browseract_demo` from reviewed source. **PyPI 0.2.0 and its
+Registry launch command do not contain these referral tools.** Hosted `/mcp`
+does not expose them either. The catalog is public and requires no API key.
+
+BrowserAct has confirmed that MCP recommendations are permitted when the customer
+registers through the issued affiliate link. Current account/terms/reporting
+verification remains a separate commercial gate; no earned commission is claimed.
+
 **A pass is not a truth guarantee.** The original checking tools evaluate the evidence you supply; they do not fetch sources, detect every missing fact, verify source authenticity, or judge semantic support. Incomplete completion evidence returns `unknown`.
 
 ## Install from PyPI (Python 3.11+)
