@@ -2,7 +2,7 @@
 import argparse, json, sqlite3
 from pathlib import Path
 from datetime import datetime, timezone
-EVENTS={'arrival','request','usage','referral_handoff','registration_confirmed','commission_approved','commission_reversed','payout_received','attributed_transaction','commission_pending'}
+EVENTS={'arrival','request','usage','referral_handoff','referral_click','registration_confirmed','commission_approved','commission_reversed','payout_received','attributed_transaction','commission_pending'}
 ORIGINS={'internal','allubi','unknown','independent_verified'}
 def record(db, event):
     if set(event)-{'id','kind','origin','evidence_ref','subject','amount_cents','currency','provider_id','occurred_at'}: raise ValueError('Unexpected fields; never log secrets or URLs with tokens')

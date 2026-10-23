@@ -60,6 +60,8 @@ def prepare(request: Preparation):
         'steps':p['steps'],'integration':p['integration'],'free_alternative':p['free_alternative'],
         'handoff':{'url':p['handoff_url'],'tracking':'none','affiliate_link':False},
         'qualification':p['qualification'],'test_status':p['test_status'],
+        'ai_mcp_eligibility':p['ai_mcp_eligibility'],
+        'commercial_blockers':p.get('commercial_blockers', ['Provider qualification and issued link remain pending.']),
         'disclosure':catalog()['disclosure'],'execution_started':False,'purchase_authorized':False,
         'approval_boundary':'Owner reviews provider terms, any account registration, OAuth scopes and maximum cost. ResultGate accepts no credentials; never infer spending consent from this task.',
         'evidence_to_keep':['provider run id if available','input hash','output with errors','actual UTC time','credit consumption shown by provider'],

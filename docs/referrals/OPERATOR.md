@@ -1,5 +1,20 @@
 # ResultGate: six-provider selection pilot
 
+## Current commercial gate (2026-10-23)
+
+BrowserAct has explicitly permitted MCP recommendations followed by customer
+registration through the issued affiliate link. Its landing page was checked
+internally and retains the referral parameter. This is not provider confirmation
+of a tracked click. Current membership, accepted terms and reporting/payout
+readiness still need owner-account evidence. Do not retry login without approval.
+The public catalog and companion continue to use untracked handoffs until that
+review; the issued link is recorded in the card as inactive review evidence.
+
+The existing Cursor topic 175684 is publicly readable and shows a Listed event.
+Glama lists ResultGate and the MCP Registry lists version 0.2.0 as active. Those
+registry/package entry points do not expose this companion. Install reviewed
+source using this guide, not `uvx resultgate-pilot==0.2.0`, for referral tools.
+
 No keys, purchase, account registration or provider run is required for the local demo. Execution and billing remain with each provider. The hosted `/mcp` has NOT acquired these companion tools. Do not paste provider credentials into ResultGate.
 
 ## Clean setup (Python 3.11+)
@@ -48,4 +63,31 @@ Owner may store evidence privately using `python -m resultgate.referral_measurem
 
 `python -m resultgate.referral_daily --db /PRIVATE/events.sqlite --day YYYY-MM-DD` reads only. Missing feeds produce null totals. Internal/ALLUBI/unknown origins remain separate. Daily GitHub workflow probes public availability, NOT customer usage; repository variable `RESULTGATE_REFERRAL_MONITOR_DISABLED=true` stops it. It cannot receive or validate affiliate payments. A failed run is visible in Actions; no external alert channel is configured.
 
-The 21-day experiment starts only after the catalog is verified deployed and an authorized acquisition channel is actually live. Days 1–7: observe independently documented setup failures and qualified handoffs. Days 8–10: one bounded fix to the most evidenced bottleneck. Days 11–21: hold scope stable. Decide using observed funnel and attribution coverage; missing data is not zero demand. No daily-sales target is promised.
+The owner's current experiment is **72 hours**, superseding the earlier 21-day
+proposal. It has not started. Start only after (1) a provider-qualified active
+referral path, (2) a verified external discovery path to that flow, and (3) real
+measurement access are all ready. Record the actual start time then, never
+backdate it to a code merge or internal probe. Hold scope steady throughout.
+
+Daily private evidence report (existing database only):
+
+```sh
+python scripts/referral_daily_status.py --db /PRIVATE/events.sqlite --day YYYY-MM-DD --no-probe
+```
+
+The daily public Actions job has **no private evidence database**. Its null totals
+are unavailable data, not a zero-user result. Keep it for availability checks; do
+not put customer/provider evidence or credentials into public workflow artifacts.
+Private evidence distinguishes `arrival`, `request`, `referral_handoff`,
+`referral_click`, `registration_confirmed`, `attributed_transaction`,
+`commission_pending`, `commission_approved`, `commission_reversed`, and
+`payout_received`. A displayed link is not a click, a click is not a signup, and
+a sale is not a commission or cash payout. Deduplicate opaque provider event IDs.
+Unknown, owner/internal and ALLUBI origins stay separate. A forum's cumulative
+view count cannot be assigned to today's independent arrivals. Even recorded
+zero events leave total unknown until measurement coverage is actually complete.
+
+After 72 hours, diagnose the earliest measurable drop: no qualified reach,
+setup/fit failure, no provider handoff, signup/attribution failure, no paid need,
+or commission hold/payout threshold. Missing data is a measurement blocker,
+not evidence of no demand. Do not add providers or features to explain it away.

@@ -3,10 +3,10 @@ import argparse,json,sqlite3
 from datetime import date,datetime
 from zoneinfo import ZoneInfo
 from .referral_selector import catalog
-STAGES={'reach':'arrival','recommendation':'request','handoff':'referral_handoff','usage':'usage','attributed_transaction':'attributed_transaction','commission_pending':'commission_pending','commission_approved':'commission_approved','payout_received':'payout_received','commission_reversed':'commission_reversed'}
+STAGES={'reach':'arrival','recommendation':'request','handoff':'referral_handoff','click':'referral_click','registration':'registration_confirmed','usage':'usage','attributed_transaction':'attributed_transaction','commission_pending':'commission_pending','commission_approved':'commission_approved','payout_received':'payout_received','commission_reversed':'commission_reversed'}
 def daily(db,day):
     date.fromisoformat(day)
-    result={'day':day,'timezone':'America/Chicago','scope':'manually supplied evidence only','experiment_clock':'not_started_no_verified_active_acquisition_channel','providers':{},'unassigned_legacy_records':0,'limitations':['No provider feeds or web analytics connected. Total metrics unavailable, not zero.','Recorded events are not unique customers. Internal, ALLUBI and unknown origins never count as independent.','Evidence references are operator attestations, not authenticated payment proofs. Financial stages must not be added together.']}
+    result={'day':day,'timezone':'America/Chicago','scope':'manually supplied evidence only','experiment_clock':'not_started_requires_verified_referral_discovery_and_measurement','providers':{},'unassigned_legacy_records':0,'limitations':['No provider feeds or web analytics connected. Total metrics unavailable, not zero.','Recorded events are not unique customers. Internal, ALLUBI and unknown origins never count as independent.','A returned link is a handoff, not a click. Registration is not an attributed purchase.','Evidence references are operator attestations, not authenticated payment proofs. Financial stages must not be added together.']}
     for p in catalog()['providers']:
         result['providers'][p['id']]={stage:{'total':None,'coverage':'unavailable','recorded_events':{origin:0 for origin in ('internal','allubi','unknown','independent_verified')},'recorded_amount_cents':{}} for stage in STAGES}
     exists=db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='events'").fetchone()
