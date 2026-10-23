@@ -1,0 +1,14 @@
+{
+  "name": "ResultGate public page preparation",
+  "status": "review_required_not_publicly_deployed",
+  "production_gateway": "https://agents.allubiyerbamate.com/mcp",
+  "production_tools_include_this_pilot": false,
+  "pilot_transport": "stdio",
+  "command": "python -m resultgate.first_order.mcp --directory PRIVATE_DIRECTORY",
+  "documentation": "docs/first-order/README.md",
+  "service": "public-page-markdown",
+  "provider_candidate": "firecrawl",
+  "provider_agreement": "unconfirmed",
+  "execution_enabled": false,
+  "tools": ["compare_public_page_services", "prepare_public_page_request", "get_public_page_request", "prepare_firecrawl_request", "verify_public_page_result"]
+}
