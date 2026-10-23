@@ -4,13 +4,13 @@
   "timezone": "America/Chicago",
   "scope": "Informational referral candidates, not contracted sellers. No live checkout or provider execution by ResultGate.",
   "ranking_policy": "Permission and existing/free alternatives first; exact capability fit next; no commission, sponsorship or payout term used in ranking.",
-  "disclosure": "BrowserAct permits MCP recommendations followed by human registration through an issued affiliate link. Current account and accepted terms remain unverified; active handoffs remain untracked until that review. No earned commissions or payout are claimed. No ResultGate referral fee.",
+  "disclosure": "BrowserAct affiliate disclosure: ResultGate may earn a commission if you register through our affiliate link and make an eligible purchase. Recommendations are based on fit, not commission. Other provider links are untracked. No purchase or execution is authorized by a recommendation.",
   "providers": [
     {
-      "qualification": "mcp_flow_permitted_account_and_terms_verification_pending",
+      "qualification": "existing_affiliate_dashboard_verified_mcp_permission_received",
       "ai_mcp_eligibility": "written_permission_received_2026-10-23",
-      "referral_url": null,
-      "handoff_tracking": "untracked",
+      "referral_url": "https://browseract.com?fpr=ahed-ddc97e",
+      "handoff_tracking": "provider_affiliate_link",
       "commission_approved": null,
       "payout_received": null,
       "cross_device": "Not confirmed. Prefer human opening the issued link and registering in the same browser; never promise attribution.",
@@ -27,9 +27,9 @@
         "docs_url": "https://www.browseract.com/integrations",
         "method": "Official integration / customer-owned account"
       },
-      "commission_terms": "30% first eligible order, then 20% for six months from first payment.",
+      "commission_terms": "Account dashboard: first month 30%, then 20% (maximum 7 months). Eligibility and refunds remain subject to provider terms.",
       "attribution": "Customer must register through the issued link. MCP recommendation or API usage alone does not attribute. Public FAQ: last valid referral click before signup; cookie lifetime unconfirmed.",
-      "payout": "Public FAQ: $50 confirmed balance; monthly by following month 15th after validation and clearing refunds/disputes. Current payout readiness, fees and hold unverified.",
+      "payout": "Account dashboard: PayPal selected; monthly Net-15, next month on the 15th if payout is over $50. Payment destination verification, fees and refund hold remain unconfirmed.",
       "refunds": "Maggie confirmed on 2026-10-23 that refunded-order commission is deducted; public FAQ also covers reversals/disputes.",
       "sources": {
         "pricing": "https://www.browseract.com/pricing",
@@ -63,14 +63,14 @@
       },
       "program_url": "https://browseract.firstpromoter.com/",
       "checked_on": "2026-10-21",
-      "handoff_url": "https://www.browseract.com/pricing",
+      "handoff_url": "https://browseract.com?fpr=ahed-ddc97e",
       "test_status": "prior_owner_supplied_csv_20_rows_preserved_not_rerun",
       "issued_referral_url": "https://browseract.com?fpr=ahed-ddc97e",
-      "link_check": "2026-10-23: internal browser navigation reached official homepage retaining fpr; provider click attribution not verified",
+      "link_check": "2026-10-23: issued URL verified inside the existing signed-in account; provider reporting is accessible. No independent customer attribution is asserted.",
       "commercial_blockers": [
-        "Current affiliate account status and accepted terms have not been reverified; no login retried.",
-        "Cookie lifetime, refund hold, payout fees and account-specific rate duration need confirmation.",
-        "Provider reporting access is unavailable; no signup, purchase, approved commission or payout verified."
+        "Accepted-contract version/history is not exposed in the reviewed dashboard; no new agreement was presented or accepted.",
+        "Cookie lifetime, refund hold and payout fees remain unconfirmed. PayPal selection is not proof of payout deliverability.",
+        "Independent arrival and recommendation measurement remain unavailable; the 72-hour trial has not started."
       ],
       "reporting": "BrowserAct support confirms dashboard reports; affiliate reporting API is not supported."
     },

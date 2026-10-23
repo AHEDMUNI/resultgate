@@ -14,7 +14,9 @@ class SelectionTests(unittest.TestCase):
             self.assertEqual(result['candidates'][0]['id'],p['id'])
             self.assertFalse(result['paid_plan_recommended'])
             task=prepare(Preparation(provider_id=p['id'],sources_permitted=True))
-            self.assertEqual(task['handoff']['tracking'],'none')
+            self.assertEqual(task['handoff']['tracking'],'provider_affiliate_link' if p['id']=='browseract' else 'none')
+            self.assertEqual(task['handoff']['affiliate_link'],p['id']=='browseract')
+            if p['id']=='browseract': self.assertEqual(task['handoff']['url'],'https://browseract.com?fpr=ahed-ddc97e')
             self.assertFalse(task['execution_started']);self.assertFalse(task['purchase_authorized'])
             self.assertTrue(task['input_fields']);self.assertTrue(task['output_fields'])
     def test_evidence_dedup_and_unknown(self):
