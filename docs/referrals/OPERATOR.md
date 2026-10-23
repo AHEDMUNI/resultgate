@@ -2,13 +2,18 @@
 
 ## Current commercial gate (2026-10-23)
 
-BrowserAct has explicitly permitted MCP recommendations followed by customer
-registration through the issued affiliate link. Its landing page was checked
-internally and retains the referral parameter. This is not provider confirmation
-of a tracked click. Current membership, accepted terms and reporting/payout
-readiness still need owner-account evidence. Do not retry login without approval.
-The public catalog and companion continue to use untracked handoffs until that
-review; the issued link is recorded in the card as inactive review evidence.
+BrowserAct's existing signed-in dashboard was reviewed on 2026-10-23 after
+owner login: the issued link is https://browseract.com?fpr=ahed-ddc97e and the
+campaign shows first month 30%, then 20%, maximum 7 months. Written MCP permission
+requires customer registration through this link. This change prepares the
+catalog/three selection tools to supply it with affiliate disclosure. Until this
+change is merged and deployed, the live catalog remains untracked. The older
+BrowserAct demo offer remains a separate untracked practice flow.
+
+No new terms appeared or were accepted. Accepted-contract version/history was
+not exposed. PayPal is selected; monthly Net-15 payout requires over $50 per the
+account. Destination verification, fees, cookie lifetime and refund hold remain
+unknown. No spending or payout settings changed. The 72-hour trial is not started.
 
 The existing Cursor topic 175684 is publicly readable and shows a Listed event.
 Glama lists ResultGate and the MCP Registry lists version 0.2.0 as active. Those

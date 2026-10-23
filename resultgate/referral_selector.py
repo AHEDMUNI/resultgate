@@ -40,7 +40,7 @@ def select(request: Selection):
         'prepare_free_evaluation':'Exact capability match. Evaluate with free allowance first; paid fit is not yet established.'}[decision],
         'candidates':candidates,'requested_budget_usd':request.maximum_monthly_budget_usd,
         'budget_is_authorization':False,'paid_plan_recommended':False,
-        'execution_started':False,'commercial_referral_enabled':False,
+        'execution_started':False,'commercial_referral_enabled':any(p.get('referral_url') for p in candidates),
         'ranking_policy':data['ranking_policy'],
         'next_step':'Stop.' if not candidates else 'Call prepare_referral_task with the provider id; review its free example and official integration steps.'}
 
@@ -58,20 +58,20 @@ def prepare(request: Preparation):
     return {'status':'instructions_only','provider':p['name'],'task':p['task'],
         'input_fields':p['input_fields'],'example_inputs':p['example'],'output_fields':p['output_fields'],
         'steps':p['steps'],'integration':p['integration'],'free_alternative':p['free_alternative'],
-        'handoff':{'url':p['handoff_url'],'tracking':'none','affiliate_link':False},
+        'handoff':{'url':p['handoff_url'],'tracking':p['handoff_tracking'] if p.get('referral_url') else 'none','affiliate_link':bool(p.get('referral_url'))},
         'qualification':p['qualification'],'test_status':p['test_status'],
         'ai_mcp_eligibility':p['ai_mcp_eligibility'],
         'commercial_blockers':p.get('commercial_blockers', ['Provider qualification and issued link remain pending.']),
         'disclosure':catalog()['disclosure'],'execution_started':False,'purchase_authorized':False,
         'approval_boundary':'Owner reviews provider terms, any account registration, OAuth scopes and maximum cost. ResultGate accepts no credentials; never infer spending consent from this task.',
         'evidence_to_keep':['provider run id if available','input hash','output with errors','actual UTC time','credit consumption shown by provider'],
-        'attribution_warning':'API calls and clicks are not attributed sales. No active commercial link is supplied.'}
+        'attribution_warning':'API calls, link handoffs and clicks are not attributed sales. For affiliate attribution, the human customer must open the issued link and register through it before an eligible purchase. Attribution is determined by the provider.'}
 
 
 def register(mcp):
     @mcp.tool()
     def list_referral_providers() -> dict:
-        """List six researched provider cards and unresolved eligibility, prices and payout terms. Not contracted sellers; no execution or tracked links."""
+        """List six researched provider cards and unresolved eligibility, prices and payout terms. Not contracted sellers; no execution. Affiliate status and disclosure are explicit."""
         return catalog()
     @mcp.tool()
     def recommend_referral_service(request: Selection) -> dict:
