@@ -6,15 +6,29 @@ Local MCP evidence checks, opt-in provider discovery and consented specialist ta
 
 ## Looking for service recommendations?
 
-Start with the [public six-provider catalog](https://agents.allubiyerbamate.com/referrals)
-and [local MCP setup](docs/referrals/OPERATOR.md). The referral companion runs as
-`python -m resultgate.browseract_demo` from reviewed source. **PyPI 0.2.0 and its
-Registry launch command do not contain these referral tools.** Hosted `/mcp`
-does not expose them either. The catalog is public and requires no API key.
+Use the [public catalog](https://agents.allubiyerbamate.com/referrals) or add this
+local stdio server to your MCP client (Python 3.11+, Git and uv required):
 
-BrowserAct has confirmed that MCP recommendations are permitted when the customer
-registers through the issued affiliate link. Current account/terms/reporting
-verification remains a separate commercial gate; no earned commission is claimed.
+```json
+{"mcpServers":{"resultgate-referrals":{"command":"uv","args":["run","--no-project","--with","git+https://github.com/AHEDMUNI/resultgate.git@REVIEWED_MEASUREMENT_COMMIT","python","-m","resultgate.browseract_demo"]}}}
+```
+
+This pins reviewed source, installs it in an isolated environment and exposes
+`list_referral_providers`, `recommend_referral_service`, and
+`prepare_referral_task`, plus the three existing evidence/demo tools. No account,
+API key, manual clone or provider purchase is required. First installation needs
+network access; tool calls do not send telemetry or run provider tasks.
+
+**PyPI/Registry 0.2.0 does not contain these tools.** From the existing Registry
+repository link or Glama source/README link, use the configuration above rather
+than the old auto-install command. Glama's cached schema may still show only the
+old checking tools until it re-indexes; no re-index or registry update is claimed.
+Hosted `/mcp` is unchanged and does not expose this companion.
+
+[Examples and permission flags](docs/referrals/OPERATOR.md) ·
+[Privacy, counters and launch gates](docs/referrals/MEASUREMENT.md).
+BrowserAct's affiliate relationship is disclosed in recommendation results.
+No commission or independent customer is inferred from installation or a click.
 
 **A pass is not a truth guarantee.** The original checking tools evaluate the evidence you supply; they do not fetch sources, detect every missing fact, verify source authenticity, or judge semantic support. Incomplete completion evidence returns `unknown`.
 

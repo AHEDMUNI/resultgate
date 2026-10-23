@@ -39,7 +39,7 @@ class BusinessSiteTests(unittest.TestCase):
 
     def test_reload_transition_retries_complete_boundary(self):
         expected = {**dict.fromkeys(module.PAGES, '200'), '/mcp':'401',
-                    '/healthz':'404', '/v1/capabilities':'404'}
+                    '/go/browseract':'302', '/healthz':'404', '/v1/capabilities':'404'}
         first = dict(expected); first['/'] = '404'
         with patch.object(module, 'probe', side_effect=list(first.values())+list(expected.values())) as probe, patch.object(module.time, 'sleep'):
             module.verify_routes()
@@ -57,7 +57,7 @@ class BusinessSiteTests(unittest.TestCase):
             page=Links(); page.feed(text)
             self.assertNotIn('script',page.tags); self.assertNotIn('form',page.tags)
             for link in page.links:
-                if link.startswith('/'): self.assertIn(link,module.PAGES)
+                if link.startswith('/'): self.assertIn(link,{**module.PAGES, "/go/browseract": None})
             self.assertIn('ALLUBI Yerba Mate LLC',text)
             self.assertIn('support@allubiyerbamate.com',text)
             self.assertIn('Live checkout is not currently available',text)

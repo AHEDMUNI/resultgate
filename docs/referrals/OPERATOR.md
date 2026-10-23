@@ -22,7 +22,14 @@ source using this guide, not `uvx resultgate-pilot==0.2.0`, for referral tools.
 
 No keys, purchase, account registration or provider run is required for the local demo. Execution and billing remain with each provider. The hosted `/mcp` has NOT acquired these companion tools. Do not paste provider credentials into ResultGate.
 
-## Clean setup (Python 3.11+)
+## Quick client setup
+
+Use the pinned `uv` client configuration at the top of [README](../../README.md).
+It installs reviewed source directly without a manual clone. The existing Registry
+0.2.0 auto-install remains the old server; the repository link is the bridge.
+For optional device-only counts and the private daily report see [measurement](MEASUREMENT.md).
+
+## Manual setup (Python 3.11+)
 
 Clone this existing repository, use a reviewed release commit, then:
 

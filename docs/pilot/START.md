@@ -1,3 +1,5 @@
+> Looking for BrowserAct/service recommendations? Use the pinned local MCP configuration at the top of [the current README](../../README.md#looking-for-service-recommendations). The Registry 0.2.0 command below does not include referral tools.
+
 # ResultGate local pilot: start here
 
 Release 0.2.0 local pilot. No hosted network, payments or complete A2A transport. Python 3.11+ required; Linux/macOS commands below (Windows: use `client\Scripts\python.exe`). Package installation downloads dependencies; runtime has no external calls by default.

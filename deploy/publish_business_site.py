@@ -9,6 +9,10 @@ import subprocess
 import tempfile
 import time
 
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from deploy.referral_metrics import instrument, strip
+
 HOST = 'agents.allubiyerbamate.com'
 LEGACY_PAGES = {'/':'index.html','/terms':'terms.html','/privacy':'privacy.html',
          '/refunds':'refunds.html','/providers':'providers.html','/contact':'contact.html',
@@ -83,12 +87,12 @@ def run(*args):
 
 def probe(path):
     return run('curl','--silent','--show-error','--max-time','15','--resolve',HOST+':443:127.0.0.1',
-               '--output','/dev/null','--write-out','%{http_code}','https://'+HOST+path)
+               '--user-agent','ResultGate-Internal-Deployment/1.0','--output','/dev/null','--write-out','%{http_code}','https://'+HOST+path)
 
 
 def verify_routes():
     expected = {**dict.fromkeys(PAGES, '200'), '/mcp': '401',
-                '/healthz': '404', '/v1/capabilities': '404'}
+                '/go/browseract': '302', '/healthz': '404', '/v1/capabilities': '404'}
     # A successful reload command can return before new workers accept requests.
     # Require the entire boundary check to pass in one round; never relax it.
     for attempt in range(5):
@@ -117,9 +121,17 @@ def main():
             if re.search(r'\bserver_name\s+agents\.allubiyerbamate\.com\s*;',content) and 'ssl_certificate ' in content:
                 candidates.add(path.resolve())
     if len(candidates)!=1: raise SystemExit('Cannot identify one dedicated TLS config. Nothing changed.')
-    config=candidates.pop(); before=config.read_text(); after=replacement(before,str(destination))
+    config=candidates.pop(); before=config.read_text(); after=instrument(replacement(strip(before),str(destination)))
+    # Require an existing rotation policy covering this nginx log.
+    rotation = Path('/etc/logrotate.d/nginx')
+    if not rotation.is_file() or '/var/log/nginx/*.log' not in rotation.read_text():
+        raise SystemExit('Existing nginx wildcard log rotation required; nothing changed.')
     run('nginx','-t')
     if probe('/mcp')!='401': raise SystemExit('MCP baseline was not 401. Nothing changed.')
+    metrics_log=Path('/var/log/nginx/resultgate-referral.log')
+    if metrics_log.is_symlink(): raise SystemExit('Unexpected metrics log symlink')
+    fd=os.open(metrics_log,os.O_CREAT|os.O_APPEND|os.O_WRONLY|os.O_NOFOLLOW,0o600)
+    os.close(fd)
     destination.mkdir(parents=True,exist_ok=True,mode=0o755)
     os.chmod(destination.parent,0o755); os.chmod(destination,0o755)
     for name,data in contents.items():
@@ -134,8 +146,16 @@ def main():
         config.write_text(after)
         run('nginx','-t'); run('systemctl','reload','nginx')
         verify_routes()
+        headers=run('curl','--silent','--show-error','--max-time','15',
+            '--user-agent','ResultGate-Internal-Deployment/1.0',
+            '--resolve',HOST+':443:127.0.0.1','--dump-header','-','--output','/dev/null',
+            'https://'+HOST+'/go/browseract')
+        locations=[line.split(':',1)[1].strip() for line in headers.splitlines() if line.lower().startswith('location:')]
+        if locations != ['https://browseract.com?fpr=ahed-ddc97e']:
+            raise ValueError('Unexpected BrowserAct redirect target')
         for url, name in PAGES.items():
             result = subprocess.run(['curl','--silent','--show-error','--max-time','15',
+                '--user-agent','ResultGate-Internal-Deployment/1.0',
                 '--resolve',HOST+':443:127.0.0.1','https://'+HOST+url],check=True,capture_output=True)
             if result.stdout != contents[name]:
                 raise ValueError('Published asset mismatch: '+url)
