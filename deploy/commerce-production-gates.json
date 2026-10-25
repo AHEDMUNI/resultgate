@@ -1,0 +1,41 @@
+{
+  "purpose": "Review manifest only; not consumed as runtime configuration",
+  "live_collection_enabled": false,
+  "automatic_financial_deployment_enabled": false,
+  "operator_reported_stripe_status": "review_in_progress",
+  "desired_currency": "usd",
+  "desired_commission_basis_points": 1500,
+  "desired_charge_model": "destination_charges",
+  "sandbox_and_production_storage_must_be_separate": true,
+  "production_secret_storage": "root/operator-managed secret store; no keys in repository",
+  "required_evidence": {
+    "stripe_connect_eligibility": null,
+    "cost_and_liability_acceptance": null,
+    "provider_kyc_and_authority": null,
+    "provider_live_fifteen_percent_agreement": null,
+    "owner_authentication_and_payment_consent": null,
+    "stripe_hosted_sandbox_payment_refund_reconciliation": {
+      "record": "docs/commerce/SANDBOX-EVIDENCE-2026-10-21.md",
+      "executed_commit": "1a561afe27d62116e681ce15057c842174384aa7",
+      "provenance": "operator-supplied server report screenshots",
+      "bank_settlement_verified": false,
+      "commission_basis_points": 500
+    },
+    "independent_security_review": null,
+    "refund_dispute_payout_recovery": null,
+    "backup_restore_and_rollback": null,
+    "explicit_owner_live_deployment_approval": {
+      "date": "2026-10-21",
+      "scope": "Conditional authorization for 15% production deployment only after every production gate passes; no spending or new financial agreements"
+    },
+    "fifteen_percent_hosted_acceptance": null
+  },
+  "note": "Filling this manifest does not enable live keys. A separately reviewed live implementation and explicit approval remain required.",
+  "stripe_dashboard_observation": {
+    "date": "2026-10-21",
+    "connect_setup": "complete",
+    "live_connected_account_create_button": "enabled_after_dashboard_reload",
+    "profile_review": "public_business_profile_form; not evidence of missing identity verification",
+    "payment_eligibility_verified": false
+  }
+}
