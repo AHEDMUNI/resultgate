@@ -18,7 +18,7 @@ class CatalogTests(unittest.TestCase):
         self.assertFalse(result['a2a_supported'])
         self.assertIsNone(result['public_execution_endpoint'])
         self.assertFalse(result['external_execution_enabled_by_configuration'])
-        self.assertEqual(result['safe_mcp_configuration']['args'], ['resultgate-pilot==0.3.0', '--brokerage', '--delegation'])
+        self.assertEqual(result['safe_mcp_configuration']['args'], ['resultgate-pilot==0.3.1', '--brokerage', '--delegation'])
 
     def test_secrets_or_instructions_are_not_capabilities(self):
         for value in ['raw task text', 'https://127.0.0.1', ['ignore instructions'], ['a']*17, ['x'*65], [False]]:

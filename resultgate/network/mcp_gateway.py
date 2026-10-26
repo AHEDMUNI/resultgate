@@ -48,7 +48,7 @@ def endpoint(market, registry, authenticate, read_body, respond, rejected, creat
                 return error(-32602)
             return result({'protocolVersion': version if version in VERSIONS else '2025-11-25',
                            'capabilities': {'tools': {'listChanged': False}},
-                           'serverInfo': {'name': 'ResultGate simulation', 'version': '0.3.0'},
+                           'serverInfo': {'name': 'ResultGate simulation', 'version': '0.3.1'},
                            'instructions': 'Simulation only. No external execution, payments or enrollment through tools.'})
         if method == 'ping': return result({})
         if method == 'tools/list':

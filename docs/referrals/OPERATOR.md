@@ -2,7 +2,7 @@
 
 ## Versioned client setup
 
-Use `uvx resultgate-pilot==0.3.0 --referrals` or the MCP JSON configuration at the
+Use `uvx resultgate-pilot==0.3.1 --referrals` or the MCP JSON configuration at the
 top of [README](../../README.md). The package includes six tools covering six
 providers. Existing 0.2.0 installations must upgrade to get referral tools.
 The `resultgate-referrals` executable is equivalent after pip installation.
@@ -17,7 +17,7 @@ untracked practice flow for compatibility; use `prepare_referral_task` for the
 commercial handoff. No new financial terms are accepted by installing this package.
 
 The original 72-hour observation is a historical baseline, not a release gate.
-See [release notes](../../release/0.3.0.md) for comparison boundaries.
+See [release notes](../../release/0.3.1.md) for comparison boundaries.
 For device-only counts and private reports see [measurement](MEASUREMENT.md).
 
 ## Manual setup (Python 3.11+)
