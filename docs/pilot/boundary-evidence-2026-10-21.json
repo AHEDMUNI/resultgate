@@ -1,0 +1,41 @@
+{
+  "checks": [
+    {
+      "path": "/mcp",
+      "method": "GET",
+      "status": 401,
+      "expected": 401,
+      "passed": true,
+      "milliseconds": 4401
+    },
+    {
+      "path": "/mcp",
+      "method": "POST",
+      "status": 401,
+      "expected": 401,
+      "passed": true,
+      "milliseconds": 3897
+    },
+    {
+      "path": "/healthz",
+      "method": "GET",
+      "status": 404,
+      "expected": 404,
+      "passed": true,
+      "milliseconds": 4442
+    },
+    {
+      "path": "/v1/capabilities",
+      "method": "GET",
+      "status": 404,
+      "expected": 404,
+      "passed": true,
+      "milliseconds": 3458
+    }
+  ],
+  "passed": true,
+  "scope": "TLS verification and anonymous boundary only; not authenticated health, tenant isolation or adoption",
+  "observed_date": "2026-10-21",
+  "origin": "assistant external technical probe; not independent customer",
+  "credentials_used": false
+}

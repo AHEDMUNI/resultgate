@@ -16,14 +16,22 @@ def require(condition):
         raise ValueError("Acceptance condition failed")
 
 
-async def probe(url, token):
+async def probe(url, token, *, marketplace_preview=False):
     async with httpx.AsyncClient(headers={'Authorization': 'Bearer ' + token},
                                  timeout=10, follow_redirects=False, trust_env=False) as client:
         async with streamable_http_client(url, http_client=client) as (read, write, _):
             async with ClientSession(read, write) as session:
                 await session.initialize()
                 names = {tool.name for tool in (await session.list_tools()).tools}
-                require(names == {'search_providers', 'create_simulation_task', 'get_simulation_task'})
+                expected = {'search_providers', 'create_simulation_task', 'get_simulation_task'}
+                if marketplace_preview:
+                    expected |= {'apply_provider', 'provider_application_status', 'recommend_services',
+                                 'audit_supplied_extraction', 'audit_supplied_citations'}
+                require(names == expected)
+                if marketplace_preview:
+                    advice = await session.call_tool('recommend_services', {'need': 'scrape'})
+                    require(not advice.isError)
+                    require(json.loads(advice.content[0].text)['execution_enabled'] is False)
                 search = await session.call_tool('search_providers', {})
                 require(not search.isError)
                 args = dict(request_id='acceptance-' + secrets.token_hex(8),
@@ -45,13 +53,14 @@ async def probe(url, token):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('url')
+    parser.add_argument('--marketplace-preview', action='store_true', help='Expect the reviewed optional tools')
     args = parser.parse_args()
     url = urlsplit(args.url)
     if url.scheme != 'https' or not url.hostname or url.username or url.password or url.query or url.fragment or url.path != '/mcp':
         parser.error('HTTPS URL ending in /mcp required, without credentials/query/fragment')
     token = getpass.getpass('Invited test tenant bearer token (hidden): ')
     try:
-        result = asyncio.run(probe(args.url, token))
+        result = asyncio.run(probe(args.url, token, marketplace_preview=args.marketplace_preview))
     except Exception:
         raise SystemExit('Acceptance failed; credentials and exception details suppressed.') from None
     print(json.dumps(result, indent=2))

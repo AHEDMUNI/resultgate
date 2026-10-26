@@ -1,0 +1,31 @@
+name: Public boundary checks (no credentials)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 * * * *'
+permissions:
+  contents: read
+concurrency:
+  group: public-boundary
+  cancel-in-progress: false
+jobs:
+  probe:
+    # Public-repository runner only; do not enable paid private Actions usage.
+    if: github.repository == 'AHEDMUNI/resultgate' && github.event.repository.private == false
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Check TLS and anonymous boundary
+        run: |
+          python3 scripts/public_boundary_probe.py > "$RUNNER_TEMP/resultgate-boundary.json"
+      - name: Publish bounded technical report
+        if: always()
+        run: |
+          if test -f "$RUNNER_TEMP/resultgate-boundary.json"; then
+            printf '```json\n' >> "$GITHUB_STEP_SUMMARY"
+            cat "$RUNNER_TEMP/resultgate-boundary.json" >> "$GITHUB_STEP_SUMMARY"
+            printf '\n```\n' >> "$GITHUB_STEP_SUMMARY"
+          fi

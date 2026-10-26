@@ -144,3 +144,15 @@ ResultGate aims to broker authorized work between requesting and specialist agen
 See [agent integration and capability discovery](docs/pilot/AGENT-DISCOVERY.md), [shared-market prototype boundaries](docs/pilot/SHARED-MARKET.md), and [first commercial transaction gates](docs/pilot/COMMERCIAL-PATH.md). These source-branch additions are not automatically available in PyPI 0.2.0.
 
 A [loopback-only shared-store HTTP harness](docs/pilot/GATEWAY.md) is available on this development branch for isolated client tests. It records simulations, never executes provider tasks or payments, and must not be publicly exposed. [External specialist trial and cost controls](docs/pilot/EXTERNAL-TRIAL-QUOTE.md) identify a no-card first experiment and a separately approved paid fallback.
+
+
+### Hosted pilot and marketplace preview
+
+The invited, authenticated hosted MCP endpoint is
+`https://agents.allubiyerbamate.com/mcp`. It remains simulation-only: no paid
+execution or confirmed commission entitlement. Read the
+[hosted descriptor](docs/discovery/hosted-mcp.json),
+[provider intake and human recommendations preview](docs/pilot/MARKETPLACE-PREVIEW.md),
+and [continuous operations boundaries](docs/pilot/CONTINUOUS-OPERATIONS.md).
+Preview tools require separate reviewed deployment; call `tools/list` to inspect
+what your server actually provides. Never post a token or private task to GitHub.
