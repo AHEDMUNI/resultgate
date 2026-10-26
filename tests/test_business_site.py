@@ -120,9 +120,10 @@ class BrowserActSiteTests(unittest.TestCase):
         self.assertIn('location = /browseract ',new)
         self.assertEqual(old[:old.index(module.START)],new[:new.index(module.START)])
         self.assertEqual(old[old.index(module.END):],new[new.index(module.END):])
-    def test_offer_matches_mcp_and_is_not_enrolled(self):
+    def test_offer_matches_mcp_and_discloses_referral(self):
         import json
         from resultgate.browseract_demo import OFFER
         self.assertEqual(OFFER,json.loads((ROOT/'web/business/browseract-offer.json').read_text()))
-        self.assertIsNone(OFFER['referral_url'])
-        self.assertIn('untracked',(ROOT/'web/business/browseract.html').read_text())
+        self.assertEqual('https://browseract.com?fpr=ahed-ddc97e',OFFER['referral_url'])
+        self.assertIn('commission',OFFER['disclosure'])
+        self.assertIn('sponsored',(ROOT/'web/business/browseract.html').read_text())

@@ -20,10 +20,10 @@
   "interest": "https://agents.allubiyerbamate.com/request",
   "local_recommendations": {
     "package": "resultgate-pilot",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "command": "uvx",
     "args": [
-      "resultgate-pilot==0.3.0",
+      "resultgate-pilot==0.3.1",
       "--referrals"
     ],
     "transport": "stdio",

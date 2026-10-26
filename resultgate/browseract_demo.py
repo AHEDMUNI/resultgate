@@ -5,6 +5,10 @@ from decimal import Decimal, InvalidOperation
 from urllib.parse import urlsplit
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from mcp.server.fastmcp import FastMCP
+from resultgate.referral_selector import catalog
+
+_referrals = catalog()
+_browseract = next(p for p in _referrals["providers"] if p["id"] == "browseract")
 
 OFFER = {
     'checked_on': '2026-10-22', 'provider': 'BrowserAct',
@@ -15,9 +19,9 @@ OFFER = {
     'pricing_url': 'https://www.browseract.com/pricing',
     'integration_url': 'https://www.browseract.com/integrations',
     'api_url': 'https://www.browseract.com/docs-api',
-    'handoff_url': 'https://www.browseract.com/', 'referral_url': None,
-    'affiliate_status': 'mcp_flow_permitted_account_and_terms_verification_pending',
-    'disclosure': 'No active referral link. If approved, ResultGate may earn a provider-funded commission. Recommendations exclude commission as a ranking factor. No ResultGate customer fee.',
+    'handoff_url': _browseract['handoff_url'], 'referral_url': _browseract['referral_url'],
+    'affiliate_status': _browseract['qualification'],
+    'disclosure': _referrals['disclosure'],
     'published_commission': '30% first eligible paid order; 20% subsequent eligible purchases for six months from first payment; subject to refunds/disputes. Not a ResultGate entitlement.',
 }
 
@@ -59,7 +63,7 @@ def assess(request: Request) -> dict:
         'urls':request.product_urls,'fields':['source_url','product','price','currency','availability','checked_at','error'],
         'limits':{'max_products':len(request.product_urls),'automatic_schedule':False,'spending_authorization':None}},
         'steps':['Read pricing and provider terms; owner chooses free/local or explicitly approves recurring plan and maximum credits.',
-        'Open the official BrowserAct site (currently untracked). Create/use your own account; do not send ResultGate credentials.',
+        'Review the disclosed official BrowserAct affiliate link; attribution is not guaranteed. Create/use your own account; do not send ResultGate credentials.',
         'Follow the official integration guide for your agent; keep the key only in your own client secret configuration.',
         'Paste the prepared task into BrowserAct, review its estimate and approve one run. Export JSON results.',
         'Call validate_browseract_report with expected URLs, results and independently observed sample rows.']}

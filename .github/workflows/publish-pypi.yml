@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       publish:
-        description: 'Publish the validated 0.3.0 release to PyPI (requires configured Trusted Publisher)'
+        description: 'Publish the validated 0.3.1 release to PyPI (requires configured Trusted Publisher)'
         type: boolean
         required: true
         default: false
@@ -50,7 +50,7 @@ jobs:
           import pathlib, tomllib, json
           p = tomllib.loads(pathlib.Path('pyproject.toml').read_text())['project']
           assert p['name'] == 'resultgate-pilot'
-          assert p['version'] == '0.3.0'
+          assert p['version'] == '0.3.1'
           assert p['license'] == 'MIT'
           assert pathlib.Path('LICENSE').is_file()
           assert '<!-- mcp-name: io.github.AHEDMUNI/resultgate -->' in pathlib.Path('README.md').read_text()

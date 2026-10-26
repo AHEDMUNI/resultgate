@@ -25,6 +25,21 @@ async def check(command, args, directory):
                 return json.loads(result.content[0].text)
             catalog = await call('list_referral_providers', {})
             assert {p['id'] for p in catalog['providers']} == PROVIDERS
+            fit = await call('assess_browseract_fit', {'request': {
+                'product_urls': ['https://example.com/product'], 'sources_permitted': True}})
+            assert fit['decision'] == 'free_first'
+            assert fit['offer']['referral_url'] == 'https://browseract.com?fpr=ahed-ddc97e'
+            assert 'commission' in fit['offer']['disclosure'].lower()
+            incomplete = await call('validate_browseract_report', {'report': {
+                'expected_urls': ['https://example.com/product'], 'rows': [],
+                'origin': 'internal', 'engine': 'fixture'}})
+            assert not incomplete['complete']
+            csv = ('product_name,price,currency,availability,product_url,extracted_at_utc,error\n'
+                   'Example,12.50,USD,In stock,https://example.com/product,2026-10-26T00:00:00Z,\n')
+            checked = await call('validate_browseract_csv', {'payload': {
+                'csv_text': csv, 'expected_urls': ['https://example.com/product'], 'origin': 'internal'}})
+            assert checked['validation']['all_successful']
+            assert not checked['validation']['execution_independently_verified']
             for provider in catalog['providers']:
                 selected = await call('recommend_referral_service', {'request': {
                     'need': provider['need'], 'sources_permitted': True,
@@ -48,7 +63,7 @@ async def check(command, args, directory):
             assert denied['status'] == 'rejected'
 
 async def main():
-    assert version('resultgate-pilot') == '0.3.0'
+    assert version('resultgate-pilot') == '0.3.1'
     with tempfile.TemporaryDirectory() as directory:
         exe = Path(sys.executable).parent / ('resultgate-pilot.exe' if os.name == 'nt' else 'resultgate-pilot')
         alias = exe.with_name('resultgate-referrals.exe' if os.name == 'nt' else 'resultgate-referrals')

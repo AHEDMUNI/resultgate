@@ -70,7 +70,7 @@
       "commercial_blockers": [
         "Accepted-contract version/history is not exposed in the reviewed dashboard; no new agreement was presented or accepted.",
         "Cookie lifetime, refund hold and payout fees remain unconfirmed. PayPal selection is not proof of payout deliverability.",
-        "Independent arrival and recommendation measurement remain unavailable; the 72-hour trial has not started."
+        "Independent arrival and recommendation measurement remain unavailable. The original 72-hour freeze was ended by the owner; prior readings are a historical baseline."
       ],
       "reporting": "BrowserAct support confirms dashboard reports; affiliate reporting API is not supported."
     },

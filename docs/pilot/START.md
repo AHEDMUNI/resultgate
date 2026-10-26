@@ -1,14 +1,14 @@
-> Looking for BrowserAct/service recommendations? Use the pinned local MCP configuration at the top of [the current README](../../README.md#looking-for-service-recommendations). Registry 0.3.0 uses `--referrals`; the optional brokerage tutorial below remains separate.
+> Looking for BrowserAct/service recommendations? Use the pinned local MCP configuration at the top of [the current README](../../README.md#looking-for-service-recommendations). Registry 0.3.1 uses `--referrals`; the optional brokerage tutorial below remains separate.
 
 # ResultGate local pilot: start here
 
-Release 0.3.0 local pilot. No hosted network, payments or complete A2A transport. Python 3.11+ required; Linux/macOS commands below (Windows: use `client\Scripts\python.exe`). Package installation downloads dependencies; runtime has no external calls by default.
+Release 0.3.1 local pilot. No hosted network, payments or complete A2A transport. Python 3.11+ required; Linux/macOS commands below (Windows: use `client\Scripts\python.exe`). Package installation downloads dependencies; runtime has no external calls by default.
 
 ## Install in a new environment
 
 ```sh
 python3 -m venv client
-client/bin/python -m pip install resultgate-pilot==0.3.0
+client/bin/python -m pip install resultgate-pilot==0.3.1
 client/bin/python -m pip check
 client/bin/python -I -m resultgate.pilot_client --offline
 ```

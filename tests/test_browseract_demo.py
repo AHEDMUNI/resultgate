@@ -2,12 +2,13 @@ import unittest
 from resultgate.browseract_demo import Request, Report, assess, validate
 class BrowserActTests(unittest.TestCase):
     def request(self,**kw): return Request(product_urls=['https://example.com/product'],**kw)
-    def test_fit_gates_and_no_referral(self):
+    def test_fit_gates_and_disclosed_referral(self):
         self.assertEqual('reject',assess(self.request())['decision'])
         self.assertEqual('use_existing_api',assess(self.request(sources_permitted=True,existing_api_or_export=True))['decision'])
         self.assertEqual('free_first',assess(self.request(sources_permitted=True))['decision'])
         x=assess(self.request(sources_permitted=True,local_execution_sufficient=False,recurring_cloud_need=True))
-        self.assertEqual('consider_basic',x['decision']); self.assertIsNone(x['offer']['referral_url'])
+        self.assertEqual('consider_basic',x['decision']); self.assertEqual('https://browseract.com?fpr=ahed-ddc97e',x['offer']['referral_url'])
+        self.assertIn('commission',x['offer']['disclosure'])
         self.assertFalse(x['purchase_authorized']); self.assertIsNone(x['task']['limits']['spending_authorization'])
     def test_private_credentials_duplicate_inputs(self):
         for url in ('http://example.com/p','https://user:secret@example.com/p','https://127.0.0.1/p','https://localhost/p','https://example.com/p?key=secret'):

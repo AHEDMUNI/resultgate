@@ -2,14 +2,14 @@
 
 <!-- mcp-name: io.github.AHEDMUNI/resultgate -->
 
-Local MCP service recommendations for BrowserAct, SearchApi, PDF.co, Make, Apify and Firecrawl, with disclosed referral links and evidence checks. Release 0.3.0: [PyPI](https://pypi.org/project/resultgate-pilot/0.3.0/).
+Local MCP service recommendations for BrowserAct, SearchApi, PDF.co, Make, Apify and Firecrawl, with disclosed referral links and evidence checks. Release 0.3.1: [PyPI](https://pypi.org/project/resultgate-pilot/0.3.1/).
 
 ## Looking for service recommendations?
 
 Install the versioned package through uv (Python 3.11+; no Git required):
 
 ```json
-{"mcpServers":{"resultgate-referrals":{"command":"uvx","args":["resultgate-pilot==0.3.0","--referrals"]}}}
+{"mcpServers":{"resultgate-referrals":{"command":"uvx","args":["resultgate-pilot==0.3.1","--referrals"]}}}
 ```
 
 This local stdio entry exposes exactly six tools:
@@ -28,7 +28,7 @@ The response includes the official affiliate URL
 `https://browseract.com?fpr=ahed-ddc97e`, the measured `/go/browseract` alternative
 and commission disclosure. A handoff is not a registration, sale or commission.
 
-After `pip install resultgate-pilot==0.3.0`, `resultgate-referrals` is an equivalent
+After `pip install resultgate-pilot==0.3.1`, `resultgate-referrals` is an equivalent
 standalone entry; `resultgate-pilot --referrals` is the Registry entry.
 The original `resultgate` / `resultgate-pilot` defaults and brokerage flags remain
 available for existing clients. The old 0.2.0 release lacks referral tools.
@@ -41,7 +41,7 @@ Glama schema refresh and MCP Registry publication are separate from package publ
 
 [Examples and permission flags](docs/referrals/OPERATOR.md) ·
 [Privacy and counters](docs/referrals/MEASUREMENT.md) ·
-[0.3.0 release/migration notes](release/0.3.0.md).
+[0.3.1 release/migration notes](release/0.3.1.md).
 
 **A pass is not a truth guarantee.** The original checking tools evaluate the evidence you supply; they do not fetch sources, detect every missing fact, verify source authenticity, or judge semantic support. Incomplete completion evidence returns `unknown`.
 
@@ -49,11 +49,11 @@ Glama schema refresh and MCP Registry publication are separate from package publ
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install resultgate-pilot==0.3.0
+.venv/bin/python -m pip install resultgate-pilot==0.3.1
 .venv/bin/resultgate-pilot --help
 ```
 
-For MCP clients with uv installed: `uvx resultgate-pilot==0.3.0`.
+For MCP clients with uv installed: `uvx resultgate-pilot==0.3.1`.
 
 ## Install from GitHub (Python 3.11+ and Git)
 
@@ -71,7 +71,7 @@ On Linux/macOS, after reviewing the artifact and its SHA-256:
 
 ```sh
 python3 -m venv .venv
-.venv/bin/python -m pip install ./resultgate_pilot-0.3.0-py3-none-any.whl
+.venv/bin/python -m pip install ./resultgate_pilot-0.3.1-py3-none-any.whl
 .venv/bin/resultgate --help
 ```
 
@@ -95,7 +95,7 @@ Discoverable tools: `check_extraction` and `check_citations`. Each accepts `payl
 {"mcpServers":{"resultgate":{"command":"/ABSOLUTE/PATH/.venv/bin/resultgate","args":["--brokerage","--delegation"]}}}
 ```
 
-This exposes 12 tools while keeping external execution disabled. The 0.3.0 Registry configuration instead launches the standalone `--referrals` mode. Local provider onboarding adds 5 tools with an explicit private registry directory. See the [installed-client tutorial](https://github.com/AHEDMUNI/resultgate/blob/main/docs/pilot/START.md) and [provider application process](https://github.com/AHEDMUNI/resultgate/blob/main/docs/pilot/PROVIDERS.md). No shared hosted network, conforming A2A transport, automatic provider execution or payments. GROBID is an opt-in ML demo, not an autonomous agent.
+This exposes 12 tools while keeping external execution disabled. The 0.3.1 Registry configuration instead launches the standalone `--referrals` mode. Local provider onboarding adds 5 tools with an explicit private registry directory. See the [installed-client tutorial](https://github.com/AHEDMUNI/resultgate/blob/main/docs/pilot/START.md) and [provider application process](https://github.com/AHEDMUNI/resultgate/blob/main/docs/pilot/PROVIDERS.md). No shared hosted network, conforming A2A transport, automatic provider execution or payments. GROBID is an opt-in ML demo, not an autonomous agent.
 
 ### Extraction example
 
@@ -154,6 +154,6 @@ Local pilot: [start/install/MCP examples](docs/pilot/START.md) · [provider appl
 
 ResultGate aims to broker authorized work between requesting and specialist agents. The published local pilot is not a shared marketplace. Current source includes read-only commission reports; new development must distinguish simulations, operator attestations, verified paid events and actual collected revenue. No subscriptions or listing fees are planned; commissions require explicit bilateral terms and qualifying outcomes.
 
-See [agent integration and capability discovery](docs/pilot/AGENT-DISCOVERY.md), [shared-market prototype boundaries](docs/pilot/SHARED-MARKET.md), and [first commercial transaction gates](docs/pilot/COMMERCIAL-PATH.md). The 0.3.0 package includes these modules, but the referral entry never activates them.
+See [agent integration and capability discovery](docs/pilot/AGENT-DISCOVERY.md), [shared-market prototype boundaries](docs/pilot/SHARED-MARKET.md), and [first commercial transaction gates](docs/pilot/COMMERCIAL-PATH.md). The 0.3.1 package includes these modules, but the referral entry never activates them.
 
 A [loopback-only shared-store HTTP harness](docs/pilot/GATEWAY.md) is available on this development branch for isolated client tests. It records simulations, never executes provider tasks or payments, and must not be publicly exposed. [External specialist trial and cost controls](docs/pilot/EXTERNAL-TRIAL-QUOTE.md) identify a no-card first experiment and a separately approved paid fallback.

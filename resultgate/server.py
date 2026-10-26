@@ -40,7 +40,7 @@ def check_citations(payload: CitationInput, usage: UsageContext | None = None) -
     return measure('citations',audit_citations(payload.model_dump(exclude_unset=True)),usage)
 
 async def health(request):
-    return JSONResponse({'service':'ResultGate','version':'0.3.0','mode':'local_pilot'})
+    return JSONResponse({'service':'ResultGate','version':'0.3.1','mode':'local_pilot'})
 
 def strict_object(pairs):
     result={}
