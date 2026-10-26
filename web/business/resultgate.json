@@ -17,5 +17,17 @@
     ]
   },
   "live_payments": false,
-  "interest": "https://agents.allubiyerbamate.com/request"
+  "interest": "https://agents.allubiyerbamate.com/request",
+  "local_recommendations": {
+    "package": "resultgate-pilot",
+    "version": "0.3.0",
+    "command": "uvx",
+    "args": [
+      "resultgate-pilot==0.3.0",
+      "--referrals"
+    ],
+    "transport": "stdio",
+    "catalog": "https://agents.allubiyerbamate.com/referrals.json",
+    "provider_execution": false
+  }
 }
