@@ -21,12 +21,16 @@ jobs:
       - name: Verify live PyPI release and ownership marker
         run: |
           python3 - <<'PY'
-          import json, urllib.request
+          import json, os, urllib.request
           with open('server.json') as f:
               s = json.load(f)
           assert s['name'] == 'io.github.AHEDMUNI/resultgate'
           assert s['version'] == '0.3.1'
-          with urllib.request.urlopen('https://pypi.org/pypi/resultgate-pilot/0.3.1/json', timeout=30) as r:
+          # Avoid a negatively cached pre-publication 404 at an edge.
+          verification = os.environ['GITHUB_RUN_ID'] + '-' + os.environ['GITHUB_RUN_ATTEMPT']
+          url = 'https://pypi.org/pypi/resultgate-pilot/0.3.1/json?verification=' + verification
+          request = urllib.request.Request(url, headers={'Cache-Control': 'no-cache'})
+          with urllib.request.urlopen(request, timeout=30) as r:
               p = json.load(r)
           assert p['info']['version'] == s['version']
           assert '<!-- mcp-name: io.github.AHEDMUNI/resultgate -->' in p['info']['description']
