@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "resultgate-pilot"
-version = "0.2.0"
+version = "0.3.0"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
@@ -22,6 +22,7 @@ test = ["jsonschema==4.25.1"]
 [project.scripts]
 resultgate = "resultgate.server:main"
 resultgate-pilot = "resultgate.server:main"
+resultgate-referrals = "resultgate.browseract_demo:main"
 
 [tool.setuptools.packages.find]
 include = ["resultgate*"]

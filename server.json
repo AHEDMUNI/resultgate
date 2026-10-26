@@ -2,8 +2,8 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.AHEDMUNI/resultgate",
   "title": "ResultGate",
-  "description": "Local evidence checks, provider discovery and consented task delegation. No payments.",
-  "version": "0.2.0",
+  "description": "Local service recommendations for six providers, disclosed referrals and evidence checks.",
+  "version": "0.3.0",
   "repository": {
     "url": "https://github.com/AHEDMUNI/resultgate",
     "source": "github"
@@ -13,7 +13,7 @@
       "registryType": "pypi",
       "registryBaseUrl": "https://pypi.org",
       "identifier": "resultgate-pilot",
-      "version": "0.2.0",
+      "version": "0.3.0",
       "runtimeHint": "uvx",
       "transport": {
         "type": "stdio"
@@ -21,11 +21,7 @@
       "packageArguments": [
         {
           "type": "positional",
-          "value": "--brokerage"
-        },
-        {
-          "type": "positional",
-          "value": "--delegation"
+          "value": "--referrals"
         }
       ]
     }

@@ -5,9 +5,9 @@
   "server_name": "io.github.AHEDMUNI/resultgate",
   "published_package": {
     "name": "resultgate-pilot",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
-  "registry_record": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.AHEDMUNI%2Fresultgate/versions/0.2.0",
+  "registry_record": "https://registry.modelcontextprotocol.io/v0.1/servers/io.github.AHEDMUNI%2Fresultgate/versions/0.3.0",
   "transport": "mcp_stdio",
   "public_execution_endpoint": null,
   "capabilities": [
@@ -82,7 +82,7 @@
   "safe_mcp_configuration": {
     "command": "uvx",
     "args": [
-      "resultgate-pilot==0.2.0",
+      "resultgate-pilot==0.3.0",
       "--brokerage",
       "--delegation"
     ]
