@@ -40,7 +40,7 @@ def check_citations(payload: CitationInput, usage: UsageContext | None = None) -
     return measure('citations',audit_citations(payload.model_dump(exclude_unset=True)),usage)
 
 async def health(request):
-    return JSONResponse({'service':'ResultGate','version':'0.2.0','mode':'local_pilot'})
+    return JSONResponse({'service':'ResultGate','version':'0.3.0','mode':'local_pilot'})
 
 def strict_object(pairs):
     result={}
@@ -92,6 +92,7 @@ def main():
     global usage_store
     parser=argparse.ArgumentParser()
     parser.add_argument('--http',action='store_true')
+    parser.add_argument('--referrals',action='store_true',help='Run six read-only referral/evidence tools for six providers over stdio')
     parser.add_argument('--brokerage',action='store_true',help='Opt in to experimental provider discovery and routing tools')
     parser.add_argument('--allow-public-provider-requests',action='store_true',help='Permit explicitly consented free public DOI requests through brokerage')
     parser.add_argument('--delegation',action='store_true',help='Opt in to specialist task delegation tools')
@@ -102,6 +103,15 @@ def main():
     parser.add_argument('--port',type=int,default=8765)
     parser.add_argument('--usage-dir',help='Explicitly opt in to local-only MCP real-task counts; no automatic upload')
     args=parser.parse_args()
+    if args.referrals:
+        if (args.http or args.brokerage or args.delegation or args.usage_dir or
+                args.provider_registry or args.delegation_store or
+                args.allow_public_provider_requests or args.allow_demo_task_requests or
+                args.internal_delegation_tests):
+            parser.error('--referrals is a standalone local stdio mode')
+        from .browseract_demo import main as referrals_main
+        referrals_main()
+        return
     if (args.delegation_store or args.allow_demo_task_requests or args.internal_delegation_tests) and not args.delegation:
         parser.error('delegation options require --delegation')
     if args.delegation and (not args.brokerage or args.http):

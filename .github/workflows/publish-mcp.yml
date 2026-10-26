@@ -25,8 +25,8 @@ jobs:
           with open('server.json') as f:
               s = json.load(f)
           assert s['name'] == 'io.github.AHEDMUNI/resultgate'
-          assert s['version'] == '0.2.0'
-          with urllib.request.urlopen('https://pypi.org/pypi/resultgate-pilot/0.2.0/json', timeout=30) as r:
+          assert s['version'] == '0.3.0'
+          with urllib.request.urlopen('https://pypi.org/pypi/resultgate-pilot/0.3.0/json', timeout=30) as r:
               p = json.load(r)
           assert p['info']['version'] == s['version']
           assert '<!-- mcp-name: io.github.AHEDMUNI/resultgate -->' in p['info']['description']

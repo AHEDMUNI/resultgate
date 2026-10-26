@@ -177,4 +177,8 @@ def validate_browseract_csv(payload: CSVInput) -> dict:
 from resultgate.referral_selector import register
 register(mcp)
 
-if __name__=='__main__': mcp.run()
+def main():
+    """Run the six read-only referral/evidence tools over local stdio."""
+    mcp.run(transport='stdio')
+
+if __name__=='__main__': main()
