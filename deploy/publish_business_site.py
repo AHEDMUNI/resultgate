@@ -22,7 +22,8 @@ PRE_DEMO_PAGES = {**LEGACY_PAGES, '/services':'services.html', '/request':'reque
          '/resultgate.json':'resultgate.json', '/llms.txt':'llms.txt',
          '/robots.txt':'robots.txt', '/sitemap.xml':'sitemap.xml'}
 BROWSERACT_PAGES = {**PRE_DEMO_PAGES, '/browseract':'browseract.html', '/browseract-report':'browseract-report.html', '/browseract-report.json':'browseract-report.json', '/browseract-offer.json':'browseract-offer.json'}
-PAGES = {**BROWSERACT_PAGES, '/referrals':'referrals.html', '/referrals.json':'referrals.json'}
+REFERRAL_PAGES = {**BROWSERACT_PAGES, '/referrals':'referrals.html', '/referrals.json':'referrals.json'}
+PAGES = {**REFERRAL_PAGES, '/.well-known/glama.json':'glama.json'}
 TYPES = {'.css':'text/css', '.html':'text/html', '.json':'application/json',
          '.txt':'text/plain', '.xml':'application/xml'}
 START, END = '# RESULTGATE BUSINESS START', '# RESULTGATE BUSINESS END'
@@ -50,7 +51,7 @@ def replacement(content, root, pages=None):
         # The old publisher inserted indentation before its preserved fallback.
         base=base.replace('\n    location / { return 404; }','location / { return 404; }',1)
         expected=[]
-        for known in (LEGACY_PAGES,PRE_DEMO_PAGES,BROWSERACT_PAGES,PAGES):
+        for known in (LEGACY_PAGES,PRE_DEMO_PAGES,BROWSERACT_PAGES,REFERRAL_PAGES,PAGES):
             rendered=replacement(base,next(iter(roots)),known)
             expected.append(rendered[rendered.index(START):rendered.index(END)+len(END)])
         if old not in expected:

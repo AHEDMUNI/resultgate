@@ -77,6 +77,17 @@ class BusinessSiteTests(unittest.TestCase):
         self.assertIn('location = /referrals {',new)
         self.assertEqual(old[old.index(module.END):],new[new.index(module.END):])
 
+    def test_ownership_document_upgrade_preserves_auth_and_metrics(self):
+        from deploy.referral_metrics import instrument, strip
+        before=(ROOT/'deploy/nginx-agents.conf.staged').read_text()
+        old=instrument(module.replacement(before,'/var/www/resultgate-business/old',module.REFERRAL_PAGES))
+        new=instrument(module.replacement(strip(old),'/var/www/resultgate-business/new'))
+        def outside(s):
+            return s[:s.index(module.START)]+s[s.index(module.END)+len(module.END):]
+        self.assertEqual(outside(old),outside(new))
+        self.assertIn('location = /.well-known/glama.json {',new)
+        self.assertEqual(new,instrument(module.replacement(strip(new),'/var/www/resultgate-business/new')))
+
     def test_unknown_config_and_reinstall_fail_closed(self):
         before=(ROOT/'deploy/nginx-agents.conf.staged').read_text()
         for content in (before.replace('return 404','return 200'),before+'\nserver_name other.example;'):

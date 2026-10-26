@@ -19,9 +19,13 @@ No hosted payment or provider enrollment tool. Never interpret simulation as a s
 No shared credentials. Do not send keys or card data in requests or public issues.
 
 BrowserAct referral pilot: /browseract
-Read-only local MCP companion; hosted /mcp unchanged. Offer: /browseract-offer.json. Owner-supplied BrowserAct internal build/test CSV with original values and limits: /browseract-report.json. No approved affiliate link or independent adoption. Local tools include validate_browseract_csv; no hosted runtime change.
+Read-only local MCP companion; hosted /mcp unchanged. Offer: /browseract-offer.json. Owner-supplied BrowserAct internal build/test CSV with original values and limits: /browseract-report.json. This historical practice flow uses an untracked link; the current /referrals catalog offers the disclosed official BrowserAct affiliate link. No independent adoption is established. Local tools include validate_browseract_csv; no hosted runtime change.
 
 ## Referral selection pilot
 - https://agents.allubiyerbamate.com/referrals : Six researched providers, not contracted sellers.
-- https://agents.allubiyerbamate.com/referrals.json : Prices, qualification gaps, official docs and untracked links.
+- https://agents.allubiyerbamate.com/referrals.json : Dated prices, qualification gaps, official docs and disclosed BrowserAct affiliate link; other provider links are untracked.
 - https://github.com/AHEDMUNI/resultgate/blob/main/docs/referrals/OPERATOR.md : Local MCP selection tools; not on hosted /mcp. No purchase authorization or provider execution.
+
+## Published local recommendation MCP 0.3.0
+{"mcpServers":{"resultgate-referrals":{"command":"uvx","args":["resultgate-pilot==0.3.0","--referrals"]}}}
+Install via uvx from PyPI. Six tools; no provider keys, purchases or execution. Call list_referral_providers, recommend_referral_service, then prepare_referral_task. BrowserAct official link: https://browseract.com?fpr=ahed-ddc97e . ResultGate may earn a commission on eligible purchases. Fit and existing/local/free options take priority.

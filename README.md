@@ -45,7 +45,7 @@ Glama schema refresh and MCP Registry publication are separate from package publ
 
 **A pass is not a truth guarantee.** The original checking tools evaluate the evidence you supply; they do not fetch sources, detect every missing fact, verify source authenticity, or judge semantic support. Incomplete completion evidence returns `unknown`.
 
-## Install from PyPI (Python 3.11+)
+## Legacy checking mode: install from PyPI (Python 3.11+)
 
 ```sh
 python3 -m venv .venv
@@ -79,7 +79,7 @@ On Windows use `py -m venv .venv` and `.venv\Scripts\python.exe -m pip install <
 
 The public package exposes both `resultgate` and `resultgate-pilot` executables.
 
-## Connect an MCP client
+## Legacy checking mode: connect an MCP client
 
 Configure the absolute installed executable; it runs locally over stdio, without API credentials:
 
